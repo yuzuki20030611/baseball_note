@@ -65,7 +65,7 @@ DBと uvicorn を含めて docker 化しています。
 │   │   ├── __init__.py
 │   │   ├── __set_base_path__.py
 │   │   └── user_creation.py
-│   ├── core            // 共通で共通するCore機能
+│   ├── core            // 共通するCore機能
 │   │   ├── __init__.py
 │   │   ├── auth.py
 │   │   ├── config.py
@@ -187,14 +187,14 @@ make docker-run
 ローカル環境
 
 ```
-http://localhost:8888/docs
+http://localhost:8080/docs
 ```
 
 Debug モード(F5 押下)で起動した場合
 ※Debug モードの場合は、ブレークポイントでローカル変数を確認できます。
 
 ```
-http://localhost:8889/docs
+http://localhost:8081/docs
 ```
 ### OpenAPIでAPIエンドポイントのテストをする方法
 
