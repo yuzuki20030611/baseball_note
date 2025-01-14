@@ -1,0 +1,66 @@
+steps:
+# fetch the latest image
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'pull'
+  entrypoint: 'bash'
+  args: ['-c', 'docker pull gcr.io/nlife-ai-unit-test/front-next-service:latest || exit 0']
+
+# Create .env file
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'create-env'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      echo "NEXTAUTH_SECRET=${_NEXTAUTH_SECRET}" >> .env
+      echo "AUTH_GOOGLE_ID=${_AUTH_GOOGLE_ID}" >> .env
+      echo "AUTH_GOOGLE_SECRET=${_AUTH_GOOGLE_SECRET}" >> .env
+      echo "NEXT_PUBLIC_API_URL=${_NEXT_PUBLIC_API_URL}" >> .env
+      echo "NEXTAUTH_URL=${_NEXTAUTH_URL}" >> .env
+      echo "NEXT_PUBLIC_DIFY_URL=${_NEXT_PUBLIC_DIFY_URL}" >> .env
+  dir: 'front'
+  waitFor: ['pull']
+
+# Build the container image
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'build'
+  args: [
+    'build',
+    '-t', 'gcr.io/nlife-ai-unit-test/front-next-service:$COMMIT_SHA',
+    '-t', 'gcr.io/nlife-ai-unit-test/front-next-service:latest',
+    '--cache-from', 'gcr.io/nlife-ai-unit-test/front-next-service:latest',
+    '.'
+  ]
+  dir: 'front'
+  waitFor: ['create-env']
+
+# Push images to Container Registry
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'push-sha'
+  args: ['push', 'gcr.io/nlife-ai-unit-test/front-next-service:$COMMIT_SHA']
+  waitFor: ['build']
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'push-latest'
+  args: ['push', 'gcr.io/nlife-ai-unit-test/front-next-service:latest']
+  waitFor: ['build']
+
+# Deploy container image to Cloud Run
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  id: 'deploy'
+  entrypoint: gcloud
+  args:
+  - 'run'
+  - 'deploy'
+  - 'front-next-service'
+  - '--image'
+  - 'gcr.io/nlife-ai-unit-test/front-next-service:$COMMIT_SHA'
+  - '--region'
+  - 'asia-northeast1'
+  waitFor: ['push-sha', 'push-latest']
+
+images:
+- 'gcr.io/nlife-ai-unit-test/front-next-service:$COMMIT_SHA'
+- 'gcr.io/nlife-ai-unit-test/front-next-service:latest'
+
+options:
+  logging: 'CLOUD_LOGGING_ONLY'
