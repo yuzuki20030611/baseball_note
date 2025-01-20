@@ -149,7 +149,6 @@ DBと uvicorn を含めて docker 化しています。
 
 .envファイルに以下の開発に必要なキーを記載してください。
 必要なファイルも取得してください。
-
 ```
 ENV=local
 DEBUG=false
