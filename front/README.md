@@ -12,8 +12,6 @@ yarn install
 ### 環境変数
 .env.localを作成し、.env.sampleの内容をコピー。
 
-石田からAUTH_GOOGLE_ID等をもらう。
-
 ### ローカル起動
 
 ```bash
