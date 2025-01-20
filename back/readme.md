@@ -150,7 +150,15 @@ DBと uvicorn を含めて docker 化しています。
 .envファイルに以下の開発に必要なキーを記載してください。
 必要なファイルも取得してください。
 
-https://www.notion.so/130ff0f71017803ea6c6d9ec579eae59?pvs=4
+```
+ENV=local
+DEBUG=false
+DB_HOST=db
+DB_PORT=5432
+DB_NAME=docker
+DB_USER_NAME=docker
+DB_PASSWORD=docker
+```
 
 ### docker コンテナのビルド & 起動
 
