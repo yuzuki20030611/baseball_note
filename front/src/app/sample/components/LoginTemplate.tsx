@@ -3,14 +3,8 @@ import { Avatar } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 
 
-export const LoginTemplate = ({ handleGoogleLogin }: { handleGoogleLogin: () => Promise<void> }) => {
-  const onGoogleLogin = async () => {
-    try {
-      await handleGoogleLogin()
-    } catch (error) {
-      console.error('ログイン中にエラーが発生しました:', error)
-    }
-  }
+export const LoginTemplate = () => {
+  
   return (
     <Stack gap="4" direction="row" wrap="wrap">
       <For each={["subtle", "outline", "elevated"]}>
