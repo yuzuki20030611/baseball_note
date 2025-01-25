@@ -31,8 +31,6 @@ class Settings(BaseSettings):
     SENTRY_SDK_DNS: str = ""
     MIGRATIONS_DIR_PATH: str = os.path.join(ROOT_DIR_PATH, "alembic")
     AUTH_SKIP: bool = False
-    TOKEN_URL: str
-    GOOGLE_CLIENT_ID: str
 
 
     def get_database_url(self, is_async: bool = False) -> str:

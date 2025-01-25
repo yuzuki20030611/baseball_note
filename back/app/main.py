@@ -14,7 +14,6 @@ from app.api.apps import admin_app
 from app.app_manager import FastAPIAppManager
 from app.core.config import settings
 from app.core.logger import get_logger
-from app.middleware.auth import AuthMiddleware
 
 
 # loggingセットアップ
@@ -43,18 +42,6 @@ if settings.SENTRY_SDK_DNS:
         integrations=[sentry_logging, SqlalchemyIntegration()],
         environment=settings.ENV,
     )
-
-app.add_middleware(SentryAsgiMiddleware)
-if not settings.AUTH_SKIP:
-    app.add_middleware(AuthMiddleware)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[str(origin) for origin in settings.CORS_ORIGINS],
-    allow_origin_regex=r"^https?:\/\/([\w\-\_]{1,}\.|)example\.com",
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 @app.get("/", tags=["info"])
 def get_info() -> dict[str, str]:
