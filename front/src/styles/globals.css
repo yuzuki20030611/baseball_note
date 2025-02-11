@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply text-base; /* 基本フォントサイズ */
+  }
+
+  body {
+    @apply text-gray-900 /* テキストカラー */
+    font-sans /* フォントファミリー */
+    leading-normal /* 行の高さ */
+    antialiased; /* フォントのスムージング */
+  }
+
+  h1 {
+    @apply text-3xl font-bold mb-4;
+  }
+
+  h2 {
+    @apply text-2xl font-bold mb-3;
+  }
+
+  h3 {
+    @apply text-xl font-bold mb-2;
+  }
+
+  /* 入力フォームのデフォルトスタイル */
+  input, textarea, select {
+    @apply rounded-md border border-gray-300 px-3 py-2;
+  }
+
+  /* リンクのデフォルトスタイル */
+  a {
+    @apply text-blue-600 hover:text-blue-800;
+  }
+}

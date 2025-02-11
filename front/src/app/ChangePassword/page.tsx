@@ -1,0 +1,49 @@
+import React from 'react'
+
+import { Card } from '../../components/component/Card/Card'
+import { Header } from '../../components/component/Header/Header '
+import { PageTitle } from '../../components/component/Title/PageTitle'
+import { Label } from '../../components/component/Label/Label'
+import { FormInput } from '../../components/component/Input/FormInput'
+import { Footer } from '../../components/component/Footer/Footer'
+import { LinkButtons } from '../../components/component/Button/LinkButtons'
+
+const ChangePassword = () => {
+  return (
+    <div className="min-h-screen flex flex-col bg-white">
+      <Header />
+      <main className="bg-white flex-1 flex flex-col items-center p-8 w-full">
+        <Card>
+          <PageTitle>パスワード変更画面</PageTitle>
+
+          <form className="bg-gray-100 p-8 rounded-lg shadow-md w-full max-w-lg mt-6">
+            <div className="mb-6">
+              <Label>メールアドレス：</Label>
+              <FormInput placeholder="メールアドレスを入力してください" />
+            </div>
+
+            <div className="mb-6">
+              <Label>パスワード：</Label>
+              <FormInput placeholder="パスワードを入力してください" type="password" />
+            </div>
+
+            <div className="mb-6">
+              <Label>確認用パスワード：</Label>
+              <FormInput defaultValue="number" placeholder="確認用パスワードを入力してください" type="password" />
+            </div>
+
+            <div className="flex justify-center gap-4 mt-6">
+              <LinkButtons className="text-xl" href="/">
+                登録
+              </LinkButtons>
+            </div>
+          </form>
+        </Card>
+      </main>
+
+      <Footer />
+    </div>
+  )
+}
+
+export default ChangePassword
