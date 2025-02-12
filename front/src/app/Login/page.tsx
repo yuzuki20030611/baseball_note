@@ -20,7 +20,7 @@ const Login = () => {
           <form className="bg-gray-100 p-8 rounded-lg shadow-md w-full max-w-md mt-6">
             <div className="mb-6">
               <Label>メールアドレス：</Label>
-              <FormInput defaultValue="" placeholder="メールアドレスを入力してください" />
+              <FormInput defaultValue="" placeholder="メールアドレスを入力してください" type="email" />
             </div>
 
             <div className="mb-6">

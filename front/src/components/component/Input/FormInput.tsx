@@ -5,7 +5,7 @@ import React, { ChangeEvent, ReactNode } from 'react'
 import { Input, Textarea } from '@chakra-ui/react'
 
 type InputFieldProps = {
-  type?: 'text' | 'number' | 'textarea' | 'password'
+  type?: 'text' | 'number' | 'textarea' | 'password' | 'email'
   placeholder?: string
   defaultValue?: string | number
   onChange?: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
