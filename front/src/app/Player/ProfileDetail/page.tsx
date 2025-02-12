@@ -35,12 +35,12 @@ const ProfileDetail = () => {
               </div>
               {/* プロフィール内容 */}
               <div className="space-y-4">
-                <InfoItem label="野球歴：" value="今年の6月からノートを使っています！！" />
-                <InfoItem label="チーム名：" value="斉美高校" />
-                <InfoItem label="利き手：" value="右投げ・右打ち" />
-                <InfoItem label="ポジション：" value="レフト" />
-                <InfoItem label="憧れの選手：" value="大谷翔平" />
-                <InfoItem label="自己紹介：" value="多田羅です！甲子園優勝を目指しています。" />
+                <InfoItem label="野球歴：" value="今年の6月からノートを使っています！！" type="text" />
+                <InfoItem label="チーム名：" value="斉美高校" type="text" />
+                <InfoItem label="利き手：" value="右投げ・右打ち" type="text" />
+                <InfoItem label="ポジション：" value="レフト" type="text" />
+                <InfoItem label="憧れの選手：" value="大谷翔平" type="text" />
+                <InfoItem label="自己紹介：" value="多田羅です！甲子園優勝を目指しています。" type="text" />
               </div>
             </div>
           </div>

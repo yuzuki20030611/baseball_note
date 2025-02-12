@@ -36,49 +36,51 @@ const PlayerNoteDetail = () => {
                   </div>
                 </div>
                 <div className="space-y-2 mb-3">
-                  <InfoItem label="1日のテーマ：" value="打撃でホームランを打つ" />
+                  <InfoItem label="1日のテーマ：" value="打撃でホームランを打つ" type="text" />
                 </div>
                 <div className="space-y-2 my-3 py-3">
-                  <InfoItem label="課題：" value="打撃でセンターに返す" />
+                  <InfoItem label="課題：" value="打撃でセンターに返す" type="text" />
                 </div>
                 <div className="space-y-2 my-3 py-3">
                   <Label>基礎トレーニング：</Label>
-                  <InfoItem label="腕立て：" value="100回" />
+                  <InfoItem label="腕立て：" value="100回" type="number" />
                 </div>
                 <div className="space-y-2 my-3 py-3">
-                  <InfoItem label="腹筋：" value="100回" />
+                  <InfoItem label="腹筋：" value="100回" type="number" />
                 </div>
                 <div className="space-y-2 my-3 py-3">
-                  <InfoItem label="背筋：" value="100回" />
+                  <InfoItem label="背筋：" value="100回" type="number" />
                 </div>
                 <div className="space-y-2 my-3 py-3">
-                  <InfoItem label="バットスイング：" value="100回" />
+                  <InfoItem label="バットスイング：" value="100回" type="number" />
                 </div>
                 <div className="space-y-2 my-3 py-3">
-                  <InfoItem label="ランニング：" value="10キロ" />
+                  <InfoItem label="ランニング：" value="10キロ" type="number" />
                 </div>
                 <div className="space-y-2 my-3 py-3">
-                  <InfoItem label="体重：" value="70キロ" />
+                  <InfoItem label="体重：" value="70キロ" type="number" />
                 </div>
                 <div className="space-y-2 my-3 py-3">
-                  <InfoItem label="睡眠時間：" value="10時間" />
+                  <InfoItem label="睡眠時間：" value="10時間" type="number" />
                 </div>
                 <div className="space-y-2 my-3 py-3">
                   <InfoItem
                     label="その他練習内容："
                     value="ンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンn"
+                    type="text"
                   />
                 </div>
                 <div className="space-y-2 my-3 py-3">
-                  <InfoItem label="参考動画：" value={<FullInput type="textarea" height="400px" />} />
+                  <InfoItem label="参考動画：" value={<FullInput type="textarea" height="400px" />} type="textarea" />
                 </div>
                 <div className="space-y-2 my-3 py-3">
-                  <InfoItem label="練習動画：" value={<FullInput type="textarea" height="400px" />} />
+                  <InfoItem label="練習動画：" value={<FullInput type="textarea" height="400px" />} type="textarea" />
                 </div>
                 <div className="space-y-2 my-3 py-3">
                   <InfoItem
                     label="1日の振り返り："
                     value="aaあああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ"
+                    type="text"
                   />
                 </div>
               </div>

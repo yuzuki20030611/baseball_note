@@ -19,13 +19,13 @@ const LoginDetail = () => {
             <div className="text-right pr-5 mr-5">
               <p className="text-2xl">選手</p>
             </div>
-            <form className="bg-gray-100 p-8 rounded-lg shadow-md w-full max-w-md mt-6">
+            <form className="bg-gray-100 p-8 rounded-lg w-full max-w-md mt-6">
               <div className="mb-6">
-                <InfoItem label="現在のメールアドレス：" value="tatara@emai.com" className="md:w-96" />
+                <InfoItem label="現在のメールアドレス：" value="tatara@emai.com" className="md:w-96" type="text" />
               </div>
 
               <div className="mb-6">
-                <InfoItem label="現在のパスワード：" value="1212121212" className="md:w-96" />
+                <InfoItem label="現在のパスワード：" value="1212121212" className="md:w-96" type="password" />
               </div>
 
               <div className="text-right pt-5">
