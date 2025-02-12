@@ -45,7 +45,7 @@ const PlayerHome = () => {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 <tr className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-center text-sm text-gray-600">2025-2-2</td>
+                  <td className="px-6 py-4 text-center text-sm text-gray-600">2025-02-02</td>
                   <td className="px-6 py-4 text-center text-sm text-gray-600">バッティング</td>
                   <td className="px-6 py-4 text-center text-sm text-gray-600">守備</td>
                   <td className="px-6 py-4 text-center">
@@ -55,7 +55,7 @@ const PlayerHome = () => {
                   </td>
                 </tr>
                 <tr className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-center text-sm text-gray-600">2025-2-2</td>
+                  <td className="px-6 py-4 text-center text-sm text-gray-600">2025-02-02</td>
                   <td className="px-6 py-4 text-center text-sm text-gray-600">バッティング</td>
                   <td className="px-6 py-4 text-center text-sm text-gray-600">守備</td>
                   <td className="px-6 py-4 text-center">
@@ -65,7 +65,7 @@ const PlayerHome = () => {
                   </td>
                 </tr>
                 <tr className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-center text-sm text-gray-600">2025-2-2</td>
+                  <td className="px-6 py-4 text-center text-sm text-gray-600">2025-02-02</td>
                   <td className="px-6 py-4 text-center text-sm text-gray-600">バッティング</td>
                   <td className="px-6 py-4 text-center text-sm text-gray-600">守備</td>
                   <td className="px-6 py-4 text-center">

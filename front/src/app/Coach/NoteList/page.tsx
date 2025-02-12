@@ -30,7 +30,7 @@ const NoteList = () => {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 <tr className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm text-gray-600">2025-2-3</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">2025-02-03</td>
                   <td className="px-6 py-4 text-sm text-gray-600">三振をとる</td>
                   <td className="px-6 py-4 text-sm text-gray-600">変化球のコントロール</td>
                   <td className="px-6 py-4 text-right">
@@ -38,7 +38,7 @@ const NoteList = () => {
                   </td>
                 </tr>
                 <tr className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm text-gray-600">2025-2-3</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">2025-02-03</td>
                   <td className="px-6 py-4 text-sm text-gray-600">三振をとる</td>
                   <td className="px-6 py-4 text-sm text-gray-600">変化球のコントロール</td>
                   <td className="px-6 py-4 text-right">
@@ -46,7 +46,7 @@ const NoteList = () => {
                   </td>
                 </tr>
                 <tr className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm text-gray-600">2025-2-3</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">2025-02-03</td>
                   <td className="px-6 py-4 text-sm text-gray-600">三振をとる</td>
                   <td className="px-6 py-4 text-sm text-gray-600">変化球のコントロール</td>
                   <td className="px-6 py-4 text-right">
@@ -54,7 +54,7 @@ const NoteList = () => {
                   </td>
                 </tr>
                 <tr className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm text-gray-600">2025-2-3</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">2025-02-03</td>
                   <td className="px-6 py-4 text-sm text-gray-600">三振をとる</td>
                   <td className="px-6 py-4 text-sm text-gray-600">変化球のコントロール</td>
                   <td className="px-6 py-4 text-right">
@@ -62,7 +62,7 @@ const NoteList = () => {
                   </td>
                 </tr>
                 <tr className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm text-gray-600">2025-2-3</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">2025-02-03</td>
                   <td className="px-6 py-4 text-sm text-gray-600">三振をとる</td>
                   <td className="px-6 py-4 text-sm text-gray-600">変化球のコントロール</td>
                   <td className="px-6 py-4 text-right">
