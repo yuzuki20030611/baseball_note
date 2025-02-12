@@ -28,8 +28,8 @@ const ChangePassword = () => {
             </div>
 
             <div className="mb-6">
-              <Label>確認用パスワード：</Label>
-              <FormInput defaultValue="number" placeholder="確認用パスワードを入力してください" type="password" />
+              <Label>パスワード（再入力）：</Label>
+              <FormInput placeholder="確認用パスワードを入力してください" type="password" />
             </div>
 
             <div className="flex justify-center gap-4 mt-6">
