@@ -33,7 +33,7 @@ const EditLogin = () => {
               </div>
 
               <div className="mb-6">
-                <Label>確認用パスワード：</Label>
+                <Label>パスワード（再入力）：</Label>
                 <FormInput defaultValue="number" placeholder="パスワードを入力してください" type="password" />
               </div>
 
