@@ -1,5 +1,6 @@
-'use client'
+import { redirect } from 'next/navigation'
+import '../styles/globals.css'
 
 export default function Home() {
-  return <main>Main</main>
+  redirect('/Login')
 }

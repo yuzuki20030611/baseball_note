@@ -1,6 +1,7 @@
+'use client'
+
 import { Button, Container, Text } from '@chakra-ui/react'
 import Link from 'next/link'
-
 
 const NotFound = () => {
   return (
