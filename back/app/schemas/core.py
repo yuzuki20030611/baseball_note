@@ -9,6 +9,10 @@ from sqlalchemy import desc
 # def to_camel(string: str) -> str:
 #     return camel.case(string)
 
+# Pydanticモデル（スキーマ）が定義されています
+# APIのリクエスト/レスポンスのバリデーションや型定義を行う
+# modelsがデータベースの構造を定義するのに対し、schemasはAPIとの通信データの構造を定義する
+# QueryInが末尾についているときは、リクエストを定義している
 
 class BaseSchema(BaseModel):
     """全体共通の情報をセットするBaseSchema"""

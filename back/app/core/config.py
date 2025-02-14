@@ -4,7 +4,8 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
+# coreディレクトリは、アプリケーションの中核となる設定や機能を格納する場所です
+# アプリケーション全体の設定
 class Settings(BaseSettings):
     # NOTE: .envファイルや環境変数が同名の変数にセットされる
     TITLE: str = "education-standardization"

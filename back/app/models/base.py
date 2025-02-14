@@ -8,6 +8,9 @@ from sqlalchemy.dialects.postgresql import UUID
 
 from app.core.logger import get_logger
 
+# データベースのテーブルの基本となる共通の設定（ベースモデル）を定義
+
+
 logger = get_logger(__name__)
 
 

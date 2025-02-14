@@ -10,6 +10,9 @@ from sqlalchemy.sql import text
 from app.core.config import settings
 from app.core.logger import get_logger
 
+# データベース設定
+# データベース接続設定
+
 logger = get_logger(__name__)
 
 try:

@@ -29,6 +29,9 @@ services:
       dockerfile: Dockerfile.es
     container_name: es02
     environment:
+      - POSTGRES_USER=tatarayuzuki
+      - POSTGRES_PASSWORD=Yuzuki0611   
+      - POSTGRES_DB=baseball_note
       - node.name=es02
       - discovery.seed_hosts=es01
       - cluster.initial_master_nodes=es01,es02
