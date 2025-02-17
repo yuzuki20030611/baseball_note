@@ -48,7 +48,21 @@ class ModelBaseMixinWithoutDeletedAt:
         onupdate=func.current_timestamp(),
     )
 
+class ModelBaseMixinWithoutUpdatedAt:
+    id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True)
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=func.current_timestamp(),
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=func.current_timestamp(),
+    )
+    deleted_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
 
+    
 @event.listens_for(Session, "do_orm_execute")
 def _add_filtering_deleted_at(execute_state: Any) -> None:
     """論理削除用のfilterを自動的に適用する
