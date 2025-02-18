@@ -42,10 +42,16 @@ class Profiles(Base, ModelBaseMixinWithoutDeletedAt):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     team_name: Mapped[str] = mapped_column(String(255), nullable=False)
     birthday: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), nullable=False)
-    dominant_hand: Mapped[DominantHand] = mapped_column(Enum(DominantHand), nullable=False)
-    position: Mapped[Position] = mapped_column(Enum(Position), nullable=False)
-    admired_player: Mapped[str] = mapped_column(String(255), nullable=True)
-    introduction: Mapped[str] = mapped_column(Text, nullable=True)
+    player_dominant: Mapped[DominantHand] = mapped_column(
+        Enum(DominantHand, name='dominant_hand_type'), 
+        nullable=False
+    )
+    player_position: Mapped[Position] = mapped_column(
+        Enum(Position, name='player_position_type'), 
+        nullable=False
+    )
+    admired_player: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    introduction: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # 1対1の関係を定義
     user: Mapped["Users"] = relationship(

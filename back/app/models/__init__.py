@@ -1,6 +1,15 @@
 import importlib
 import os
 from pathlib import Path
+from app.models.base import Base
+from app.models.user import Users
+from app.models.note import Notes
+from app.models.comment import Comments
+from app.models.profile import Profiles
+from app.models.training import Trainings
+from app.models.training_note import TrainingNotes
+
+
 
 current_dir = Path(__file__).resolve().parent
 py_files = [f for f in os.listdir(current_dir) if f.endswith('.py') and f != '__init__.py']
