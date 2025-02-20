@@ -17,6 +17,8 @@ logger = get_logger(__name__)
 class Base(DeclarativeBase):
     pass
 
+# 全テーブル作成　一つのファイルでまとめる
+# idは自分で定義　継承なし
 
 class ModelBaseMixin:
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True)
@@ -61,6 +63,9 @@ class ModelBaseMixinWithoutUpdatedAt:
         server_default=func.current_timestamp(),
     )
     deleted_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
+
+
+
 
     
 @event.listens_for(Session, "do_orm_execute")
