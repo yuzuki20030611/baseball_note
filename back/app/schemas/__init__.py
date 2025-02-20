@@ -4,6 +4,8 @@ from pathlib import Path
 
 from .core import BaseSchema, PagingMeta, PagingQueryIn, SortQueryIn
 
+# 自動的にモジュールをインポートする仕組みを実装
+
 current_dir = Path(__file__).resolve().parent
 py_files = [f for f in os.listdir(current_dir) if f.endswith('.py') and f not in ['__init__.py', 'core.py']]
 

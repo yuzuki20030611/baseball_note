@@ -43,6 +43,19 @@ services:
       - esdata02:/usr/share/elasticsearch/data
     networks:
       - fastapi_network
+  db:
+    image: postgres:16
+    container_name: ed_std_db
+    environment:
+      - POSTGRES_USER=docker
+      - POSTGRES_PASSWORD=docker
+      - POSTGRES_DB=baseball_note
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - fastapi_network
 
   # logstash:
   #   build:

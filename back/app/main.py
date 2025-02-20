@@ -15,6 +15,8 @@ from app.app_manager import FastAPIAppManager
 from app.core.config import settings
 from app.core.logger import get_logger
 
+# FastAPIアプリケーションの主要な設定と起動を担当するファイル
+
 
 # loggingセットアップ
 logger = get_logger(__name__)

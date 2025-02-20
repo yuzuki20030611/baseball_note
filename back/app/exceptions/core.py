@@ -2,6 +2,7 @@ from typing import Any
 
 from fastapi import HTTPException, status
 
+# APIでのエラー処理を一貫した方法で行うための基本クラスを定義
 
 class APIException(HTTPException):
     """API例外."""

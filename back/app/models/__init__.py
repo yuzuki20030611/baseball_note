@@ -1,6 +1,9 @@
 import importlib
 import os
 from pathlib import Path
+from app.models.base import Base
+
+
 
 current_dir = Path(__file__).resolve().parent
 py_files = [f for f in os.listdir(current_dir) if f.endswith('.py') and f != '__init__.py']

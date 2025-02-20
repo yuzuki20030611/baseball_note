@@ -23,6 +23,7 @@ UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 ResponseSchemaType = TypeVar("ResponseSchemaType", bound=BaseModel)
 ListResponseSchemaType = TypeVar("ListResponseSchemaType", bound=BaseModel)
 
+# データベース操作の「定型文」
 
 class CRUDBase(
     Generic[

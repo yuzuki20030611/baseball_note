@@ -8,7 +8,7 @@ services:
     ports:
       - "5436:5432" # port重複防止のため、local側は5432以外とする
     environment:
-      POSTGRES_DB: docker
+      POSTGRES_DB: baseball_note
       POSTGRES_USER: docker
       POSTGRES_PASSWORD: docker
     networks:
@@ -17,7 +17,7 @@ services:
       - db_volume:/var/lib/postgresql/data
       - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U docker"]
+      test: ["CMD-SHELL", "pg_isready -U docker -d baseball_note"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -50,7 +50,7 @@ services:
       dockerfile: Dockerfile
     environment:
       SQLALCHEMY_WARN_20: 1
-      DATABASE_URL: "postgresql://docker:docker@db:5432/docker"
+      DATABASE_URL: "postgresql://docker:docker@db:5432/baseball_note"
     healthcheck:
       test: "curl -f http://localhost:80/docs || exit 1"
       interval: 5s
