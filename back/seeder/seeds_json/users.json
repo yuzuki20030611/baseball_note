@@ -1,0 +1,11 @@
+{
+    "model": "app.models.base.Users",
+    "data": [
+        {
+            "id": "8ec182db-d09c-44d1-a6e9-cfbe1581896b",
+            "email": "test_player@example.com",
+            "password": "$2b$12$mux9UW8WDi0QC0kVtnWkCut3TwrklJC1OtTBlT5Pcd70e4goHA.WC",
+            "role": 0
+        }
+    ]
+}

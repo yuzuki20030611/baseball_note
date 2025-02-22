@@ -169,9 +169,9 @@ class Notes(Base, ModelBaseMixin):
         back_populates="notes"
     )
 
-    comment: Mapped["Comments"] = relationship(
+    comments: Mapped["Comments"] = relationship(
         "Comments",
-        back_populates="notes"
+        back_populates="note"
     )
 
     training_notes: Mapped["TrainingNotes"] = relationship(
@@ -191,7 +191,7 @@ class Trainings(Base, ModelBaseMixinWithoutUpdatedAt):
 
     training_notes: Mapped["TrainingNotes"] = relationship(
         "TrainingNotes",
-        back_populates="trainings",
+        back_populates="training",
         cascade="all, delete-orphan"  # トレーニングが削除されたとき、関連するtraining_notesも削除
     )
 
@@ -215,8 +215,7 @@ class Comments(Base, ModelBaseMixin):
 
     note: Mapped["Notes"] = relationship(
         "Notes",
-        back_populates="comments",
-        cascade="all, delete-orphan"
+        back_populates="comments"
     )
 
 
@@ -232,7 +231,7 @@ class  TrainingNotes(Base, ModelBaseMixin):
     
     count: Mapped[int] = mapped_column(Integer, nullable=False)
 
-    note: Mapped["Notes"] = relationship(
+    notes: Mapped["Notes"] = relationship(
         "Notes",
         back_populates="training_notes"
     )
