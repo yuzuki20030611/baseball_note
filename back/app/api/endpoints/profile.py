@@ -8,16 +8,15 @@ from app.core.logger import get_logger
 
 logger = get_logger(__name__)
 
-router = APIRouter(
-    prefix="/profiles",
-    tags=["profiles"]
-)
+# ここでrouter = APIRouter(prefix="/profiles",  # "/profiles" tags=["profiles"])は必要ない
+# main.pyでファイル名がパスになるように設定している
+router = APIRouter()
 # パスでログインした時の処理
 # @router.post('/')  # プロフィール作成のエンドポイント
 # @router.get('/{user_id}')  # プロフィール取得のエンドポイント
 # @router.put('/{profile_id}')  # プロフィール更新のエンドポイント
 
-router.post('/', response_model=ResponseProfile)
+@router.post('/', response_model=ResponseProfile)
 async def create_profile_endpoint(profile: CreateProfile, db: AsyncSession = Depends(get_db)):
     """プロフィール作成API
     Args:
@@ -28,7 +27,7 @@ async def create_profile_endpoint(profile: CreateProfile, db: AsyncSession = Dep
     """
     return await profile_crud.create_profile(db, profile)
     
-router.get('/{user_id}', response_model=ResponseProfile)
+@router.get('/{user_id}', response_model=ResponseProfile)
 async def get_profile_endpoint(user_id: UUID, db: AsyncSession = Depends(get_db)):
     """プロフィール取得API
     Args:
@@ -47,7 +46,7 @@ async def get_profile_endpoint(user_id: UUID, db: AsyncSession = Depends(get_db)
         )
     return profile
 
-router.put('/{profile_id}', response_model=ResponseProfile)
+@router.put('/{profile_id}', response_model=ResponseProfile)
 async def update_profile_endpoint(
     profile_id: UUID, 
     profile: UpdateProfile, 
