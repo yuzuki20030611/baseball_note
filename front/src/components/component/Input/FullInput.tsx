@@ -8,7 +8,8 @@ type InputFieldProps = {
   type?: 'text' | 'number' | 'textarea' | 'password' | 'date' | 'email'
   placeholder?: string
   value?: string | number
-  onChange?: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+  name?: string
+  onChange?: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void
   children?: ReactNode
   rows?: number
   height?: string | number
@@ -19,6 +20,7 @@ export const FullInput = ({
   type = 'text',
   placeholder,
   value,
+  name,
   onChange,
   children,
   rows = 3,
@@ -30,6 +32,7 @@ export const FullInput = ({
     return (
       <Textarea
         placeholder={placeholder}
+        name={name}
         value={value}
         padding="3px 10px"
         onChange={onChange}
@@ -53,6 +56,7 @@ export const FullInput = ({
       type={type}
       placeholder={placeholder}
       backgroundColor="white"
+      name={name}
       value={value}
       padding="3px 10px"
       onChange={onChange}
