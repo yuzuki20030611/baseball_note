@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
-from app.db.session import get_db
+from app.core.database import get_async_db 
 from app.crud import profile as profile_crud
 from app.schemas.profile import CreateProfile, ResponseProfile, UpdateProfile
 from app.core.logger import get_logger
@@ -16,28 +16,28 @@ router = APIRouter()
 # @router.get('/{user_id}')  # プロフィール取得のエンドポイント
 # @router.put('/{profile_id}')  # プロフィール更新のエンドポイント
 
-@router.post('/', response_model=ResponseProfile)
-async def create_profile_endpoint(profile: CreateProfile, db: AsyncSession = Depends(get_db)):
-    """プロフィール作成API
-    Args:
-        profile: 作成するプロフィール情報
-        db: DBセッション（自動で注入）
-    Returns:
-        作成されたプロフィール情報
-    """
-    return await profile_crud.create_profile(db, profile)
+@router.post('/', response_model=ResponseProfile, operation_id="create_profile")  #スペースを含まないIDを明示的に指定
+async def create_profile_endpoint(profile: CreateProfile, db: AsyncSession = Depends(get_async_db )):
+    try:
+        logger.info(f"リクエスト受信: {profile}")
+        # 別のログでモデルのダンプを記録
+        logger.info("リクエストデータ詳細", extra={"request_data": profile.model_dump()})
+                
+        db_profile = await profile_crud.create_profile(db, profile)
+        logger.info(f"プロフィール作成成功： {db_profile}")
+        
+        # 作成したプロフィールをレスポンスモデルに変換 ここでschemasのレスポンスモデルとデータベースのモデルで違いが内容にする
+        resuponse_data = ResponseProfile.model_validate(db_profile)
+        return resuponse_data
+    except Exception as e:
+        logger.error(f"プロフィール作成エラー： {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"プロフィール作成中にエラー： {str(e)}"
+        )
     
-@router.get('/{user_id}', response_model=ResponseProfile)
-async def get_profile_endpoint(user_id: UUID, db: AsyncSession = Depends(get_db)):
-    """プロフィール取得API
-    Args:
-        user_id: 取得対象のユーザーID
-        db: DBセッション（自動で注入）
-    Returns:
-        プロフィール情報
-    Raises:
-        HTTPException: プロフィールが存在しない場合は404エラー
-    """
+@router.get('/{user_id}', response_model=ResponseProfile, operation_id="get_profile")
+async def get_profile_endpoint(user_id: UUID, db: AsyncSession = Depends(get_async_db )):
     profile = await profile_crud.get_user_profile(db, user_id)
     if profile is None:
         raise HTTPException(
@@ -46,22 +46,12 @@ async def get_profile_endpoint(user_id: UUID, db: AsyncSession = Depends(get_db)
         )
     return profile
 
-@router.put('/{profile_id}', response_model=ResponseProfile)
+@router.put('/{profile_id}', response_model=ResponseProfile, operation_id="update_profile")
 async def update_profile_endpoint(
     profile_id: UUID, 
     profile: UpdateProfile, 
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_async_db )
     ):
-    """プロフィール更新API
-    Args:
-        profile_id: 更新対象のプロフィールID
-        profile: 更新するプロフィール情報
-        db: DBセッション（自動で注入）
-    Returns:
-        更新されたプロフィール情報
-    Raises:
-        HTTPException: プロフィールが存在しない場合は404エラー
-    """
     update_profile = await profile_crud.update_profile(db, profile_id, profile)
     if update_profile is None:
         raise HTTPException(

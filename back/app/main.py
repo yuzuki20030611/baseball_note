@@ -38,6 +38,14 @@ app = FastAPI(
 )
 app_manager = FastAPIAppManager(root_app=app)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://localhost:8080"],  # Next.jsのURL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 if settings.SENTRY_SDK_DNS:
     sentry_sdk.init(
         dsn=settings.SENTRY_SDK_DNS,
@@ -69,6 +77,7 @@ def load_routers():
 routers = load_routers()
 
 for router, tag, prefix in routers:
+    logger.info(f"Registering router: prefix={prefix}, tag={tag}")
     app.include_router(router, tags=[tag], prefix=prefix)
 
 app_manager.add_app(path="admin", app=admin_app.app)

@@ -54,6 +54,7 @@ class ModelBaseMixinWithoutUpdatedAt:
         nullable=False,
         server_default=func.current_timestamp(),
     )
+    
     deleted_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
 
 
