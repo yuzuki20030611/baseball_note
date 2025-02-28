@@ -16,6 +16,7 @@ class CreateProfile(BaseModel):
     player_position: Position
     admired_player: Optional[str] = Field(None, max_length=255)
     introduction: Optional[str] = None
+    image_path: Optional[str] = None
 
 # レスポンスモデル
 class ResponseProfile(BaseModel):
@@ -28,6 +29,7 @@ class ResponseProfile(BaseModel):
     player_position: Position
     admired_player: Optional[str] = None
     introduction: Optional[str] = None
+    image_path: Optional[str] = None
     created_at: datetime
     updated_at: datetime
     
@@ -45,6 +47,7 @@ class UpdateProfile(BaseModel):
     player_position: Optional[Position] = None
     admired_player: Optional[str] = Field(None, max_length=255)
     introduction: Optional[str] = None
+    image_path: Optional[str] = None
     
     model_config = ConfigDict(
         from_attributes=True,

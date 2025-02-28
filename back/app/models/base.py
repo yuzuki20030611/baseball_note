@@ -138,6 +138,7 @@ class Profiles(Base, ModelBaseMixinWithoutDeletedAt):
     )
     admired_player: Mapped[str | None] = mapped_column(String(255), nullable=True)
     introduction: Mapped[str | None] = mapped_column(Text, nullable=True)
+    image_path: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     # 1対1の関係を定義
     user: Mapped["Users"] = relationship(
