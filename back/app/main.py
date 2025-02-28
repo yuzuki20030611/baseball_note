@@ -3,7 +3,7 @@ import os
 import importlib
 
 import sentry_sdk
-from fastapi import FastAPI
+from fastapi import FastAPI, StaticFiles
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
@@ -45,6 +45,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# アップロードディレクトリの作成
+os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+
+# 静的ファイル配信の設定（アップロードした画像を配信するため）
+app.mount(f"/{settings.UPLOAD_DIR}", StaticFiles(directory=settings.UPLOAD_DIR), name=settings.UPLOAD_DIR)
 
 if settings.SENTRY_SDK_DNS:
     sentry_sdk.init(

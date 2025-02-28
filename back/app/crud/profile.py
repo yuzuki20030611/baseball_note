@@ -40,3 +40,12 @@ async def update_profile(
     await db.commit()
     await db.refresh(db_profile)
     return db_profile
+
+async def get_profile_by_id(db: AsyncSession, profile_id: UUID) -> Profiles | None:
+    """プロフィールIDからプロフィールを取得する"""
+    result = await db.execute(
+         select(Profiles).where(Profiles.id == profile_id)
+    )
+    profile = result.scalar_one_or_none()
+    return profile
+   

@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Form, UploadFile, File
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 from app.core.database import get_async_db 
 from app.crud import profile as profile_crud
 from app.schemas.profile import CreateProfile, ResponseProfile, UpdateProfile
 from app.core.logger import get_logger
+from app.utils.image import save_profile_image, delete_profile_image
 
 logger = get_logger(__name__)
 
@@ -17,14 +19,42 @@ router = APIRouter()
 # @router.put('/{profile_id}')  # プロフィール更新のエンドポイント
 
 @router.post('/', response_model=ResponseProfile, operation_id="create_profile")  #スペースを含まないIDを明示的に指定
-async def create_profile_endpoint(profile: CreateProfile, db: AsyncSession = Depends(get_async_db )):
+async def create_profile_endpoint(
+    name: str = Form(...),    # ... は必須という意味
+    team_name: str = Form(...),
+    birthday: str = Form(...),
+    player_dominant: str = Form(...),
+    player_position: str = Form(...),
+    user_id: str = Form(...),
+    admired_player: Optional[str] = Form(None),
+    introduction: Optional[str] = Form(None),
+    image: Optional[UploadFile] = File(None),
+    db: AsyncSession = Depends(get_async_db)
+):
     try:
-        logger.info(f"リクエスト受信: {profile}")
-        # 別のログでモデルのダンプを記録
-        logger.info("リクエストデータ詳細", extra={"request_data": profile.model_dump()})
-                
-        db_profile = await profile_crud.create_profile(db, profile)
-        logger.info(f"プロフィール作成成功： {db_profile}")
+        logger.info('プロフィール作成リクエスト受信')
+        
+        # 画像がアップロードされた場合は保存
+        image_path = None #保存されていない状態
+        if image and image.filename: #imageオブジェクト自体が存在し、値が None ではない）image オブジェクトに filename 属性が存在している場合
+            image_path = save_profile_image(image)
+        
+        # CreateProfileモデルを作成
+        profile_data = CreateProfile(
+            user_id=UUID(user_id),
+            name=name,
+            team_name=team_name,
+            birthday=birthday,
+            player_dominant=player_dominant,
+            player_position=player_position,
+            admired_player=admired_player,
+            introduction=introduction,
+            image_path=image_path
+        )
+        
+         # プロフィールをデータベースに保存
+        db_profile = await profile_crud.create_profile(db, profile_data)
+        logger.info(f"プロフィール作成成功： {db_profile.id}")
         
         # 作成したプロフィールをレスポンスモデルに変換 ここでschemasのレスポンスモデルとデータベースのモデルで違いが内容にする
         resuponse_data = ResponseProfile.model_validate(db_profile)
@@ -49,13 +79,60 @@ async def get_profile_endpoint(user_id: UUID, db: AsyncSession = Depends(get_asy
 @router.put('/{profile_id}', response_model=ResponseProfile, operation_id="update_profile")
 async def update_profile_endpoint(
     profile_id: UUID, 
-    profile: UpdateProfile, 
-    db: AsyncSession = Depends(get_async_db )
+    name: Optional[str] = Form(None),
+    team_name: Optional[str] = Form(None),
+    birthday: Optional[str] = Form(None),
+    player_dominant: Optional[str] = Form(None),
+    player_position: Optional[str] = Form(None),
+    admired_player: Optional[str] = Form(None),
+    introduction: Optional[str] = Form(None),
+    image: Optional[UploadFile] = File(None),
+    delete_image: bool = Form(False),
+    db: AsyncSession = Depends(get_async_db)
     ):
-    update_profile = await profile_crud.update_profile(db, profile_id, profile)
-    if update_profile is None:
-        raise HTTPException(
-            status_code=404,
-            detail="update_profile not found"
-        )
-    return update_profile
+    try:
+        existing_profile = await profile_crud.get_profile_by_id(db, profile_id)
+        if not existing_profile:
+            raise HTTPException(status_code=404, detail="プロフィールが見つかりません") #raise は例外を手動で発生させるPythonのキーワードです
+        
+        update_data = {}
+        if name is not None:
+            update_data["name"] = name
+        if team_name is not None:
+            update_data["team_name"] = team_name
+        if birthday is not None:
+            update_data["birthday"] = birthday
+        if player_dominant is not None:
+            update_data["player_dominant"] = player_dominant
+        if player_position is not None:
+            update_data["player_position"] = player_position
+        if admired_player is not None:
+            update_data["admired_player"] = admired_player
+        if introduction is not None:
+            update_data["introduction"] = introduction
+        
+        # 画像の処理
+        if delete_image and existing_profile.image_path:
+            # 画像を削除する場合
+            await delete_profile_image(existing_profile.image_path)
+            update_data["image_path"] = None
+        elif image and image.filename:
+            # 新しい画像をアップロードする場合
+            if existing_profile.image_path:
+                # 既存の画像があれば削除
+                await delete_profile_image(existing_profile.image_path)
+            
+            # 新しい画像を保存してパスを取得
+            new_image_path = await save_profile_image(image)
+            update_data["image_path"] = new_image_path  # ここで更新データに追加
+        
+        update_profile_data = UpdateProfile(**update_data)
+        updated_profile = await profile_crud.update_profile(db, profile_id, update_profile_data)
+        
+        return updated_profile
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"プロフィール更新エラー: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"エラー: {str(e)}")
+    
