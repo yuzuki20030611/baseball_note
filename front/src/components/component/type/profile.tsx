@@ -31,6 +31,7 @@ export type CreateProfileRequest = {
   player_position: Position
   admired_player?: string
   introduction?: string
+  image?: File | null
 }
 
 export type ProfileResponse = {
@@ -43,6 +44,7 @@ export type ProfileResponse = {
   player_position: string // APIからは文字列として返ってくる
   admired_player: string | null
   introduction: string | null
+  image_path: string | null
   created_at: string
   updated_at: string
 }

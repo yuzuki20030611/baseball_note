@@ -10,27 +10,32 @@ export const profileApi = {
       const formattedBirthday =
         data.birthday instanceof Date ? data.birthday.toISOString().split('T')[0] : data.birthday
 
-      const requestData = {
-        user_id: userId,
-        name: data.name,
-        team_name: data.team_name,
-        birthday: formattedBirthday,
-        player_dominant: data.player_dominant,
-        player_position: data.player_position,
-        // 任意の項目
-        ...(data.admired_player ? { admired_player: data.admired_player } : {}),
-        ...(data.introduction ? { introduction: data.introduction } : {}),
+      const formData = new FormData()
+      formData.append('user_id', userId)
+      formData.append('name', data.name)
+      formData.append('team_name', data.team_name)
+      formData.append('birthday', formattedBirthday)
+      formData.append('player_dominant', data.player_dominant)
+      formData.append('player_position', data.player_position)
+      //任意の項目
+      if (data.admired_player) {
+        formData.append('admired_player', data.admired_player)
+      }
+      if (data.introduction) {
+        formData.append('introduction', data.introduction)
+      }
+      if (data.image instanceof File) {
+        formData.append('image', data.image)
       }
 
       // デバッグ用でリクエスト情報をログに出力
       console.log('リクエスト先のURL', `${BASE_URL}/profile/`)
-      console.log('リクエスト情報', JSON.stringify(requestData, null, 2))
       console.log('user_id値確認:', userId, typeof userId)
 
-      const response = await axios.post(`${BASE_URL}/profile/`, requestData, {
+      const response = await axios.post(`${BASE_URL}/profile/`, formData, {
         timeout: 10000, // 10秒のタイムアウト
         headers: {
-          'Content-Type': 'application/json', //送信するデータがJSON形式であることをサーバーに伝えている
+          'Content-Type': 'multipart/form-data', //リクエストの本文（body）が multipart/form-data 形式であることをサーバーに伝えています。
         },
         withCredentials: false, // CORS関連設定 クッキーなどの認証情報を含めるかどうかを指定している
       })
@@ -40,7 +45,7 @@ export const profileApi = {
     } catch (error: any) {
       console.error('プロフィール作成エラー：', error)
 
-      // エラー詳細を出力
+      // バックエンドでのエラー詳細を出力
       if (error.response) {
         console.error('レスポンスエラー', {
           status: error.response.status,

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { ChangeEvent, FormEvent, useState } from 'react'
+import React, { ChangeEvent, FormEvent, useRef, useState } from 'react'
 import { Header } from '../../../components/component/Header/Header '
 import { PageTitle } from '../../../components/component/Title/PageTitle'
 import { Buttons } from '../../../components/component/Button/Button'
@@ -12,10 +12,13 @@ import { Card } from '../../../components/component/Card/Card'
 import { useRouter } from 'next/navigation'
 import { CreateProfileRequest, DominantHand, Position } from '../../../components/component/type/profile'
 import { profileApi } from '../../../api/client/profile'
+import Image from 'next/image'
 
 const CreateProfile = () => {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [formData, setFormData] = useState<CreateProfileRequest>({
     user_id: '8ec182db-d09c-44d1-a6e9-cfbe1581896b',
     name: '',
@@ -25,7 +28,9 @@ const CreateProfile = () => {
     player_position: Position.PITCHER,
     admired_player: '',
     introduction: '',
+    image: null,
   })
+
   // instanceof を使って、Dateであった場合に文字列に変換
   const formatDateForInput = (dateValue: Date | string): string => {
     if (dateValue instanceof Date) {
@@ -75,8 +80,8 @@ const CreateProfile = () => {
     const { name, value, type } = e.target
     if (name === 'birthday' && type === 'date') {
       setFormData((prev) => ({
-        ...prev,
-        [name]: new Date(value),
+        ...prev, //更新される前の値
+        [name]: new Date(value), //HTML の date 入力フィールドは "YYYY-MM-DD" 形式の文字列を返すので、Date型に変換する
       }))
     } else {
       setFormData((prev) => ({
@@ -85,6 +90,40 @@ const CreateProfile = () => {
       }))
     }
   }
+  const handleImageSelect = () => {
+    // 画面上のファイル選択入力欄を参照するための変数
+    if (fileInputRef.current) {
+      fileInputRef.current.click()
+    }
+  }
+
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (files && files.length > 0) {
+      //files の中に少なくとも1つのファイルがある
+      const file = files[0]
+
+      //5MB以下のサイズに
+      if (file.size > 5 * 1024 * 1024) {
+        setError('画像サイズは5MB以下にしてください')
+        return
+      }
+
+      if (!file.type.startsWith('image/')) {
+        setError('画像ファイルを選択してください')
+        return
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        image: file,
+      }))
+      // プレビュー用のURLを作成
+      const imageUrl = URL.createObjectURL(file)
+      setImagePreview(imageUrl)
+    }
+  }
+
   return (
     <div className="min-h-screen">
       <div className="flex flex-col min-h-screen">
@@ -107,8 +146,41 @@ const CreateProfile = () => {
                 <div className="bg-gray-100 rounded-lg p-20">
                   {/* 写真 */}
                   <div className="flex flex-col items-center mb-8">
-                    <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center mb-4"></div>
-                    <Buttons width="100px" type="button">
+                    <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center mb-4">
+                      {imagePreview ? (
+                        <Image
+                          src={imagePreview}
+                          alt="プロフィール画像"
+                          width={128}
+                          height={128}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg" //これはSVG名前空間を定義します。ブラウザにこの要素がSVG形式であることを伝える
+                          className="h-12 w-12 text-gray-400"
+                          fill="none" //SVGの塗りつぶしを無しに設定（透明）このアイコンはアウトラインのみで描画
+                          viewBox="0 0 24 24" //SVGの座標システムを定義
+                          stroke="currentColor" //アイコンの線（ストローク）の色を、text-gray-400で設定した現在のテキスト色（薄いグレー）にする
+                        >
+                          <path
+                            strokeLinecap="round" //線の端を丸くする
+                            strokeLinejoin="round" //線の接続部分を丸くする
+                            strokeWidth={2} //線の太さを2に設定
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" //アイコンの形状を定義
+                          />{' '}
+                          {/*M16 7a4 4 0 11-8 0 4 4 0 018 0z - 頭の円形部分（人の頭）M12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z - 体の部分（人の上半身） */}
+                        </svg>
+                      )}
+                    </div>
+                    <input
+                      type="file" //type="file": これはブラウザの標準ファイル選択ダイアログを呼び出すための入力タイプ
+                      ref={fileInputRef}
+                      accept="image/*" //選択できるファイルを画像ファイルのみに制限
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                    <Buttons width="100px" type="button" onClick={handleImageSelect}>
                       写真を選ぶ
                     </Buttons>
                   </div>
@@ -119,6 +191,7 @@ const CreateProfile = () => {
                       <RequiredBadge />
                     </Label>
                     <FullInput name="name" value={formData.name} onChange={handleChange}></FullInput>
+                    {/*ここでのnameとはkeyのこと */}
                   </div>
                   <div className="space-y-2 my-3 py-3">
                     <Label>
@@ -126,10 +199,10 @@ const CreateProfile = () => {
                       <RequiredBadge />
                     </Label>
                     <FullInput
-                      name="birthday"
+                      name="birthday" //ユーザーが日付を入力すると → 文字列形式 "YYYY-MM-DD" が入力される
                       type="date"
-                      value={formatDateForInput(formData.birthday)} //Dateの値を文字列に変換
-                      onChange={handleChange}
+                      value={formatDateForInput(formData.birthday)} //画面に表示する際はormatDateForInput で再びHTML inputが理解できる文字列形式に変換
+                      onChange={handleChange} //handleChange 関数がそれを Date オブジェクトに変換し formData に保存
                     ></FullInput>
                   </div>
                   <div className="space-y-2 my-3 py-3">
