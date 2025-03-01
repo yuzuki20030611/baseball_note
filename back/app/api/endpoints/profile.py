@@ -35,9 +35,9 @@ async def create_profile_endpoint(
         logger.info('プロフィール作成リクエスト受信')
         
         # 画像がアップロードされた場合は保存
-        image_path = None #保存されていない状態
+        image_path = None #プロフィール作成なので、画像は保存されていない状態
         if image and image.filename: #imageオブジェクト自体が存在し、値が None ではない）image オブジェクトに filename 属性が存在している場合
-            image_path = save_profile_image(image)
+            image_path = await save_profile_image(image)  #image_pathにしているのはデータベースに保存するため
         
         # CreateProfileモデルを作成
         profile_data = CreateProfile(
@@ -56,7 +56,7 @@ async def create_profile_endpoint(
         db_profile = await profile_crud.create_profile(db, profile_data)
         logger.info(f"プロフィール作成成功： {db_profile.id}")
         
-        # 作成したプロフィールをレスポンスモデルに変換 ここでschemasのレスポンスモデルとデータベースのモデルで違いが内容にする
+        # 作成したプロフィールをレスポンスモデルに変換 ここでschemasのレスポンスモデルとデータベースのモデルで違い
         resuponse_data = ResponseProfile.model_validate(db_profile)
         return resuponse_data
     except Exception as e:

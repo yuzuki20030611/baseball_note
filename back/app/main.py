@@ -3,7 +3,8 @@ import os
 import importlib
 
 import sentry_sdk
-from fastapi import FastAPI, StaticFiles
+from fastapi import FastAPI
+from starlette.staticfiles import StaticFiles
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from sentry_sdk.integrations.logging import LoggingIntegration
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration

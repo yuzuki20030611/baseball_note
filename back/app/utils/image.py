@@ -51,16 +51,16 @@ async def save_profile_image(image: UploadFile) -> str:
         
 async def delete_profile_image(image_path: str) -> bool:
     try:
-        if not image_path:
+        if not image_path: #削除するものがない
             return False
     
         #image_path.lstrip("/"): 画像パスの先頭にあるスラッシュ（/）を削除します。これは通常、Webアプリケーションで使用される相対パス
         file_path = Path(image_path.lstrip("/"))
         
-        if file_path.exists():
+        if file_path.exists(): #相対パスがある場合、削除してTrueを返す
             os.remove(file_path)
             return True
-        else:
+        else:     #相対パスがない場合、削除できないので、Falseを返す
             return False
     except Exception as e:
         logger.error(f"画像削除エラー：{str(e)}")
