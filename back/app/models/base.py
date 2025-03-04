@@ -143,8 +143,8 @@ class Profiles(Base, ModelBaseMixinWithoutDeletedAt):
     # 1対1の関係を定義
     user: Mapped["Users"] = relationship(
         "Users",
-        back_populates="profile",
-        uselist=False  # 1対1の関係であることを示す
+        back_populates="profile",   #ここで自分が多いのであった場合、複数にする
+        uselist=False  # ここが重要！1対1の場合はuselistをFalseに設定   # uselistは指定しない（デフォルトはTrue）
     )
 
 
@@ -220,7 +220,7 @@ class Comments(Base, ModelBaseMixin):
         back_populates="comments"
     )
 
-
+#多対多関係ではsecondaryパラメータで中間テーブルを指定
 class  TrainingNotes(Base, ModelBaseMixin):
     __tablename__ = "training_notes"
 

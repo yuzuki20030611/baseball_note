@@ -9,7 +9,7 @@ from app.core.logger import get_logger
 logger = get_logger(__name__)
 
 def get_profile_image_path():
-    upload_dir = Path(settings.UPLOAD_DIR) #指定された基本アップロードディレクトリ（例：「uploads」）を取得
+    upload_dir = Path(settings.UPLOAD_DIR) #指定された基本アップロードディレクトリ（「uploads」）を取得
     profile_dir = upload_dir / settings.PROFILE_IMAGE_DIR #その中にsettings.PROFILE_IMAGE_DIRで指定されたサブディレクトリ（例：「profiles」）へのパスを作成
     
     os.makedirs(profile_dir, exist_ok=True) #そのディレクトリが存在しない場合は作成する
@@ -22,8 +22,8 @@ def get_profile_image_path():
 async def save_profile_image(image: UploadFile) -> str:
     #プロフィールを保存し、保存されたpathを返す
     try:
-        content_type = image.content_type
-        extension = ""
+        content_type = image.content_type   #これでどのような画像がアップされたかをチェックしている
+        extension = ""     #ファイル拡張子を格納するための変数を初期化しています（空の文字列で）。その後、content_typeに基づいて適切な拡張子（.jpgまたは.png）を設定
         
         if content_type == "image/jpeg":
             extension = ".jpg"
