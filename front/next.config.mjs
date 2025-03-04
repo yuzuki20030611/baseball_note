@@ -7,6 +7,9 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ["@chakra-ui/react"],
   },
+  images: {
+    domains: ['localhost'], // localhost:8080からの画像読み込みを許可
+  },
 }
 
 export default nextConfig

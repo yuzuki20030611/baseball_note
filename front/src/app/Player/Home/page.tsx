@@ -1,5 +1,4 @@
 import React from 'react'
-
 import { Header } from '../../../components/component/Header/Header '
 import { Footer } from '../../../components/component/Footer/Footer'
 import { Buttons } from '../../../components/component/Button/Button'
@@ -22,6 +21,9 @@ const PlayerHome = () => {
                 </LinkButtons>
                 <LinkButtons href="/Player/CreateProfile" className="w-130px">
                   プロフィール登録
+                </LinkButtons>
+                <LinkButtons href="/Player/ProfileDetail" className="w-130px">
+                  プロフィール詳細
                 </LinkButtons>
               </div>
             </div>

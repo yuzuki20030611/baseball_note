@@ -65,15 +65,15 @@ export const profileApi = {
       }
     }
   },
-  // get: async (userId: string) => {
-  //   try {
-  //     const response = await axios.get(`${BASE_URL}/profile/${userId}`)
-  //     return response.data
-  //   } catch (error) {
-  //     console.error('Profile creation error:', error)
-  //     throw new Error('プロフィールの取得を失敗しました')
-  //   }
-  // },
+  get: async (userId: string) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/profile/${userId}`)
+      return response.data
+    } catch (error) {
+      console.error('Profile creation error:', error)
+      throw new Error('プロフィールの取得を失敗しました')
+    }
+  },
   // update: async (profileId: string, data: Partial<CreateProfileRequest>) => {
   //   try {
   //     const response = await axios.put(`${BASE_URL}/profile/${profileId}`, data)
