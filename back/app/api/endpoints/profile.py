@@ -57,8 +57,8 @@ async def create_profile_endpoint(
         logger.info(f"プロフィール作成成功： {db_profile.id}")
         
         # 作成したプロフィールをレスポンスモデルに変換 ここでschemasのレスポンスモデルとデータベースのモデルで違い
-        resuponse_data = ResponseProfile.model_validate(db_profile)
-        return resuponse_data
+        response_data = ResponseProfile.model_validate(db_profile)
+        return response_data
     except Exception as e:
         logger.error(f"プロフィール作成エラー： {str(e)}", exc_info=True)
         raise HTTPException(
@@ -68,13 +68,24 @@ async def create_profile_endpoint(
     
 @router.get('/{user_id}', response_model=ResponseProfile, operation_id="get_profile")
 async def get_profile_endpoint(user_id: UUID, db: AsyncSession = Depends(get_async_db )):
-    profile = await profile_crud.get_user_profile(db, user_id)
-    if profile is None:
-        raise HTTPException(
-            status_code=404,
-            detail="profile not found"
+    try:
+        logger.info('プロフィール取得リクエスト成功')
+        #プロフィール取得
+        profile = await profile_crud.get_user_profile(db, user_id)
+        logger.info('プロフィール取得成功')
+        if profile is None:
+            raise HTTPException(
+                status_code=404,
+                detail="プロフィールが存在しません"
         )
-    return profile
+        response_profile = ResponseProfile.model_validate(profile)
+        return response_profile
+    except Exception as e:
+        logger.error(f"プロフィール情報取得エラー： {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"プロフィール取得中にエラー： {str(e)}"
+        )
 
 @router.put('/{profile_id}', response_model=ResponseProfile, operation_id="update_profile")
 async def update_profile_endpoint(
