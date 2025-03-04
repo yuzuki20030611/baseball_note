@@ -90,6 +90,9 @@ const CreateProfile = () => {
       }))
     }
   }
+  //このコードで作成された fileInputRef は、オブジェクトであり、
+  // その current プロパティを通して実際の DOM 要素（今回の場合は input 要素）にアクセスします。　ref={fileInputRef}
+  //見えないファイル入力欄に対して「クリック」イベントを発生させ、ブラウザのファイル選択ダイアログを開きます。
   const handleImageSelect = () => {
     // 画面上のファイル選択入力欄を参照するための変数
     if (fileInputRef.current) {
@@ -174,7 +177,7 @@ const CreateProfile = () => {
                       )}
                     </div>
                     <input
-                      type="file" //type="file": これはブラウザの標準ファイル選択ダイアログを呼び出すための入力タイプ
+                      type="file" //type="file": このタイプの input 要素は、ブラウザのファイル選択ダイアログを開く機能を持っています
                       ref={fileInputRef}
                       accept="image/*" //選択できるファイルを画像ファイルのみに制限
                       onChange={handleImageChange}
