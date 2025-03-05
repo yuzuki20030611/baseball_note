@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { HeaderLink } from '../Button/HeaderLink '
+import { HeaderLink } from '../Button/HeaderLink'
 
 type HeaderProps = {
   children?: string

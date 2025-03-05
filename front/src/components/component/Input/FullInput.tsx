@@ -7,7 +7,7 @@ import { Input, Textarea } from '@chakra-ui/react'
 type InputFieldProps = {
   type?: 'text' | 'number' | 'textarea' | 'password' | 'date' | 'email'
   placeholder?: string
-  value?: string | number
+  value?: string | number | Date | undefined
   name?: string
   onChange?: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void
   children?: ReactNode
@@ -19,7 +19,7 @@ type InputFieldProps = {
 export const FullInput = ({
   type = 'text',
   placeholder,
-  value,
+  value = 'undefined',
   name,
   onChange,
   children,
@@ -33,7 +33,7 @@ export const FullInput = ({
       <Textarea
         placeholder={placeholder}
         name={name}
-        value={value}
+        value={typeof value === 'string' || typeof value === 'number' ? value : undefined}
         padding="3px 10px"
         onChange={onChange}
         rows={rows}
@@ -57,7 +57,7 @@ export const FullInput = ({
       placeholder={placeholder}
       backgroundColor="white"
       name={name}
-      value={value}
+      value={typeof value === 'string' || typeof value === 'number' ? value : undefined}
       padding="3px 10px"
       onChange={onChange}
       border="2px solid"

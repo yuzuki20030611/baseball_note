@@ -51,7 +51,7 @@ const ProfileDetail = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-white">
-        <Header>ホーム画面</Header>
+        <Header href="/Player/Home">ホーム画面</Header>
         <main className="flex-grow container mx-auto px-6 py-6 overflow-y-auto h-[calc(100vh-200px)]">
           <Card>
             <div className="pt-5">
@@ -69,7 +69,7 @@ const ProfileDetail = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-white">
-        <Header>ホーム画面</Header>
+        <Header href="/Player/Home">ホーム画面</Header>
         <main className="flex-grow container mx-auto px-6 py-6 overflow-y-auto h-[calc(100vh-200px)]">
           <Card>
             <div className="pt-5">
@@ -163,6 +163,7 @@ const ProfileDetail = () => {
               {/* プロフィール内容 */}
               <div className="space-y-4">
                 <InfoItem label="ノート作成日時：" value={formatBirthday(profile.created_at)} type="text" />
+                <InfoItem label="生年月日：" value={formatBirthday(profile.birthday)} type="text" />
                 <InfoItem label="チーム名：" value={profile.team_name} type="text" />
                 <InfoItem label="利き手：" value={profile.player_dominant} type="text" />
                 <InfoItem label="ポジション：" value={profile.player_position} type="text" />

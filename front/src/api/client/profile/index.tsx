@@ -74,13 +74,58 @@ export const profileApi = {
       throw new Error('プロフィールの取得を失敗しました')
     }
   },
-  // update: async (profileId: string, data: Partial<CreateProfileRequest>) => {
-  //   try {
-  //     const response = await axios.put(`${BASE_URL}/profile/${profileId}`, data)
-  //     return response.data
-  //   } catch (error) {
-  //     console.error('Profile update error:', error)
-  //     throw new Error('プロフィールの更新を失敗しました')
-  //   }
-  // },
+  update: async (profileId: string, data: Partial<CreateProfileRequest>) => {
+    try {
+      const formData = new FormData()
+
+      if (data.name !== undefined) formData.append('name', data.name)
+      if (data.team_name !== undefined) formData.append('team_name', data.team_name)
+
+      if (data.birthday !== undefined) {
+        const formattedBirthday =
+          data.birthday instanceof Date ? data.birthday.toISOString().split('T')[0] : data.birthday
+        formData.append('birthday', formattedBirthday)
+      }
+
+      if (data.player_dominant !== undefined) formData.append('player_dominant', data.player_dominant)
+      if (data.player_position !== undefined) formData.append('player_position', data.player_position)
+      if (data.admired_player !== undefined) formData.append('admired_player', data.admired_player)
+      if (data.introduction !== undefined) formData.append('introduction', data.introduction)
+      if (data.image instanceof File) {
+        formData.append('image', data.image)
+      }
+      console.log('プロフィール更新リクエスト', profileId)
+
+      const response = await axios.put(`${BASE_URL}/profile/${profileId}`, formData, {
+        timeout: 10000,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        withCredentials: false,
+      })
+      console.log('更新レスポンス', response.data)
+      return response.data
+    } catch (error: any) {
+      console.error('プロフィール更新エラー:', error)
+
+      // バックエンドでのエラー詳細を出力
+      if (error.response) {
+        console.error('レスポンスエラー', {
+          status: error.response.status,
+          headers: error.response.headers,
+          data: error.response.data,
+        })
+      }
+
+      if (error.code === 'ERR_NETWORK') {
+        throw new Error('APIサーバーに接続できません。サーバーが起動しているか確認してください。')
+      } else if (error.response) {
+        // サーバーからのレスポンスがある場合
+        throw new Error(`プロフィール更新失敗: ${error.response.data.detail || error.response.statusText}`)
+      } else {
+        // その他のエラー
+        throw new Error(`プロフィール更新失敗: ${error.message || '不明なエラー'}`)
+      }
+    }
+  },
 }
