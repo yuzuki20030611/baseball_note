@@ -5,22 +5,40 @@ type ButtonProps = {
   children: ReactNode
   className?: string
   href?: string
+  role?: 'player' | 'coach' // ロールを追加
 }
 
-export const HeaderLink = ({ children, href = '/', className = '' }: ButtonProps) => {
+export const HeaderLink = ({ children, href, role, className = '' }: ButtonProps) => {
+  // テキストとロールに基づいてhrefを決定
+  let linkHref = href
+  if (!linkHref) {
+    if (children === 'ログアウト') {
+      linkHref = '/'
+    } else if (children === 'ホーム画面') {
+      // ロールに基づいてホーム画面のURLを決定
+      if (role === 'coach') {
+        linkHref = '/Coach/Home'
+      } else {
+        linkHref = '/Player/Home' // デフォルトはプレイヤー
+      }
+    } else {
+      linkHref = '/' // デフォルト
+    }
+  }
+
   return (
     <Link
-      href={href}
+      href={linkHref}
       className={`
         inline-block
-        px-6        /* 横方向のパディング */
-        py-4        /* 縦方向のパディング */
-        h-12        /* 高さ48px */
-        w-120    /* 幅90px */
-        rounded-md  /* ボーダーレディウス */
-        text-xl   /* フォントサイズ */
-        bg-white /* 背景色 */
-        text-blue-700  /* 文字色 */
+        px-6
+        py-4
+        h-12
+        w-120
+        rounded-md
+        text-xl
+        bg-white
+        text-blue-700
         mt-2
         pt-3
         cursor-pointer

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 
-import { Header } from '../../../components/component/Header/Header '
+import { Header } from '../../../components/component/Header/Header'
 import { Footer } from '../../../components/component/Footer/Footer'
 import { PageTitle } from '../../../components/component/Title/PageTitle'
 import { InfoItem } from '../../../components/component/InfoItem/InfoItem'
@@ -90,7 +90,7 @@ const ProfileDetail = () => {
   if (!profile) {
     return (
       <div className="min-h-screen bg-white">
-        <Header>ホーム画面</Header>
+        <Header role="player">ホーム画面</Header>
         <main className="flex-grow container mx-auto px-6 py-6 overflow-y-auto h-[calc(100vh-200px)]">
           <Card>
             <div className="pt-5">

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Header } from '../../../components/component/Header/Header '
+import { Header } from '../../../components/component/Header/Header'
 import { Footer } from '../../../components/component/Footer/Footer'
 import { Buttons } from '../../../components/component/Button/Button'
 import { PageTitle } from '../../../components/component/Title/PageTitle'
@@ -38,7 +38,7 @@ const PlayerHome = () => {
   return (
     <div className="min-h-screen">
       <div className="flex flex-col min-h-screen">
-        <Header />
+        <Header>ログアウト</Header>
         <main className="flex-grow container mx-auto p-6 overflow-y-auto h-[calc(100vh-200px)]">
           <Card>
             <div className="flex justify-between gap-1">
