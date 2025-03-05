@@ -29,11 +29,15 @@ async def update_profile(
     result = await db.execute(
         select(Profiles).where(Profiles.id == profile_id)
     )
+    #IDが一致するプロフィールが1つ見つかればそれを返し、見つからなければ None を返します。複数見つかった場合はエラーになります。
     db_profile = result.scalar_one_or_none()
     
     if db_profile is None:
         return None
-        # UpdateProfileの更新されたフィールドのみを辞書として取得
+        # UpdateProfileの更新されたフィールドのみを辞書として取得。ここでは変更があった値のみを辞書型として抽出している
+        #setattrでデータベースオブジェクトの対応する属性を更新する  exclude_unset=Trueで明示的に値が設定されたフィールドのみと限定している
+        #setattr（オブジェクト名、オブジェクトのカラム名、　新しい値）これで、変更できるように設定して、そのあと、データベースに保存してようやく修正が完了
+        #この時点では、変更はメモリ上のオブジェクトにのみ適用されている（DBには保存されていない）
     for key, value in profile.model_dump(exclude_unset=True).items():
         setattr(db_profile, key, value)  #ブジェクトの属性を動的に設定
     

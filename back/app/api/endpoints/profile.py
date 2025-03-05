@@ -136,7 +136,7 @@ async def update_profile_endpoint(
             # 新しい画像を保存してパスを取得
             new_image_path = await save_profile_image(image)
             update_data["image_path"] = new_image_path  # ここで更新データに追加
-        
+        #**辞書（dictionary）のキーと値のペアを関数やクラスの引数として展開する役割
         update_profile_data = UpdateProfile(**update_data)
         updated_profile = await profile_crud.update_profile(db, profile_id, update_profile_data)
         
