@@ -20,6 +20,7 @@ const CreateProfile = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [formData, setFormData] = useState<CreateProfileRequest>({
+    //現在、ログイン機能を作成していないので現在はこちらのダミーデータを使用して進めております
     user_id: '8ec182db-d09c-44d1-a6e9-cfbe1581896b',
     name: '',
     birthday: new Date(),

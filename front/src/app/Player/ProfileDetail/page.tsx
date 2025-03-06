@@ -8,9 +8,9 @@ import { PageTitle } from '../../../components/component/Title/PageTitle'
 import { InfoItem } from '../../../components/component/InfoItem/InfoItem'
 import { Card } from '../../../components/component/Card/Card'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
-import { ProfileResponse } from '@/components/component/type/profile'
-import { profileApi } from '@/api/client/profile'
-import { LinkButton } from '@/components/component/Button/LoginPageButton'
+import { ProfileResponse } from '../../../components/component/type/profile'
+import { profileApi } from '../../../api/client/profile'
+import { LinkButton } from '../../../components/component/Button/LoginPageButton'
 import Image from 'next/image'
 
 const ProfileDetail = () => {
@@ -18,6 +18,7 @@ const ProfileDetail = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
+  //現在、ログイン機能を作成していないので現在はこちらのダミーデータを使用して進めております
   const userId = '8ec182db-d09c-44d1-a6e9-cfbe1581896b'
 
   useEffect(() => {

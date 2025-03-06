@@ -7,7 +7,7 @@ import { Buttons } from '../../../components/component/Button/Button'
 import { PageTitle } from '../../../components/component/Title/PageTitle'
 import { Card } from '../../../components/component/Card/Card'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
-import { profileApi } from '@/api/client/profile'
+import { profileApi } from '../../../api/client/profile'
 
 const PlayerHome = () => {
   const [hasProfile, setHasProfile] = useState(false)

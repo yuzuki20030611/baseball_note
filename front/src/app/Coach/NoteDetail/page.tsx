@@ -2,7 +2,6 @@ import React from 'react'
 
 import { Header } from '../../../components/component/Header/Header'
 import { PageTitle } from '../../../components/component/Title/PageTitle'
-import { Buttons } from '../../../components/component/Button/Button'
 import { Footer } from '../../../components/component/Footer/Footer'
 import { Label } from '../../../components/component/Label/Label'
 import { FullInput } from '../../../components/component/Input/FullInput'

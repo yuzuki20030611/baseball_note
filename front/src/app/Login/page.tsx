@@ -7,7 +7,7 @@ import { PageTitle } from '../../components/component/Title/PageTitle'
 import { Label } from '../../components/component/Label/Label'
 import { Card } from '../../components/component/Card/Card'
 import { LinkButton } from '../../components/component/Button/LoginPageButton'
-import { LinkButtons } from '@/components/component/Button/LinkButtons'
+import { LinkButtons } from '../../components/component/Button/LinkButtons'
 
 const Login = () => {
   return (

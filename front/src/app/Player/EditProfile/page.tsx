@@ -10,8 +10,8 @@ import { FullInput } from '../../../components/component/Input/FullInput'
 import { RequiredBadge } from '../../../components/component/Label/RequiredBadge'
 import { Card } from '../../../components/component/Card/Card'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
-import { profileApi } from '@/api/client/profile'
-import { DominantHand, Position, ProfileResponse } from '@/components/component/type/profile'
+import { profileApi } from '../../../api/client/profile'
+import { DominantHand, Position, ProfileResponse } from '../../../components/component/type/profile'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 
@@ -34,6 +34,7 @@ const EditProfile = () => {
   const [image, setImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
 
+  //現在、ログイン機能を作成していないので現在はこちらのダミーデータを使用して進めております
   const userId = '8ec182db-d09c-44d1-a6e9-cfbe1581896b'
 
   useEffect(() => {
