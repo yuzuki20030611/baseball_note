@@ -68,7 +68,7 @@ const CreateProfile = () => {
     // リクエストする型定義に問題がなければリクエストを開始
     try {
       await profileApi.create(dataToSubmit, dataToSubmit.user_id)
-      router.push('/Player/Home')
+      router.push('/Player/ProfileDetail')
     } catch (error: any) {
       // エラーメッセージを設定する処理
       console.error('エラー：', error)

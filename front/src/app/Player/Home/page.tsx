@@ -12,6 +12,7 @@ import { profileApi } from '../../../api/client/profile'
 const PlayerHome = () => {
   const [hasProfile, setHasProfile] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const userId = '8ec182db-d09c-44d1-a6e9-cfbe1581896b'
 
@@ -23,10 +24,12 @@ const PlayerHome = () => {
     const checkProfile = async () => {
       try {
         setLoading(true)
+        setError(null)
         const profileData = await profileApi.get(userId)
         //プロフィールデータが入っているかいないかを真偽で決める
         setHasProfile(!!profileData)
       } catch (error) {
+        console.log('プロフィール取得中にエラーが発生しました。', error)
         setHasProfile(false)
       } finally {
         setLoading(false)
@@ -40,6 +43,14 @@ const PlayerHome = () => {
       <div className="flex flex-col min-h-screen">
         <Header>ログアウト</Header>
         <main className="flex-grow container mx-auto p-6 overflow-y-auto h-[calc(100vh-200px)]">
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+              <p>{error}</p>
+              <button className="underline font-semibold" onClick={() => window.location.reload()}>
+                再読み込み
+              </button>
+            </div>
+          )}
           <Card>
             <div className="flex justify-between gap-1">
               <div className="space-x-4">

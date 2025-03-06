@@ -69,9 +69,29 @@ export const profileApi = {
     try {
       const response = await axios.get(`${BASE_URL}/profile/${userId}`)
       return response.data
-    } catch (error) {
-      console.error('Profile creation error:', error)
-      throw new Error('プロフィールの取得を失敗しました')
+    } catch (error: any) {
+      if (error.response && error.response.status === 404) {
+        console.log(`ユーザー${userId}のプロフィールが存在しません`)
+        return null
+      }
+      console.log('プロフィール取得エラー', error)
+
+      // バックエンドでのエラー詳細を出力（デバッグに役立つ）
+      if (error.response) {
+        console.log('レスポンスエラー', {
+          status: error.response.status,
+          headers: error.response.headers,
+          data: error.response.data,
+        })
+      }
+      if (error.code === 'ERR_NETWORK') {
+        throw new Error('APIサーバーに接続することができません。サーバーが接続されているか確認してください')
+      } else if (error.response) {
+        throw new Error(`プロフィール取得失敗: ${error.response.data.detail || error.response.statusText}`)
+      } else {
+        // その他のエラー
+        throw new Error(`プロフィール取得失敗: ${error.message || '不明なエラー'}`)
+      }
     }
   },
   update: async (profileId: string, data: Partial<CreateProfileRequest>) => {
