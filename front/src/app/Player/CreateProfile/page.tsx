@@ -13,12 +13,20 @@ import { useRouter } from 'next/navigation'
 import { CreateProfileRequest, DominantHand, Position } from '../../../components/component/type/profile'
 import { profileApi } from '../../../api/client/profile'
 import Image from 'next/image'
+import AlertMessage from '../../../components/component/Alert/AlertMessage'
 
 const CreateProfile = () => {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+
+  const [alert, setAlert] = useState({
+    status: 'success' as 'success' | 'error',
+    message: '',
+    isVisible: false,
+  })
+
   const [formData, setFormData] = useState<CreateProfileRequest>({
     //現在、ログイン機能を作成していないので現在はこちらのダミーデータを使用して進めております
     user_id: '8ec182db-d09c-44d1-a6e9-cfbe1581896b',
@@ -43,6 +51,7 @@ const CreateProfile = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setError(null)
+    setAlert({ status: 'success', message: '', isVisible: false })
 
     console.log('送信直前のフォームデータ:', formData)
     console.log('player_dominant型:', typeof formData.player_dominant)
@@ -68,11 +77,15 @@ const CreateProfile = () => {
     // リクエストする型定義に問題がなければリクエストを開始
     try {
       await profileApi.create(dataToSubmit, dataToSubmit.user_id)
-      router.push('/Player/ProfileDetail')
+      setAlert({ status: 'success', message: 'プロフィール作成に成功しました！！👍', isVisible: true })
+      setTimeout(() => {
+        router.push('/Player/ProfileDetail')
+      }, 3000)
     } catch (error: any) {
       // エラーメッセージを設定する処理
       console.error('エラー：', error)
       setError('プロフィール作成に失敗しました。入力内容を確認してください。')
+      setAlert({ status: 'error', message: 'プロフィール作成に失敗しました😭', isVisible: true })
     }
   }
   //この型定義で3種類のHTML要素からの変更イベントを処理できる
@@ -278,6 +291,7 @@ const CreateProfile = () => {
                     ></FullInput>
                   </div>
                   <div className="text-center mt-6">
+                    <AlertMessage status={alert.status} message={alert.message} isVisible={alert.isVisible} />
                     <Buttons type="submit" fontSize="xl">
                       登録
                     </Buttons>

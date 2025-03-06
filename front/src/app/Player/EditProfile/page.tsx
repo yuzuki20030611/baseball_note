@@ -14,6 +14,7 @@ import { profileApi } from '../../../api/client/profile'
 import { DominantHand, Position, ProfileResponse } from '../../../components/component/type/profile'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import AlertMessage from '../../../components/component/Alert/AlertMessage'
 
 const EditProfile = () => {
   const router = useRouter()
@@ -33,6 +34,12 @@ const EditProfile = () => {
   const [introduction, setIntroduction] = useState<string | null>(null)
   const [image, setImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+
+  const [alert, setAlert] = useState({
+    status: 'success' as 'success' | 'error',
+    message: '',
+    isvVisible: false,
+  })
 
   //現在、ログイン機能を作成していないので現在はこちらのダミーデータを使用して進めております
   const userId = '8ec182db-d09c-44d1-a6e9-cfbe1581896b'
@@ -98,27 +105,33 @@ const EditProfile = () => {
     // nameが空または空白のみの場合　trim()で空の場合もerrorにする
     if (!name.trim()) {
       setError('名前を入力してください')
+      setAlert({ status: 'error', message: '名前を入力してください😭', isvVisible: true })
       return
     }
     if (!birthday) {
       setError('生年月日を入力してください')
+      setAlert({ status: 'error', message: '生年月日を入力してください😭', isvVisible: true })
       return
     }
     if (!teamName.trim()) {
-      setError('生年月日を入力してください')
+      setError('チーム名を入力してください')
+      setAlert({ status: 'error', message: 'チーム名を入力してください😭', isvVisible: true })
       return
     }
     if (!playerDominant) {
-      setError('生年月日を入力してください')
+      setError('利き手を入力してください')
+      setAlert({ status: 'error', message: '利き手を入力してください😭', isvVisible: true })
       return
     }
     if (!playerPosition) {
-      setError('生年月日を入力してください')
+      setError('ポジションを入力してください')
+      setAlert({ status: 'error', message: 'ポジションを入力してください😭', isvVisible: true })
       return
     }
 
     try {
       setSubmitting(true) //送信中ということを表せている
+      setAlert({ status: 'success', message: '', isvVisible: false })
 
       if (!profile) {
         throw new Error('プロフィールデータを取得できていません')
@@ -134,10 +147,14 @@ const EditProfile = () => {
         introduction: introduction ?? undefined,
         image: image,
       })
-      router.push('/Player/ProfileDetail')
+      setAlert({ status: 'success', message: 'プロフィールの編集が成功しました！！👍👍🙆‍♂️', isvVisible: true })
+      setTimeout(() => {
+        router.push('/Player/ProfileDetail')
+      }, 3000)
     } catch (error: any) {
       console.error('プロフィール更新エラー:', error)
       setError('プロフィール更新に失敗しました。')
+      setAlert({ status: 'error', message: 'プロフィールの編集が失敗しました😭', isvVisible: true })
     } finally {
       setSubmitting(false)
     }
@@ -299,6 +316,7 @@ const EditProfile = () => {
                   ></FullInput>
                 </div>
                 <div className="text-center space-x-6 mt-5 pt-5">
+                  <AlertMessage status={alert.status} message={alert.message} isVisible={alert.isvVisible} />
                   <LinkButtons href="/Player/ProfileDetail" className="text-lg">
                     プロフィール詳細画面に戻る
                   </LinkButtons>
