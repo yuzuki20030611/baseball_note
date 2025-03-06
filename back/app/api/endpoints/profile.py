@@ -74,12 +74,16 @@ async def get_profile_endpoint(user_id: UUID, db: AsyncSession = Depends(get_asy
         profile = await profile_crud.get_user_profile(db, user_id)
         logger.info('プロフィール取得成功')
         if profile is None:
+            logger.info(f'ユーザー{user_id}のプロフィールが存在しません')
             raise HTTPException(
                 status_code=404,
                 detail="プロフィールが存在しません"
         )
         response_profile = ResponseProfile.model_validate(profile)
         return response_profile
+    except HTTPException:
+        # HTTPExceptionをそのまま再送出
+        raise
     except Exception as e:
         logger.error(f"プロフィール情報取得エラー： {str(e)}")
         raise HTTPException(
