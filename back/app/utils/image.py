@@ -1,66 +1,93 @@
 import os
 import shutil
 import uuid
-from fastapi import UploadFile
+from fastapi import UploadFile, HTTPException
 from pathlib import Path
+import aiofiles
 from app.core.config import settings
 from app.core.logger import get_logger
 
 logger = get_logger(__name__)
 
-def get_profile_image_path():
-    upload_dir = Path(settings.UPLOAD_DIR) #指定された基本アップロードディレクトリ（「uploads」）を取得
-    profile_dir = upload_dir / settings.PROFILE_IMAGE_DIR #その中にsettings.PROFILE_IMAGE_DIRで指定されたサブディレクトリ（例：「profiles」）へのパスを作成
-    
-    os.makedirs(profile_dir, exist_ok=True) #そのディレクトリが存在しない場合は作成する
-    
-    return profile_dir
+# プロフィール画像の保存先ディレクトリ
+PROFILE_IMAGES_DIR = os.path.join(settings.UPLOAD_DIR, settings.PROFILE_IMAGE_DIR)
 
-#例　/uploads/profiles/550e8400-e29b-41d4-a716-446655440000.jpg
-#uploadsはsettings.UPLOAD_DIRの値 profilesはsettings.PROFILE_IMAGE_DIRの値 550e8400-e29b-41d4-a716-446655440000.jpgはUUIDベースの一意のファイル名
+# ディレクトリが存在しない場合は作成
+os.makedirs(PROFILE_IMAGES_DIR, exist_ok=True)
+
+# 許可する画像の拡張子
+ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif"}
+
+# 最大ファイルサイズは設定から取得
+MAX_FILE_SIZE = settings.MAX_IMAGE_SIZE
+
+async def validate_image(image: UploadFile) -> None:
+    
+    if not image or not image.filename:
+        return
+    
+    file_ext = os.path.splitext(image.filename.lower())[1]
+    if file_ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"画像形式が不正です。許容されている形式: {', '.join(ALLOWED_EXTENSIONS)}"
+        )
+    
+    # ファイルサイズチェック
+    contents = await image.read()
+    await image.seek(0)
+    
+    if len(contents) > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"ファイルサイズが大きすぎます。最大サイズ: {MAX_FILE_SIZE/1024/1024:.1f}MB"
+        )
+    
+    
 
 async def save_profile_image(image: UploadFile) -> str:
     #プロフィールを保存し、保存されたpathを返す
+    
+    if not image or not image.filename:
+        return None
+    
+    await validate_image(image)
+    
+    # ファイル名をユニークにするためにUUIDを使用
+    file_ext = os.path.splitext(image.filename.lower())[1]
+    unique_filename = f"{uuid.uuid4()}{file_ext}"
+    
+    # 保存先のパス
+    file_path = os.path.join(PROFILE_IMAGES_DIR, unique_filename)
+    
     try:
-        content_type = image.content_type   #これでどのような画像がアップされたかをチェックしている
-        extension = ""     #ファイル拡張子を格納するための変数を初期化しています（空の文字列で）。その後、content_typeに基づいて適切な拡張子（.jpgまたは.png）を設定
-        
-        if content_type == "image/jpeg":
-            extension = ".jpg"
-        elif content_type == "image/png":
-            extension = ".png"
-        else:
-            extension = ".jpg"
-            
-        # ユニークなファイル名を生成
-        filename = f"{uuid.uuid4()}{extension}"
-        
-        # 保存先のフルパスを作成
-        profile_dir = get_profile_image_path()
-        file_path = profile_dir / filename
-        
         # 画像を保存　withステートメントにより、処理が終わったら自動的にファイルが閉じられる
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(image.file, buffer) #shutil.copyfileobj関数を使用して、アップロードされた画像ファイルのデータをディスクに効率的にコピーします
+        async with aiofiles.open(file_path, "wb") as out_file:
+            contents = await image.read()
+            await out_file.write(contents)
             
-        # データベースに保存するためのパスを返す
-        relative_path = f"/{settings.UPLOAD_DIR}/{settings.PROFILE_IMAGE_DIR}/{filename}"
+        # データベースに保存するための相対パスを返す
+        relative_path = f"/{settings.UPLOAD_DIR}/{settings.PROFILE_IMAGE_DIR}/{unique_filename}"
+        logger.info(f"画像保存成功: {relative_path}")
         return relative_path
     except Exception as e:
         logger.error(f"画像保存エラー:{str(e)}")
+        raise HTTPException(status_code=500, detail=f"画像の保存に失敗しました: {str(e)}")
         
 async def delete_profile_image(image_path: str) -> bool:
     try:
         if not image_path: #削除するものがない
             return False
-    
-        #image_path.lstrip("/"): 画像パスの先頭にあるスラッシュ（/）を削除します。これは通常、Webアプリケーションで使用される相対パス
-        file_path = Path(image_path.lstrip("/"))
+        # 相対パスから実際のファイルパスを取得
+        filename = os.path.basename(image_path)
+        file_path = os.path.join(PROFILE_IMAGES_DIR, filename)
         
-        if file_path.exists(): #相対パスがある場合、削除してTrueを返す
+        if os.path.exists(file_path): #相対パスがある場合、削除してTrueを返す
             os.remove(file_path)
+            logger.info(f"画像削除成功: {file_path}")
             return True
         else:     #相対パスがない場合、削除できないので、Falseを返す
+            logger.warning(f"削除しようとしたが画像が見つかりません: {file_path}")
             return False
     except Exception as e:
         logger.error(f"画像削除エラー：{str(e)}")

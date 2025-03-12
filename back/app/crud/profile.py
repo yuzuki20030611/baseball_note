@@ -7,6 +7,13 @@ from app.schemas.profile import CreateProfile, UpdateProfile
 
 
 async def create_profile(db: AsyncSession, profile: CreateProfile) -> Profiles:
+    # 既存のプロフィールがあるか確認
+    existing_profile = await get_user_profile(db, profile.user_id)
+    if existing_profile:
+        # 既存のプロフィールを更新するか、エラーを返すかの処理
+        # 例: raise HTTPException(status_code=400, detail="プロフィールが既に存在します")
+        pass
+    
     db_profile = Profiles(**profile.model_dump())
     db.add(db_profile)
     await db.commit()
