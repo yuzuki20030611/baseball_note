@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Header } from '../../../components/component/Header/Header '
+import { Header } from '../../../components/component/Header/Header'
 import { Footer } from '../../../components/component/Footer/Footer'
 import { PageTitle } from '../../../components/component/Title/PageTitle'
 import { InfoItem } from '../../../components/component/InfoItem/InfoItem'
@@ -10,7 +10,7 @@ import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 const LoginDetail = () => {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header href="/Player/Home">ホーム画面</Header>
+      <Header role="player">ホーム画面</Header>
 
       <main className="flex-1 flex flex-col items-center p-4 w-full">
         <Card>

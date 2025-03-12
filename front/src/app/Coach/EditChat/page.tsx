@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Header } from '../../../components/component/Header/Header '
+import { Header } from '../../../components/component/Header/Header'
 import { Footer } from '../../../components/component/Footer/Footer'
 import { PageTitle } from '../../../components/component/Title/PageTitle'
 import { Card } from '../../../components/component/Card/Card'
@@ -10,7 +10,7 @@ const EditChat = () => {
   return (
     <div className="min-h-screen">
       <div className="flex flex-col min-h-screen">
-        <Header href="/Coach/Home">ホーム画面</Header>
+        <Header role="coach">ホーム画面</Header>
         <div className="max-w-4xl mx-auto p-6 w-full">
           <Card>
             <PageTitle>コメント編集</PageTitle>
