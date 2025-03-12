@@ -1,7 +1,6 @@
 'use client'
 
 import React, { ChangeEvent, ReactNode } from 'react'
-
 import { Input, Textarea } from '@chakra-ui/react'
 
 type InputFieldProps = {
@@ -19,7 +18,7 @@ type InputFieldProps = {
 export const FullInput = ({
   type = 'text',
   placeholder,
-  value = 'undefined',
+  value,
   name,
   onChange,
   children,
@@ -28,12 +27,21 @@ export const FullInput = ({
   className = '',
   ...props
 }: InputFieldProps) => {
+  // 値を文字列または数値に変換
+  const formattedValue = React.useMemo(() => {
+    if (value === undefined || value === null) return ''
+    if (value instanceof Date) {
+      return type === 'date' ? value.toISOString().split('T')[0] : value.toString()
+    }
+    return value
+  }, [value, type])
+
   if (type === 'textarea') {
     return (
       <Textarea
         placeholder={placeholder}
         name={name}
-        value={typeof value === 'string' || typeof value === 'number' ? value : undefined}
+        value={formattedValue}
         padding="3px 10px"
         onChange={onChange}
         rows={rows}
@@ -57,7 +65,7 @@ export const FullInput = ({
       placeholder={placeholder}
       backgroundColor="white"
       name={name}
-      value={typeof value === 'string' || typeof value === 'number' ? value : undefined}
+      value={formattedValue}
       padding="3px 10px"
       onChange={onChange}
       border="2px solid"

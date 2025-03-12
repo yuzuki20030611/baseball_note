@@ -15,6 +15,8 @@ import { DominantHand, Position, ProfileResponse } from '../../../components/com
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import AlertMessage from '../../../components/component/Alert/AlertMessage'
+import { validateImage, validateProfile, ValidationErrors } from '@/hooks/useFormValidation'
+import { Target } from 'lucide-react'
 
 const EditProfile = () => {
   const router = useRouter()
@@ -23,6 +25,7 @@ const EditProfile = () => {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [errors, setErrors] = useState<ValidationErrors>({})
 
   const [profile, setProfile] = useState<ProfileResponse | null>(null)
   const [name, setName] = useState<string>('')
@@ -87,12 +90,27 @@ const EditProfile = () => {
   }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // 画像のエラーをクリア
+    setErrors((prev) => ({
+      ...prev,
+      image: undefined,
+    }))
+
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0]
+
+      const imageError = validateImage(file)
+      if (imageError) {
+        setErrors((prev) => ({
+          ...prev,
+          image: imageError,
+        }))
+        return
+      }
+
       setImage(file)
 
       const reader = new FileReader()
-
       //onloadendはファイル読み込みが完了したときに実行される関数
       reader.onloadend = () => {
         setImagePreview(reader.result as string)
@@ -102,35 +120,42 @@ const EditProfile = () => {
   }
 
   const handleSubmit = async () => {
-    // nameが空または空白のみの場合　trim()で空の場合もerrorにする
-    if (!name.trim()) {
-      setError('名前を入力してください')
-      setAlert({ status: 'error', message: '名前を入力してください😭', isvVisible: true })
-      return
+    // フォームデータを収集
+    const formData = {
+      name,
+      birthday: new Date(birthday),
+      team_name: teamName,
+      player_dominant: playerDominant as DominantHand,
+      player_position: playerPosition as Position,
+      admired_player: admiredPlayer || '',
+      introduction: introduction || '',
+      image,
+      // validateProfileの型に合わせるためにuser_idを追加
+      user_id: userId,
     }
-    if (!birthday) {
-      setError('生年月日を入力してください')
-      setAlert({ status: 'error', message: '生年月日を入力してください😭', isvVisible: true })
-      return
+
+    const validationErrors = validateProfile(formData)
+
+    if (image) {
+      const imageError = validateImage(image)
+      if (imageError) {
+        validationErrors.image = imageError
+      }
     }
-    if (!teamName.trim()) {
-      setError('チーム名を入力してください')
-      setAlert({ status: 'error', message: 'チーム名を入力してください😭', isvVisible: true })
-      return
-    }
-    if (!playerDominant) {
-      setError('利き手を入力してください')
-      setAlert({ status: 'error', message: '利き手を入力してください😭', isvVisible: true })
-      return
-    }
-    if (!playerPosition) {
-      setError('ポジションを入力してください')
-      setAlert({ status: 'error', message: 'ポジションを入力してください😭', isvVisible: true })
+
+    // エラーがある場合は処理を中止
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors)
+      setError('入力内容に誤りがあります。各項目を確認してください🙇')
+      setAlert({ status: 'error', message: '入力内容に誤りがあります。再度確認してください🙇', isvVisible: true })
       return
     }
 
+    // エラーがなければ送信
     try {
       setSubmitting(true) //送信中ということを表せている
+      setError(null)
+      setErrors({})
       setAlert({ status: 'success', message: '', isvVisible: false })
 
       if (!profile) {
@@ -158,6 +183,49 @@ const EditProfile = () => {
     } finally {
       setSubmitting(false)
     }
+  }
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setName(e.target.value)
+    setErrors((prev) => ({ ...prev, name: undefined }))
+  }
+
+  const handleBirthdayChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setBirthday(e.target.value)
+    setErrors((prev) => ({ ...prev, birthday: undefined }))
+  }
+
+  const handleTeamNameChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setTeamName(e.target.value)
+    setErrors((prev) => ({ ...prev, team_name: undefined }))
+  }
+
+  const handlePlayerDominantChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    setPlayerDominant(e.target.value)
+    setErrors((prev) => ({ ...prev, player_dominant: undefined }))
+  }
+
+  const handlePlayerPositionChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    setPlayerPosition(e.target.value)
+    setErrors((prev) => ({ ...prev, player_position: undefined }))
+  }
+
+  const handleAdmiredPlayerChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    setAdmiredPlayer(e.target.value)
+    setErrors((prev) => ({ ...prev, admired_player: undefined }))
+  }
+
+  const handleIntroductionChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    setIntroduction(e.target.value)
+    setErrors((prev) => ({ ...prev, introduction: undefined }))
   }
 
   if (loading) {
@@ -236,6 +304,7 @@ const EditProfile = () => {
                   <Buttons width="100px" onClick={handleImageClick}>
                     写真を選ぶ
                   </Buttons>
+                  {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
                 </div>
 
                 <div className="space-y-2 mb-3">
@@ -243,22 +312,27 @@ const EditProfile = () => {
                     名前：
                     <RequiredBadge />
                   </Label>
-                  <FullInput value={name} onChange={(e) => setName(e.target.value)}></FullInput>
+                  <FullInput value={name} onChange={handleNameChange} />
+                  {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
                 </div>
+
                 <div className="space-y-2 my-3 py-3">
                   <Label>
                     生年月日：
                     <RequiredBadge />
                   </Label>
-                  <FullInput type="date" value={birthday} onChange={(e) => setBirthday(e.target.value)}></FullInput>
+                  <FullInput type="date" value={birthday} onChange={handleBirthdayChange} />
+                  {errors.birthday && <p className="text-red-500 text-sm">{errors.birthday}</p>}
                 </div>
                 <div className="space-y-2 my-3 py-3">
                   <Label>
                     チーム名：
                     <RequiredBadge />
                   </Label>
-                  <FullInput value={teamName} onChange={(e) => setTeamName(e.target.value)}></FullInput>
+                  <FullInput value={teamName} onChange={handleTeamNameChange} />
+                  {errors.team_name && <p className="text-red-500 text-sm">{errors.team_name}</p>}
                 </div>
+
                 <div className="space-y-2 my-3 py-3">
                   <Label>
                     利き手：
@@ -267,7 +341,7 @@ const EditProfile = () => {
                   <select
                     className="w-full px-4 py-2 border border-gray-300 rounded-md"
                     value={playerDominant}
-                    onChange={(e) => setPlayerDominant(e.target.value)}
+                    onChange={handlePlayerDominantChange}
                   >
                     {Object.values(DominantHand).map((dominant) => (
                       <option key={dominant} value={dominant}>
@@ -275,7 +349,9 @@ const EditProfile = () => {
                       </option>
                     ))}
                   </select>
+                  {errors.player_dominant && <p className="text-red-500 text-sm">{errors.player_dominant}</p>}
                 </div>
+
                 <div className="space-y-2 my-3 py-3">
                   <Label>
                     ポジション：
@@ -284,7 +360,7 @@ const EditProfile = () => {
                   <select
                     className="w-full px-4 py-2 border border-gray-300 rounded-md"
                     value={playerPosition}
-                    onChange={(e) => setPlayerPosition(e.target.value)}
+                    onChange={handlePlayerPositionChange}
                   >
                     {Object.values(Position).map((position) => (
                       <option key={position} value={position}>
@@ -292,17 +368,18 @@ const EditProfile = () => {
                       </option>
                     ))}
                   </select>
+                  {errors.player_position && <p className="text-red-500 text-sm">{errors.player_position}</p>}
                 </div>
+
                 <div className="space-y-2 my-3 py-3">
                   <Label>
                     憧れの選手：
                     <RequiredBadge variant="optional" />
                   </Label>
-                  <FullInput
-                    value={admiredPlayer ?? undefined}
-                    onChange={(e) => setAdmiredPlayer(e.target.value)}
-                  ></FullInput>
+                  <FullInput value={admiredPlayer ?? undefined} onChange={handleAdmiredPlayerChange} />
+                  {errors.admired_player && <p className="text-red-500 text-sm">{errors.admired_player}</p>}
                 </div>
+
                 <div className="space-y-2 my-3 py-3">
                   <Label>
                     自己紹介：
@@ -312,11 +389,13 @@ const EditProfile = () => {
                     type="textarea"
                     height="300px"
                     value={introduction ?? undefined}
-                    onChange={(e) => setIntroduction(e.target.value)}
-                  ></FullInput>
+                    onChange={handleIntroductionChange}
+                  />
+                  {errors.introduction && <p className="text-red-500 text-sm">{errors.introduction}</p>}
                 </div>
+                <AlertMessage status={alert.status} message={alert.message} isVisible={alert.isvVisible} />
+
                 <div className="text-center space-x-6 mt-5 pt-5">
-                  <AlertMessage status={alert.status} message={alert.message} isVisible={alert.isvVisible} />
                   <LinkButtons href="/Player/ProfileDetail" className="text-lg">
                     プロフィール詳細画面に戻る
                   </LinkButtons>

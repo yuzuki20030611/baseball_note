@@ -14,18 +14,12 @@ import { CreateProfileRequest, DominantHand, Position } from '../../../component
 import { profileApi } from '../../../api/client/profile'
 import Image from 'next/image'
 import AlertMessage from '../../../components/component/Alert/AlertMessage'
+import { validateImage, validateProfile, ValidationErrors } from '@/hooks/useFormValidation'
 
 const CreateProfile = () => {
   const router = useRouter()
-  const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-
-  const [alert, setAlert] = useState({
-    status: 'success' as 'success' | 'error',
-    message: '',
-    isVisible: false,
-  })
 
   const [formData, setFormData] = useState<CreateProfileRequest>({
     //現在、ログイン機能を作成していないので現在はこちらのダミーデータを使用して進めております
@@ -40,12 +34,38 @@ const CreateProfile = () => {
     image: null,
   })
 
-  // instanceof を使って、Dateであった場合に文字列に変換
-  const formatDateForInput = (dateValue: Date | string): string => {
-    if (dateValue instanceof Date) {
-      return dateValue.toISOString().split('T')[0]
+  const [errors, setErrors] = useState<ValidationErrors>({})
+  const [error, setError] = useState<string | null>(null)
+
+  const [alert, setAlert] = useState({
+    status: 'success' as 'success' | 'error',
+    message: '',
+    isVisible: false,
+  })
+
+  //この型定義で3種類のHTML要素からの変更イベントを処理できる
+  // イベントオブジェクト e から name, value, type を抽出
+  // 入力変更ハンドラー
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target
+
+    // 入力フィールド変更時に対応するエラーをクリア
+    setErrors((prev) => ({
+      ...prev,
+      [name]: undefined,
+    }))
+
+    if (name === 'birthday' && type === 'date') {
+      setFormData((prev) => ({
+        ...prev, //更新される前の値
+        [name]: new Date(value), //HTML の date 入力フィールドは "YYYY-MM-DD" 形式の文字列を返すので、Date型に変換する
+      }))
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }))
     }
-    return String(dateValue)
   }
 
   const handleSubmit = async (e: FormEvent) => {
@@ -53,9 +73,25 @@ const CreateProfile = () => {
     setError(null)
     setAlert({ status: 'success', message: '', isVisible: false })
 
-    console.log('送信直前のフォームデータ:', formData)
-    console.log('player_dominant型:', typeof formData.player_dominant)
-    console.log('player_position型:', typeof formData.player_position)
+    // プロフィールデータのバリデーション
+    const validationErrors = validateProfile(formData)
+
+    // 画像バリデーション
+    const imageError = validateImage(formData.image)
+    if (imageError) {
+      validationErrors.image = imageError
+    }
+
+    // エラーがある場合は処理を中止
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors)
+      setError('入力内容に誤りがあります。各項目を確認してください。')
+      setAlert({ status: 'error', message: '入力内容に誤りがあります😭', isVisible: true })
+      return
+    }
+
+    // エラーがなければエラー状態をクリア
+    setErrors({})
 
     // ここでUUID形式として有効になっているかについての検証
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -70,6 +106,7 @@ const CreateProfile = () => {
     const dataToSubmit = {
       ...formData,
       birthday: birthdayValue,
+      image: formData.image || null,
     }
 
     console.log('最終送信データ:', dataToSubmit)
@@ -88,22 +125,7 @@ const CreateProfile = () => {
       setAlert({ status: 'error', message: 'プロフィール作成に失敗しました😭', isVisible: true })
     }
   }
-  //この型定義で3種類のHTML要素からの変更イベントを処理できる
-  // イベントオブジェクト e から name, value, type を抽出
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target
-    if (name === 'birthday' && type === 'date') {
-      setFormData((prev) => ({
-        ...prev, //更新される前の値
-        [name]: new Date(value), //HTML の date 入力フィールドは "YYYY-MM-DD" 形式の文字列を返すので、Date型に変換する
-      }))
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }))
-    }
-  }
+
   //このコードで作成された fileInputRef は、オブジェクトであり、
   // その current プロパティを通して実際の DOM 要素（今回の場合は input 要素）にアクセスします。　ref={fileInputRef}
   //見えないファイル入力欄に対して「クリック」イベントを発生させ、ブラウザのファイル選択ダイアログを開きます。
@@ -116,29 +138,41 @@ const CreateProfile = () => {
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
+
+    // 画像関連のエラーをクリア
+    setErrors((prev) => ({
+      ...prev,
+      image: undefined,
+    }))
+
     if (files && files.length > 0) {
       //files の中に少なくとも1つのファイルがある
       const file = files[0]
 
-      //5MB以下のサイズに
-      if (file.size > 5 * 1024 * 1024) {
-        setError('画像サイズは5MB以下にしてください')
+      const imageError = validateImage(file)
+      if (imageError) {
+        setErrors((prev) => ({ ...prev, image: imageError }))
         return
       }
 
-      if (!file.type.startsWith('image/')) {
-        setError('画像ファイルを選択してください')
-        return
-      }
-
+      // フォームデータ更新
       setFormData((prev) => ({
         ...prev,
         image: file,
       }))
+
       // プレビュー用のURLを作成
       const imageUrl = URL.createObjectURL(file)
       setImagePreview(imageUrl)
     }
+  }
+
+  // instanceof を使って、Dateであった場合に文字列に変換
+  const formatDateForInput = (dateValue: Date | string): string => {
+    if (dateValue instanceof Date) {
+      return dateValue.toISOString().split('T')[0]
+    }
+    return String(dateValue)
   }
 
   return (
@@ -200,6 +234,7 @@ const CreateProfile = () => {
                     <Buttons width="100px" type="button" onClick={handleImageSelect}>
                       写真を選ぶ
                     </Buttons>
+                    {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
                   </div>
 
                   <div className="space-y-2 mb-3">
@@ -207,9 +242,11 @@ const CreateProfile = () => {
                       名前：
                       <RequiredBadge />
                     </Label>
-                    <FullInput name="name" value={formData.name} onChange={handleChange}></FullInput>
+                    <FullInput name="name" value={formData.name} onChange={handleChange} />
+                    {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
                     {/*ここでのnameとはkeyのこと */}
                   </div>
+
                   <div className="space-y-2 my-3 py-3">
                     <Label>
                       生年月日：
@@ -220,15 +257,19 @@ const CreateProfile = () => {
                       type="date"
                       value={formatDateForInput(formData.birthday)} //画面に表示する際はormatDateForInput で再びHTML inputが理解できる文字列形式に変換
                       onChange={handleChange} //handleChange 関数がそれを Date オブジェクトに変換し formData に保存
-                    ></FullInput>
+                    />
+                    {errors.birthday && <p className="text-red-500 text-sm">{errors.birthday}</p>}
                   </div>
+
                   <div className="space-y-2 my-3 py-3">
                     <Label>
                       チーム名：
                       <RequiredBadge />
                     </Label>
-                    <FullInput name="team_name" value={formData.team_name} onChange={handleChange}></FullInput>
+                    <FullInput name="team_name" value={formData.team_name} onChange={handleChange} />
+                    {errors.team_name && <p className="text-red-500 text-sm">{errors.team_name}</p>}
                   </div>
+
                   <div className="space-y-2 my-3 py-3">
                     <Label>
                       利き手：
@@ -246,7 +287,9 @@ const CreateProfile = () => {
                         </option>
                       ))}
                     </select>
+                    {errors.player_dominant && <p className="text-red-500 text-sm">{errors.player_dominant}</p>}
                   </div>
+
                   <div className="space-y-2 my-3 py-3">
                     <Label>
                       ポジション：
@@ -265,18 +308,18 @@ const CreateProfile = () => {
                         </option>
                       ))}
                     </select>
+                    {errors.player_position && <p className="text-red-500 text-sm">{errors.player_position}</p>}
                   </div>
+
                   <div className="space-y-2 my-3 py-3">
                     <Label>
                       憧れの選手：
                       <RequiredBadge variant="optional" />
                     </Label>
-                    <FullInput
-                      name="admired_player"
-                      value={formData.admired_player}
-                      onChange={handleChange}
-                    ></FullInput>
+                    <FullInput name="admired_player" value={formData.admired_player} onChange={handleChange} />
+                    {errors.admired_player && <p className="text-red-500 text-sm">{errors.admired_player}</p>}
                   </div>
+
                   <div className="space-y-2 my-3 py-3">
                     <Label>
                       自己紹介：
@@ -288,7 +331,8 @@ const CreateProfile = () => {
                       height="300px"
                       value={formData.introduction}
                       onChange={handleChange}
-                    ></FullInput>
+                    />
+                    {errors.introduction && <p className="text-red-500 text-sm">{errors.introduction}</p>}
                   </div>
                   <div className="text-center mt-6">
                     <AlertMessage status={alert.status} message={alert.message} isVisible={alert.isVisible} />
