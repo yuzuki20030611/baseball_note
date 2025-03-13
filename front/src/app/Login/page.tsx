@@ -1,18 +1,18 @@
 import React from 'react'
 
-import { Header } from '../../components/component/Header/Header'
+import { Header } from '../../components/component/Header/Header '
 import { Footer } from '../../components/component/Footer/Footer'
 import { FormInput } from '../../components/component/Input/FormInput'
 import { PageTitle } from '../../components/component/Title/PageTitle'
 import { Label } from '../../components/component/Label/Label'
 import { Card } from '../../components/component/Card/Card'
 import { LinkButton } from '../../components/component/Button/LoginPageButton'
-import { LinkButtons } from '../../components/component/Button/LinkButtons'
+import { LinkButtons } from '@/components/component/Button/LinkButtons'
 
 const Login = () => {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header>ログアウト</Header>
+      <Header />
       <main className="bg-white flex-1 flex flex-col items-center p-8 w-full">
         <Card>
           <PageTitle>野球ノート</PageTitle>

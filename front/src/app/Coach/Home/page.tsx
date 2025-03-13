@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Header } from '../../../components/component/Header/Header'
+import { Header } from '../../../components/component/Header/Header '
 import { Footer } from '../../../components/component/Footer/Footer'
 import { Buttons } from '../../../components/component/Button/Button'
 import { PageTitle } from '../../../components/component/Title/PageTitle'
@@ -11,7 +11,7 @@ const CoachHome = () => {
   return (
     <div className="min-h-screen">
       <div className="flex flex-col min-h-screen">
-        <Header>ログアウト</Header>
+        <Header />
 
         <main className="flex-grow container mx-auto p-6 overflow-y-auto h-[calc(100vh-200px)]">
           <Card>
