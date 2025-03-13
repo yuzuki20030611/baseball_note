@@ -1,13 +1,12 @@
-'use client'
+import React from 'react'
 
-import React, { useEffect, useState } from 'react'
-
-import { Header } from '../../../components/component/Header/Header'
+import { Header } from '../../../components/component/Header/Header '
 import { Footer } from '../../../components/component/Footer/Footer'
 import { PageTitle } from '../../../components/component/Title/PageTitle'
 import { InfoItem } from '../../../components/component/InfoItem/InfoItem'
 import { Card } from '../../../components/component/Card/Card'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
+<<<<<<< HEAD
 import { ProfileResponse } from '../../../components/component/type/profile'
 import { profileApi } from '../../../api/client/profile'
 import { LinkButton } from '../../../components/component/Button/LoginPageButton'
@@ -137,6 +136,10 @@ const ProfileDetail = () => {
     )
   }
 
+=======
+
+const ProfileDetail = () => {
+>>>>>>> main
   return (
     <div className="min-h-screen bg-white">
       <Header>ホーム画面</Header>
@@ -162,47 +165,18 @@ const ProfileDetail = () => {
               </div>
               {/* プロフィールとメイン情報 */}
               <div className="flex flex-col items-center mb-8">
-                {profile.image_path ? (
-                  <div className="w-40 h-40 rounded-full overflow-hidden mb-4">
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_API_URL}${profile.image_path}`}
-                      alt="プロフィール画像"
-                      width={160}
-                      height={160}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div className="w-40 h-40 bg-gray-200 rounded-full flex items-center justify-center mb-4">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-20 w-20 text-gray-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                      />
-                    </svg>
-                  </div>
-                )}
-                <h2 className="text-2xl font-bold mb-2">{profile.name}</h2>
-                {/* 文字列で返ってくるのでDate型に変換する */}
-                <p className="text-gray-600">{formatBirthday(profile.birthday)}</p>
+                <div className="w-40 h-40 bg-gray-200 rounded-full flex items-center justify-center mb-4"></div>
+                <h2 className="text-2xl font-bold mb-2">多田羅抱希</h2>
+                <p className="text-gray-600">2003年 6月11日</p>
               </div>
               {/* プロフィール内容 */}
               <div className="space-y-4">
-                <InfoItem label="ノート作成日時：" value={formatBirthday(profile.created_at)} type="text" />
-                <InfoItem label="生年月日：" value={formatBirthday(profile.birthday)} type="text" />
-                <InfoItem label="チーム名：" value={profile.team_name} type="text" />
-                <InfoItem label="利き手：" value={profile.player_dominant} type="text" />
-                <InfoItem label="ポジション：" value={profile.player_position} type="text" />
-                <InfoItem label="憧れの選手：" value={profile.admired_player || '-'} type="text" />
-                <InfoItem label="自己紹介：" value={profile.introduction || '-'} type="text" />
+                <InfoItem label="野球歴：" value="今年の6月からノートを使っています！！" type="text" />
+                <InfoItem label="チーム名：" value="斉美高校" type="text" />
+                <InfoItem label="利き手：" value="右投げ・右打ち" type="text" />
+                <InfoItem label="ポジション：" value="レフト" type="text" />
+                <InfoItem label="憧れの選手：" value="大谷翔平" type="text" />
+                <InfoItem label="自己紹介：" value="多田羅です！甲子園優勝を目指しています。" type="text" />
               </div>
             </div>
           </div>
