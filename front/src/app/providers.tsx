@@ -3,11 +3,9 @@
 import { SWRConfig } from 'swr'
 import NextTopLoader from 'nextjs-toploader'
 import { SessionProvider } from 'next-auth/react'
-import { auth } from '../auth'
 import { Provider } from '../components/ui/provider'
 
-export async function Providers({ children }: { children: React.ReactNode }) {
-  const session = await auth()
+export function Providers({ children, session }: { children: React.ReactNode; session: any }) {
   return (
     <SessionProvider session={session}>
       <Provider>

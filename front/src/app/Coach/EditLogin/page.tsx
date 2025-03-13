@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Header } from '../../../components/component/Header/Header '
+import { Header } from '../../../components/component/Header/Header'
 import { Footer } from '../../../components/component/Footer/Footer'
 import { FormInput } from '../../../components/component/Input/FormInput'
 import { PageTitle } from '../../../components/component/Title/PageTitle'
@@ -11,7 +11,7 @@ import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 const EditLogin = () => {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header href="/Coach/Home">ホーム画面</Header>
+      <Header role="coach">ホーム画面</Header>
 
       <main className="flex-1 flex flex-col items-center p-6 w-full">
         <Card>

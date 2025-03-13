@@ -9,10 +9,17 @@ import type { ButtonProps as ChakraButtonProps } from '@chakra-ui/react'
 type ButtonProps = ChakraButtonProps & {
   children: ReactNode
   className?: string
-  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
+  disabled?: boolean
 }
 
-export const Buttons = ({ children, className = '', onClick, ...props }: ButtonProps) => {
+export const Buttons = ({
+  children,
+  fontSize = 'md',
+  className = '',
+  disabled = false,
+  type = 'submit',
+  ...props
+}: ButtonProps) => {
   return (
     <ChakraButton
       px="6" // 横方向のパディングを増やす (24px相当)
@@ -20,13 +27,14 @@ export const Buttons = ({ children, className = '', onClick, ...props }: ButtonP
       h="48px" // 高さを48pxに固定
       w="90px"
       borderRadius="md"
-      fontSize="md"
+      fontSize={fontSize}
       border="none"
       bg="blue.500"
       color="white"
       cursor="pointer"
+      type={type}
       className={className}
-      onClick={onClick}
+      disabled={disabled}
       _hover={{
         bg: 'blue.600',
       }}
