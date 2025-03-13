@@ -14,7 +14,7 @@ import { CreateProfileRequest, DominantHand, Position } from '../../../component
 import { profileApi } from '../../../api/client/profile'
 import Image from 'next/image'
 import AlertMessage from '../../../components/component/Alert/AlertMessage'
-import { validateImage, validateProfile, ValidationErrors } from '@/hooks/useFormValidation'
+import { validateImage, validateProfile, ValidationErrors } from '../../../hooks/useFormValidation'
 
 const CreateProfile = () => {
   const router = useRouter()
@@ -86,7 +86,7 @@ const CreateProfile = () => {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors)
       setError('入力内容に誤りがあります。各項目を確認してください。')
-      setAlert({ status: 'error', message: '入力内容に誤りがあります😭', isVisible: true })
+      setAlert({ status: 'error', message: '入力内容に誤りがあります', isVisible: true })
       return
     }
 
@@ -114,15 +114,12 @@ const CreateProfile = () => {
     // リクエストする型定義に問題がなければリクエストを開始
     try {
       await profileApi.create(dataToSubmit, dataToSubmit.user_id)
-      setAlert({ status: 'success', message: 'プロフィール作成に成功しました！！👍', isVisible: true })
-      setTimeout(() => {
-        router.push('/Player/ProfileDetail')
-      }, 3000)
+      router.push('/Player/ProfileDetail?success=true')
     } catch (error: any) {
       // エラーメッセージを設定する処理
       console.error('エラー：', error)
       setError('プロフィール作成に失敗しました。入力内容を確認してください。')
-      setAlert({ status: 'error', message: 'プロフィール作成に失敗しました😭', isVisible: true })
+      setAlert({ status: 'error', message: 'プロフィール作成に失敗しました', isVisible: true })
     }
   }
 

@@ -12,14 +12,43 @@ import { ProfileResponse } from '../../../components/component/type/profile'
 import { profileApi } from '../../../api/client/profile'
 import { LinkButton } from '../../../components/component/Button/LoginPageButton'
 import Image from 'next/image'
+import { useSearchParams } from 'next/navigation'
+import AlertMessage from '../../../components/component/Alert/AlertMessage'
 
 const ProfileDetail = () => {
   const [profile, setProfile] = useState<ProfileResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [alert, setAlert] = useState({
+    status: 'success' as 'success' | 'error',
+    message: '',
+    isVisible: false,
+  })
+
+  // URLパラメータを取得
+  const searchParams = useSearchParams()
+  const success = searchParams.get('success')
 
   //現在、ログイン機能を作成していないので現在はこちらのダミーデータを使用して進めております
   const userId = '8ec182db-d09c-44d1-a6e9-cfbe1581896b'
+
+  useEffect(() => {
+    if (success === 'true') {
+      const action = searchParams.get('action')
+      const message = action === 'edit' ? 'プロフィールの編集が成功しました!!' : 'プロフィール作成に成功しました!!'
+
+      setAlert({
+        status: 'success',
+        message: message,
+        isVisible: true,
+      })
+
+      const timer = setTimeout(() => {
+        setAlert((prev) => ({ ...prev, isVisible: false }))
+      }, 4000)
+      return () => clearTimeout(timer)
+    }
+  }, [success, searchParams])
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -41,7 +70,7 @@ const ProfileDetail = () => {
       }
     }
     fetchProfile()
-  }, [userId]) //userIdに依存しており、userIdが変更すれば、レンダリングする
+  }, [userId])
 
   const formatBirthday = (dateString: string | undefined) => {
     if (!dateString) return ''
@@ -116,6 +145,10 @@ const ProfileDetail = () => {
         <Card>
           <div className="pt-5">
             <PageTitle>プロフィール詳細</PageTitle>
+          </div>
+          {/* アラートメッセージを追加 */}
+          <div className="max-w-4xl mx-auto">
+            <AlertMessage status={alert.status} message={alert.message} isVisible={alert.isVisible} />
           </div>
           {/* カード内 */}
           <div className="max-w-4xl mx-auto p-8">

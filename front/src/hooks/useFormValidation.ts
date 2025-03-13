@@ -1,4 +1,4 @@
-import { CreateProfileRequest } from "@/components/component/type/profile"
+import { CreateProfileRequest } from "../components/component/type/profile"
 
 export type ValidationErrors = {
     name?: string, 
@@ -22,7 +22,7 @@ export const validateProfile = (data: CreateProfileRequest): ValidationErrors =>
 
     // 名前のバリデーション
     if(!data.name || data.name.trim() === "") {
-        errors.name = "名前は必須です💢"
+        errors.name = "名前は必須です"
     } else if (data.name.length >= 50) {
         errors.name = "名前は50字以内で入力してください"
     }
@@ -46,7 +46,7 @@ export const validateProfile = (data: CreateProfileRequest): ValidationErrors =>
 
     //チーム名のバリデーション
     if(!data.team_name || data.team_name.trim() === "") {
-        errors.team_name = "チーム名は必須です💢"
+        errors.team_name = "チーム名は必須です"
     } else if (data.team_name.length > 50) {
         errors.team_name = "チーム名は50字以内で入力してください"
     }

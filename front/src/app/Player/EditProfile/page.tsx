@@ -15,8 +15,7 @@ import { DominantHand, Position, ProfileResponse } from '../../../components/com
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import AlertMessage from '../../../components/component/Alert/AlertMessage'
-import { validateImage, validateProfile, ValidationErrors } from '@/hooks/useFormValidation'
-import { Target } from 'lucide-react'
+import { validateImage, validateProfile, ValidationErrors } from '../../../hooks/useFormValidation'
 
 const EditProfile = () => {
   const router = useRouter()
@@ -146,8 +145,8 @@ const EditProfile = () => {
     // エラーがある場合は処理を中止
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors)
-      setError('入力内容に誤りがあります。各項目を確認してください🙇')
-      setAlert({ status: 'error', message: '入力内容に誤りがあります。再度確認してください🙇', isvVisible: true })
+      setError('入力内容に誤りがあります。各項目を確認してください')
+      setAlert({ status: 'error', message: '入力内容に誤りがあります。再度確認してください', isvVisible: true })
       return
     }
 
@@ -172,14 +171,12 @@ const EditProfile = () => {
         introduction: introduction ?? undefined,
         image: image,
       })
-      setAlert({ status: 'success', message: 'プロフィールの編集が成功しました！！👍👍🙆‍♂️', isvVisible: true })
-      setTimeout(() => {
-        router.push('/Player/ProfileDetail')
-      }, 3000)
+
+      router.push('/Player/ProfileDetail?success=true&action=edit')
     } catch (error: any) {
       console.error('プロフィール更新エラー:', error)
       setError('プロフィール更新に失敗しました。')
-      setAlert({ status: 'error', message: 'プロフィールの編集が失敗しました😭', isvVisible: true })
+      setAlert({ status: 'error', message: 'プロフィールの編集が失敗しました', isvVisible: true })
     } finally {
       setSubmitting(false)
     }
