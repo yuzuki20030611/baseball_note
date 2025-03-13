@@ -33,9 +33,6 @@ class Settings(BaseSettings):
     SENTRY_SDK_DNS: str = ""
     MIGRATIONS_DIR_PATH: str = os.path.join(ROOT_DIR_PATH, "alembic")
     AUTH_SKIP: bool = False
-    UPLOAD_DIR: str = "uploads"
-    PROFILE_IMAGE_DIR: str = "profile_images"
-    MAX_IMAGE_SIZE: int = 5 * 1024 * 1024  # 5MB
 
 
     def get_database_url(self, is_async: bool = False) -> str:

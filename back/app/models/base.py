@@ -54,7 +54,6 @@ class ModelBaseMixinWithoutUpdatedAt:
         nullable=False,
         server_default=func.current_timestamp(),
     )
-    
     deleted_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
 
 
@@ -138,13 +137,12 @@ class Profiles(Base, ModelBaseMixinWithoutDeletedAt):
     )
     admired_player: Mapped[str | None] = mapped_column(String(255), nullable=True)
     introduction: Mapped[str | None] = mapped_column(Text, nullable=True)
-    image_path: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     # 1対1の関係を定義
     user: Mapped["Users"] = relationship(
         "Users",
-        back_populates="profile",   #ここで自分が多いのであった場合、複数にする
-        uselist=False  # ここが重要！1対1の場合はuselistをFalseに設定   # uselistは指定しない（デフォルトはTrue）
+        back_populates="profile",
+        uselist=False  # 1対1の関係であることを示す
     )
 
 
@@ -171,9 +169,9 @@ class Notes(Base, ModelBaseMixin):
         back_populates="notes"
     )
 
-    comments: Mapped["Comments"] = relationship(
+    comment: Mapped["Comments"] = relationship(
         "Comments",
-        back_populates="note"
+        back_populates="notes"
     )
 
     training_notes: Mapped["TrainingNotes"] = relationship(
@@ -193,7 +191,7 @@ class Trainings(Base, ModelBaseMixinWithoutUpdatedAt):
 
     training_notes: Mapped["TrainingNotes"] = relationship(
         "TrainingNotes",
-        back_populates="training",
+        back_populates="trainings",
         cascade="all, delete-orphan"  # トレーニングが削除されたとき、関連するtraining_notesも削除
     )
 
@@ -217,10 +215,11 @@ class Comments(Base, ModelBaseMixin):
 
     note: Mapped["Notes"] = relationship(
         "Notes",
-        back_populates="comments"
+        back_populates="comments",
+        cascade="all, delete-orphan"
     )
 
-#多対多関係ではsecondaryパラメータで中間テーブルを指定
+
 class  TrainingNotes(Base, ModelBaseMixin):
     __tablename__ = "training_notes"
 
@@ -233,7 +232,7 @@ class  TrainingNotes(Base, ModelBaseMixin):
     
     count: Mapped[int] = mapped_column(Integer, nullable=False)
 
-    notes: Mapped["Notes"] = relationship(
+    note: Mapped["Notes"] = relationship(
         "Notes",
         back_populates="training_notes"
     )

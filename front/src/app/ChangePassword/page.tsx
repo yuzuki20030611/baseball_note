@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { Card } from '../../components/component/Card/Card'
-import { Header } from '../../components/component/Header/Header'
+import { Header } from '../../components/component/Header/Header '
 import { PageTitle } from '../../components/component/Title/PageTitle'
 import { Label } from '../../components/component/Label/Label'
 import { FormInput } from '../../components/component/Input/FormInput'
@@ -11,7 +11,7 @@ import { LinkButtons } from '../../components/component/Button/LinkButtons'
 const ChangePassword = () => {
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      <Header>ログアウト</Header>
+      <Header />
       <main className="bg-white flex-1 flex flex-col items-center p-8 w-full">
         <Card>
           <PageTitle>パスワード変更画面</PageTitle>

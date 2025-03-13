@@ -11,7 +11,6 @@ from app.core.logger.logger import init_logger
 
 logger = logging.getLogger(__name__)
 
-# 主要な機能：シードデータのインポートと管理
 
 def drop_all_tables() -> None:
     database.drop_all_tables()
