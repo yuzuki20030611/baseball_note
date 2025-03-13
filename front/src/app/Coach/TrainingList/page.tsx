@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Header } from '../../../components/component/Header/Header '
+import { Header } from '../../../components/component/Header/Header'
 import { Footer } from '../../../components/component/Footer/Footer'
 import { PageTitle } from '../../../components/component/Title/PageTitle'
 import { DeleteButton } from '../../../components/component/Button/Delete'
@@ -11,7 +11,7 @@ const TrainingList = () => {
   return (
     <div>
       <div className="flex flex-col min-h-screen">
-        <Header href="/Coach/Home">ホーム画面</Header>
+        <Header role="coach">ホーム画面</Header>
         <main className="bg-white">
           <Card>
             <PageTitle>トレーニングメニュー詳細</PageTitle>

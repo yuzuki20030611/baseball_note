@@ -7,8 +7,9 @@ import { Input, Textarea } from '@chakra-ui/react'
 type InputFieldProps = {
   type?: 'text' | 'number' | 'textarea' | 'password' | 'date' | 'email'
   placeholder?: string
-  value?: string | number
-  onChange?: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+  value?: string | number | Date | undefined
+  name?: string
+  onChange?: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void
   children?: ReactNode
   rows?: number
   height?: string | number
@@ -19,6 +20,7 @@ export const FullInput = ({
   type = 'text',
   placeholder,
   value,
+  name,
   onChange,
   children,
   rows = 3,
@@ -26,11 +28,21 @@ export const FullInput = ({
   className = '',
   ...props
 }: InputFieldProps) => {
+  // 値を文字列または数値に変換
+  const formattedValue = React.useMemo(() => {
+    if (value === undefined || value === null) return ''
+    if (value instanceof Date) {
+      return type === 'date' ? value.toISOString().split('T')[0] : value.toString()
+    }
+    return value
+  }, [value, type])
+
   if (type === 'textarea') {
     return (
       <Textarea
         placeholder={placeholder}
-        value={value}
+        name={name}
+        value={formattedValue}
         padding="3px 10px"
         onChange={onChange}
         rows={rows}
@@ -53,7 +65,8 @@ export const FullInput = ({
       type={type}
       placeholder={placeholder}
       backgroundColor="white"
-      value={value}
+      name={name}
+      value={formattedValue}
       padding="3px 10px"
       onChange={onChange}
       border="2px solid"

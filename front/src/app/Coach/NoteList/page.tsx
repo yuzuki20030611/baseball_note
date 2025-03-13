@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Header } from '../../../components/component/Header/Header '
+import { Header } from '../../../components/component/Header/Header'
 import { Footer } from '../../../components/component/Footer/Footer'
 import { PageTitle } from '../../../components/component/Title/PageTitle'
 import { Buttons } from '../../../components/component/Button/Button'
@@ -11,7 +11,7 @@ const NoteList = () => {
   return (
     <div className="min-h-screen">
       <div className="flex flex-col min-h-screen">
-        <Header href="/Coach/Home">ホーム画面</Header>
+        <Header role="coach">ホーム画面</Header>
 
         <main className="flex-grow container mx-auto px-6 py-8 overflow-y-auto h-[calc(100vh-200px)]">
           <Card>
