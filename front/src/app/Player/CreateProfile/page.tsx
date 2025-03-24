@@ -9,7 +9,6 @@ import { Label } from '../../../components/component/Label/Label'
 import { FullInput } from '../../../components/component/Input/FullInput'
 import { RequiredBadge } from '../../../components/component/Label/RequiredBadge'
 import { Card } from '../../../components/component/Card/Card'
-import { useRouter } from 'next/navigation'
 import { CreateProfileRequest, DominantHand, Position } from '../../../components/component/type/profile'
 import { profileApi } from '../../../api/client/profile'
 import Image from 'next/image'
@@ -18,7 +17,6 @@ import { validateImage, validateProfile, ValidationErrors } from '../../../hooks
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 
 const CreateProfile = () => {
-  const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [isCompleted, setIsCompleted] = useState<true | null>(null)
@@ -34,7 +32,7 @@ const CreateProfile = () => {
     introduction: '',
     image: null,
   })
-  const [errors, setErrors] = useState<ValidationErrors>({})
+  const [validateError, setValidateError] = useState<ValidationErrors>({})
   const [error, setError] = useState<string | null>(null)
   const [alert, setAlert] = useState({
     status: 'success' as 'success' | 'error',
@@ -47,7 +45,7 @@ const CreateProfile = () => {
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target
     // 入力フィールド変更時に対応するエラーをクリア
-    setErrors((prev) => ({
+    setValidateError((prev) => ({
       ...prev,
       [name]: undefined,
     }))
@@ -76,7 +74,7 @@ const CreateProfile = () => {
     }
     // エラーがある場合は処理を中止
     if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors)
+      setValidateError(validationErrors)
       setError('入力内容に誤りがあります。各項目を確認してください。')
       setAlert({ status: 'error', message: '入力内容に誤りがあります', isVisible: true })
       return
@@ -125,7 +123,7 @@ const CreateProfile = () => {
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     // 画像関連のエラーをクリア
-    setErrors((prev) => ({
+    setValidateError((prev) => ({
       ...prev,
       image: undefined,
     }))
@@ -134,7 +132,7 @@ const CreateProfile = () => {
       const file = files[0]
       const imageError = validateImage(file)
       if (imageError) {
-        setErrors((prev) => ({ ...prev, image: imageError }))
+        setValidateError((prev) => ({ ...prev, image: imageError }))
         return
       }
       // フォームデータ更新
@@ -223,7 +221,7 @@ const CreateProfile = () => {
                       <Buttons width="100px" type="button" onClick={handleImageSelect}>
                         写真を選ぶ
                       </Buttons>
-                      {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
+                      {validateError.image && <p className="text-red-500 text-sm mt-1">{validateError.image}</p>}
                     </div>
 
                     <div className="space-y-2 mb-3">
@@ -232,7 +230,7 @@ const CreateProfile = () => {
                         <RequiredBadge />
                       </Label>
                       <FullInput name="name" value={formData.name} onChange={handleChange} />
-                      {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+                      {validateError.name && <p className="text-red-500 text-sm">{validateError.name}</p>}
                       {/*ここでのnameとはkeyのこと */}
                     </div>
 
@@ -247,7 +245,7 @@ const CreateProfile = () => {
                         value={formatDateForInput(formData.birthday)} //画面に表示する際はormatDateForInput で再びHTML inputが理解できる文字列形式に変換
                         onChange={handleChange} //handleChange 関数がそれを Date オブジェクトに変換し formData に保存
                       />
-                      {errors.birthday && <p className="text-red-500 text-sm">{errors.birthday}</p>}
+                      {validateError.birthday && <p className="text-red-500 text-sm">{validateError.birthday}</p>}
                     </div>
 
                     <div className="space-y-2 my-3 py-3">
@@ -256,7 +254,7 @@ const CreateProfile = () => {
                         <RequiredBadge />
                       </Label>
                       <FullInput name="team_name" value={formData.team_name} onChange={handleChange} />
-                      {errors.team_name && <p className="text-red-500 text-sm">{errors.team_name}</p>}
+                      {validateError.team_name && <p className="text-red-500 text-sm">{validateError.team_name}</p>}
                     </div>
 
                     <div className="space-y-2 my-3 py-3">
@@ -276,7 +274,9 @@ const CreateProfile = () => {
                           </option>
                         ))}
                       </select>
-                      {errors.player_dominant && <p className="text-red-500 text-sm">{errors.player_dominant}</p>}
+                      {validateError.player_dominant && (
+                        <p className="text-red-500 text-sm">{validateError.player_dominant}</p>
+                      )}
                     </div>
 
                     <div className="space-y-2 my-3 py-3">
@@ -297,7 +297,9 @@ const CreateProfile = () => {
                           </option>
                         ))}
                       </select>
-                      {errors.player_position && <p className="text-red-500 text-sm">{errors.player_position}</p>}
+                      {validateError.player_position && (
+                        <p className="text-red-500 text-sm">{validateError.player_position}</p>
+                      )}
                     </div>
 
                     <div className="space-y-2 my-3 py-3">
@@ -306,7 +308,9 @@ const CreateProfile = () => {
                         <RequiredBadge variant="optional" />
                       </Label>
                       <FullInput name="admired_player" value={formData.admired_player} onChange={handleChange} />
-                      {errors.admired_player && <p className="text-red-500 text-sm">{errors.admired_player}</p>}
+                      {validateError.admired_player && (
+                        <p className="text-red-500 text-sm">{validateError.admired_player}</p>
+                      )}
                     </div>
 
                     <div className="space-y-2 my-3 py-3">
@@ -321,7 +325,9 @@ const CreateProfile = () => {
                         value={formData.introduction}
                         onChange={handleChange}
                       />
-                      {errors.introduction && <p className="text-red-500 text-sm">{errors.introduction}</p>}
+                      {validateError.introduction && (
+                        <p className="text-red-500 text-sm">{validateError.introduction}</p>
+                      )}
                     </div>
                     <div className="text-center mt-6">
                       <AlertMessage status={alert.status} message={alert.message} isVisible={alert.isVisible} />

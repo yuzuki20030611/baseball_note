@@ -24,7 +24,7 @@ const EditProfile = () => {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
-  const [errors, setErrors] = useState<ValidationErrors>({})
+  const [validateError, setValidateError] = useState<ValidationErrors>({})
   const [profile, setProfile] = useState<ProfileResponse | null>(null)
   const [name, setName] = useState<string>('')
   const [birthday, setBirthday] = useState<string>('')
@@ -80,7 +80,7 @@ const EditProfile = () => {
   }
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // 画像のエラーをクリア
-    setErrors((prev) => ({
+    setValidateError((prev) => ({
       ...prev,
       image: undefined,
     }))
@@ -88,7 +88,7 @@ const EditProfile = () => {
       const file = e.target.files[0]
       const imageError = validateImage(file)
       if (imageError) {
-        setErrors((prev) => ({
+        setValidateError((prev) => ({
           ...prev,
           image: imageError,
         }))
@@ -126,7 +126,7 @@ const EditProfile = () => {
     }
     // エラーがある場合は処理を中止
     if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors)
+      setValidateError(validationErrors)
       setError('入力内容に誤りがあります。各項目を確認してください')
       setAlert({ status: 'error', message: '入力内容に誤りがあります。再度確認してください', isVisible: true })
       return
@@ -135,7 +135,7 @@ const EditProfile = () => {
     try {
       setSubmitting(true) //送信中ということを表せている
       setError(null)
-      setErrors({})
+      setValidateError({})
       setAlert({ status: 'success', message: '', isVisible: false })
       if (!profile) {
         throw new Error('プロフィールデータを取得できていません')
@@ -168,39 +168,39 @@ const EditProfile = () => {
   }
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setName(e.target.value)
-    setErrors((prev) => ({ ...prev, name: undefined }))
+    setValidateError((prev) => ({ ...prev, name: undefined }))
   }
   const handleBirthdayChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setBirthday(e.target.value)
-    setErrors((prev) => ({ ...prev, birthday: undefined }))
+    setValidateError((prev) => ({ ...prev, birthday: undefined }))
   }
   const handleTeamNameChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setTeamName(e.target.value)
-    setErrors((prev) => ({ ...prev, team_name: undefined }))
+    setValidateError((prev) => ({ ...prev, team_name: undefined }))
   }
   const handlePlayerDominantChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setPlayerDominant(e.target.value)
-    setErrors((prev) => ({ ...prev, player_dominant: undefined }))
+    setValidateError((prev) => ({ ...prev, player_dominant: undefined }))
   }
   const handlePlayerPositionChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setPlayerPosition(e.target.value)
-    setErrors((prev) => ({ ...prev, player_position: undefined }))
+    setValidateError((prev) => ({ ...prev, player_position: undefined }))
   }
   const handleAdmiredPlayerChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setAdmiredPlayer(e.target.value)
-    setErrors((prev) => ({ ...prev, admired_player: undefined }))
+    setValidateError((prev) => ({ ...prev, admired_player: undefined }))
   }
   const handleIntroductionChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setIntroduction(e.target.value)
-    setErrors((prev) => ({ ...prev, introduction: undefined }))
+    setValidateError((prev) => ({ ...prev, introduction: undefined }))
   }
 
   if (loading) {
@@ -289,7 +289,7 @@ const EditProfile = () => {
                     <Buttons width="100px" onClick={handleImageClick}>
                       写真を選ぶ
                     </Buttons>
-                    {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
+                    {validateError.image && <p className="text-red-500 text-sm mt-1">{validateError.image}</p>}
                   </div>
 
                   <div className="space-y-2 mb-3">
@@ -298,7 +298,7 @@ const EditProfile = () => {
                       <RequiredBadge />
                     </Label>
                     <FullInput value={name} onChange={handleNameChange} />
-                    {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+                    {validateError.name && <p className="text-red-500 text-sm">{validateError.name}</p>}
                   </div>
 
                   <div className="space-y-2 my-3 py-3">
@@ -307,7 +307,7 @@ const EditProfile = () => {
                       <RequiredBadge />
                     </Label>
                     <FullInput type="date" value={birthday} onChange={handleBirthdayChange} />
-                    {errors.birthday && <p className="text-red-500 text-sm">{errors.birthday}</p>}
+                    {validateError.birthday && <p className="text-red-500 text-sm">{validateError.birthday}</p>}
                   </div>
 
                   <div className="space-y-2 my-3 py-3">
@@ -316,7 +316,7 @@ const EditProfile = () => {
                       <RequiredBadge />
                     </Label>
                     <FullInput value={teamName} onChange={handleTeamNameChange} />
-                    {errors.team_name && <p className="text-red-500 text-sm">{errors.team_name}</p>}
+                    {validateError.team_name && <p className="text-red-500 text-sm">{validateError.team_name}</p>}
                   </div>
 
                   <div className="space-y-2 my-3 py-3">
@@ -335,7 +335,9 @@ const EditProfile = () => {
                         </option>
                       ))}
                     </select>
-                    {errors.player_dominant && <p className="text-red-500 text-sm">{errors.player_dominant}</p>}
+                    {validateError.player_dominant && (
+                      <p className="text-red-500 text-sm">{validateError.player_dominant}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2 my-3 py-3">
@@ -354,7 +356,9 @@ const EditProfile = () => {
                         </option>
                       ))}
                     </select>
-                    {errors.player_position && <p className="text-red-500 text-sm">{errors.player_position}</p>}
+                    {validateError.player_position && (
+                      <p className="text-red-500 text-sm">{validateError.player_position}</p>
+                    )}
                   </div>
                   <div className="space-y-2 my-3 py-3">
                     <Label>
@@ -362,7 +366,9 @@ const EditProfile = () => {
                       <RequiredBadge variant="optional" />
                     </Label>
                     <FullInput value={admiredPlayer ?? undefined} onChange={handleAdmiredPlayerChange} />
-                    {errors.admired_player && <p className="text-red-500 text-sm">{errors.admired_player}</p>}
+                    {validateError.admired_player && (
+                      <p className="text-red-500 text-sm">{validateError.admired_player}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2 my-3 py-3">
@@ -376,7 +382,7 @@ const EditProfile = () => {
                       value={introduction ?? undefined}
                       onChange={handleIntroductionChange}
                     />
-                    {errors.introduction && <p className="text-red-500 text-sm">{errors.introduction}</p>}
+                    {validateError.introduction && <p className="text-red-500 text-sm">{validateError.introduction}</p>}
                   </div>
 
                   <AlertMessage status={alert.status} message={alert.message} isVisible={alert.isVisible} />
