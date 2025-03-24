@@ -79,8 +79,6 @@ const CreateProfile = () => {
       setAlert({ status: 'error', message: '入力内容に誤りがあります', isVisible: true })
       return
     }
-    // エラーがなければエラー状態をクリア
-    setErrors({})
     // ここでUUID形式として有効になっているかについての検証
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(formData.user_id)) {
