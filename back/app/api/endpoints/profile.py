@@ -104,7 +104,7 @@ async def get_profile_endpoint(user_id: UUID, db: AsyncSession = Depends(get_asy
     try:
         logger.info('プロフィール取得リクエスト成功')
         #プロフィール取得
-        profile = await profile_crud.get_user_profile(db, user_id)
+        profile = await profile_crud.get_profile_by_user_id(db, user_id)
         logger.info('プロフィール取得成功')
         if profile is None:
             logger.info(f'ユーザー{user_id}のプロフィールが存在しません')

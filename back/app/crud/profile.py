@@ -8,7 +8,7 @@ from app.schemas.profile import CreateProfile, UpdateProfile
 
 async def create_profile(db: AsyncSession, profile: CreateProfile) -> Profiles:
     # 既存のプロフィールがあるか確認
-    existing_profile = await get_user_profile(db, profile.user_id)
+    existing_profile = await get_profile_by_user_id(db, profile.user_id)
     if existing_profile:
         # 既存のプロフィールを更新するか、エラーを返すかの処理
         # 例: raise HTTPException(status_code=400, detail="プロフィールが既に存在します")
@@ -20,7 +20,7 @@ async def create_profile(db: AsyncSession, profile: CreateProfile) -> Profiles:
     await db.refresh(db_profile)
     return db_profile
 
-async def get_user_profile(db: AsyncSession, user_id: UUID) -> Profiles | None:
+async def get_profile_by_user_id(db: AsyncSession, user_id: UUID) -> Profiles | None:
     # db.execute(): このSQLを実行する
     result = await db.execute(
         select(Profiles).where(Profiles.user_id == user_id)
