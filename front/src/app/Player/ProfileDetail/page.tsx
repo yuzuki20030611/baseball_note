@@ -32,24 +32,6 @@ const ProfileDetail = () => {
   const userId = '8ec182db-d09c-44d1-a6e9-cfbe1581896b'
 
   useEffect(() => {
-    if (success === 'true') {
-      const action = searchParams.get('action')
-      const message = action === 'edit' ? 'プロフィールの編集が成功しました!!' : 'プロフィール作成に成功しました!!'
-
-      setAlert({
-        status: 'success',
-        message: message,
-        isVisible: true,
-      })
-
-      const timer = setTimeout(() => {
-        setAlert((prev) => ({ ...prev, isVisible: false }))
-      }, 4000)
-      return () => clearTimeout(timer)
-    }
-  }, [success, searchParams])
-
-  useEffect(() => {
     const fetchProfile = async () => {
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
       if (!uuidRegex.test(userId)) {

@@ -15,11 +15,13 @@ import { profileApi } from '../../../api/client/profile'
 import Image from 'next/image'
 import AlertMessage from '../../../components/component/Alert/AlertMessage'
 import { validateImage, validateProfile, ValidationErrors } from '../../../hooks/useFormValidation'
+import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 
 const CreateProfile = () => {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [isCompleted, setIsCompleted] = useState<true | null>(null)
   const [formData, setFormData] = useState<CreateProfileRequest>({
     //現在、ログイン機能を作成していないので現在はこちらのダミーデータを使用して進めております
     user_id: '8ec182db-d09c-44d1-a6e9-cfbe1581896b',
@@ -96,7 +98,14 @@ const CreateProfile = () => {
     // リクエストする型定義に問題がなければリクエストを開始
     try {
       await profileApi.create(dataToSubmit, dataToSubmit.user_id)
-      router.push('/Player/ProfileDetail?success=true')
+      setAlert({
+        status: 'success',
+        message: 'プロフィール作成に成功しました。',
+        isVisible: true,
+      })
+      setTimeout(() => {
+        setIsCompleted(true)
+      }, 3000)
     } catch (error: any) {
       // エラーメッセージを設定する処理
       console.error('エラー：', error)
@@ -159,160 +168,171 @@ const CreateProfile = () => {
                 {error}
               </div>
             )}
-            <form onSubmit={handleSubmit}>
-              <div className="max-w-4xl mx-auto p-8">
-                <div className="text-right pb-1 pr-5 mr-5">
-                  <p className="text-2xl">選手</p>
-                </div>
-                <div className="bg-gray-100 rounded-lg p-20">
-                  {/* 写真 */}
-                  <div className="flex flex-col items-center mb-8">
-                    <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center mb-4">
-                      {imagePreview ? (
-                        <Image
-                          src={imagePreview}
-                          alt="プロフィール画像"
-                          width={128}
-                          height={128}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg" //これはSVG名前空間を定義します。ブラウザにこの要素がSVG形式であることを伝える
-                          className="h-12 w-12 text-gray-400"
-                          fill="none" //SVGの塗りつぶしを無しに設定（透明）このアイコンはアウトラインのみで描画
-                          viewBox="0 0 24 24" //SVGの座標システムを定義
-                          stroke="currentColor" //アイコンの線（ストローク）の色を、text-gray-400で設定した現在のテキスト色（薄いグレー）にする
-                        >
-                          <path
-                            strokeLinecap="round" //線の端を丸くする
-                            strokeLinejoin="round" //線の接続部分を丸くする
-                            strokeWidth={2} //線の太さを2に設定
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" //アイコンの形状を定義
-                          />{' '}
-                          {/*M16 7a4 4 0 11-8 0 4 4 0 018 0z - 頭の円形部分（人の頭）M12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z - 体の部分（人の上半身） */}
-                        </svg>
-                      )}
-                    </div>
-                    <input
-                      type="file" //type="file": このタイプの input 要素は、ブラウザのファイル選択ダイアログを開く機能を持っています
-                      ref={fileInputRef}
-                      accept="image/*" //選択できるファイルを画像ファイルのみに制限
-                      onChange={handleImageChange}
-                      className="hidden"
-                    />
-                    <Buttons width="100px" type="button" onClick={handleImageSelect}>
-                      写真を選ぶ
-                    </Buttons>
-                    {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
-                  </div>
-
-                  <div className="space-y-2 mb-3">
-                    <Label>
-                      名前：
-                      <RequiredBadge />
-                    </Label>
-                    <FullInput name="name" value={formData.name} onChange={handleChange} />
-                    {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-                    {/*ここでのnameとはkeyのこと */}
-                  </div>
-
-                  <div className="space-y-2 my-3 py-3">
-                    <Label>
-                      生年月日：
-                      <RequiredBadge />
-                    </Label>
-                    <FullInput
-                      name="birthday" //ユーザーが日付を入力すると → 文字列形式 "YYYY-MM-DD" が入力される
-                      type="date"
-                      value={formatDateForInput(formData.birthday)} //画面に表示する際はormatDateForInput で再びHTML inputが理解できる文字列形式に変換
-                      onChange={handleChange} //handleChange 関数がそれを Date オブジェクトに変換し formData に保存
-                    />
-                    {errors.birthday && <p className="text-red-500 text-sm">{errors.birthday}</p>}
-                  </div>
-
-                  <div className="space-y-2 my-3 py-3">
-                    <Label>
-                      チーム名：
-                      <RequiredBadge />
-                    </Label>
-                    <FullInput name="team_name" value={formData.team_name} onChange={handleChange} />
-                    {errors.team_name && <p className="text-red-500 text-sm">{errors.team_name}</p>}
-                  </div>
-
-                  <div className="space-y-2 my-3 py-3">
-                    <Label>
-                      利き手：
-                      <RequiredBadge />
-                    </Label>
-                    <select
-                      name="player_dominant"
-                      value={formData.player_dominant}
-                      onChange={handleChange}
-                      className="w-full p-2 border-2 border-black bg-white"
-                    >
-                      {Object.entries(DominantHand).map(([key, value]) => (
-                        <option key={key} value={value}>
-                          {value}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.player_dominant && <p className="text-red-500 text-sm">{errors.player_dominant}</p>}
-                  </div>
-
-                  <div className="space-y-2 my-3 py-3">
-                    <Label>
-                      ポジション：
-                      <RequiredBadge />
-                    </Label>
-                    <select
-                      name="player_position"
-                      value={formData.player_position}
-                      onChange={handleChange}
-                      className="w-full p-2 border-2 border-black bg-white"
-                    >
-                      {/* Object.entries JavaScript の標準メソッド。オブジェクトの列挙可能なプロパティの [key, value] ペアの配列を返します */}
-                      {Object.entries(Position).map(([key, value]) => (
-                        <option key={key} value={value}>
-                          {value}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.player_position && <p className="text-red-500 text-sm">{errors.player_position}</p>}
-                  </div>
-
-                  <div className="space-y-2 my-3 py-3">
-                    <Label>
-                      憧れの選手：
-                      <RequiredBadge variant="optional" />
-                    </Label>
-                    <FullInput name="admired_player" value={formData.admired_player} onChange={handleChange} />
-                    {errors.admired_player && <p className="text-red-500 text-sm">{errors.admired_player}</p>}
-                  </div>
-
-                  <div className="space-y-2 my-3 py-3">
-                    <Label>
-                      自己紹介：
-                      <RequiredBadge variant="optional" />
-                    </Label>
-                    <FullInput
-                      name="introduction"
-                      type="textarea"
-                      height="300px"
-                      value={formData.introduction}
-                      onChange={handleChange}
-                    />
-                    {errors.introduction && <p className="text-red-500 text-sm">{errors.introduction}</p>}
-                  </div>
-                  <div className="text-center mt-6">
-                    <AlertMessage status={alert.status} message={alert.message} isVisible={alert.isVisible} />
-                    <Buttons type="submit" fontSize="xl">
-                      登録
-                    </Buttons>
-                  </div>
+            {isCompleted ? (
+              <div className="max-w-4xl mx-auto p-8 text-center">
+                <h2 className="text-2xl mb-6">プロフィール作成が完了致しました</h2>
+                <p className="mb-8">次にどちらに進みますか</p>
+                <div className="flex justify-center space-x-4">
+                  <LinkButtons href="/Player/ProfileDetail">プロフィール詳細画面をみる</LinkButtons>
+                  <LinkButtons href="/Player/Home">ホームに戻る</LinkButtons>
                 </div>
               </div>
-            </form>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <div className="max-w-4xl mx-auto p-8">
+                  <div className="text-right pb-1 pr-5 mr-5">
+                    <p className="text-2xl">選手</p>
+                  </div>
+                  <div className="bg-gray-100 rounded-lg p-20">
+                    {/* 写真 */}
+                    <div className="flex flex-col items-center mb-8">
+                      <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center mb-4">
+                        {imagePreview ? (
+                          <Image
+                            src={imagePreview}
+                            alt="プロフィール画像"
+                            width={128}
+                            height={128}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg" //これはSVG名前空間を定義します。ブラウザにこの要素がSVG形式であることを伝える
+                            className="h-12 w-12 text-gray-400"
+                            fill="none" //SVGの塗りつぶしを無しに設定（透明）このアイコンはアウトラインのみで描画
+                            viewBox="0 0 24 24" //SVGの座標システムを定義
+                            stroke="currentColor" //アイコンの線（ストローク）の色を、text-gray-400で設定した現在のテキスト色（薄いグレー）にする
+                          >
+                            <path
+                              strokeLinecap="round" //線の端を丸くする
+                              strokeLinejoin="round" //線の接続部分を丸くする
+                              strokeWidth={2} //線の太さを2に設定
+                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" //アイコンの形状を定義
+                            />{' '}
+                            {/*M16 7a4 4 0 11-8 0 4 4 0 018 0z - 頭の円形部分（人の頭）M12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z - 体の部分（人の上半身） */}
+                          </svg>
+                        )}
+                      </div>
+                      <input
+                        type="file" //type="file": このタイプの input 要素は、ブラウザのファイル選択ダイアログを開く機能を持っています
+                        ref={fileInputRef}
+                        accept="image/*" //選択できるファイルを画像ファイルのみに制限
+                        onChange={handleImageChange}
+                        className="hidden"
+                      />
+                      <Buttons width="100px" type="button" onClick={handleImageSelect}>
+                        写真を選ぶ
+                      </Buttons>
+                      {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
+                    </div>
+
+                    <div className="space-y-2 mb-3">
+                      <Label>
+                        名前：
+                        <RequiredBadge />
+                      </Label>
+                      <FullInput name="name" value={formData.name} onChange={handleChange} />
+                      {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+                      {/*ここでのnameとはkeyのこと */}
+                    </div>
+
+                    <div className="space-y-2 my-3 py-3">
+                      <Label>
+                        生年月日：
+                        <RequiredBadge />
+                      </Label>
+                      <FullInput
+                        name="birthday" //ユーザーが日付を入力すると → 文字列形式 "YYYY-MM-DD" が入力される
+                        type="date"
+                        value={formatDateForInput(formData.birthday)} //画面に表示する際はormatDateForInput で再びHTML inputが理解できる文字列形式に変換
+                        onChange={handleChange} //handleChange 関数がそれを Date オブジェクトに変換し formData に保存
+                      />
+                      {errors.birthday && <p className="text-red-500 text-sm">{errors.birthday}</p>}
+                    </div>
+
+                    <div className="space-y-2 my-3 py-3">
+                      <Label>
+                        チーム名：
+                        <RequiredBadge />
+                      </Label>
+                      <FullInput name="team_name" value={formData.team_name} onChange={handleChange} />
+                      {errors.team_name && <p className="text-red-500 text-sm">{errors.team_name}</p>}
+                    </div>
+
+                    <div className="space-y-2 my-3 py-3">
+                      <Label>
+                        利き手：
+                        <RequiredBadge />
+                      </Label>
+                      <select
+                        name="player_dominant"
+                        value={formData.player_dominant}
+                        onChange={handleChange}
+                        className="w-full p-2 border-2 border-black bg-white"
+                      >
+                        {Object.entries(DominantHand).map(([key, value]) => (
+                          <option key={key} value={value}>
+                            {value}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.player_dominant && <p className="text-red-500 text-sm">{errors.player_dominant}</p>}
+                    </div>
+
+                    <div className="space-y-2 my-3 py-3">
+                      <Label>
+                        ポジション：
+                        <RequiredBadge />
+                      </Label>
+                      <select
+                        name="player_position"
+                        value={formData.player_position}
+                        onChange={handleChange}
+                        className="w-full p-2 border-2 border-black bg-white"
+                      >
+                        {/* Object.entries JavaScript の標準メソッド。オブジェクトの列挙可能なプロパティの [key, value] ペアの配列を返します */}
+                        {Object.entries(Position).map(([key, value]) => (
+                          <option key={key} value={value}>
+                            {value}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.player_position && <p className="text-red-500 text-sm">{errors.player_position}</p>}
+                    </div>
+
+                    <div className="space-y-2 my-3 py-3">
+                      <Label>
+                        憧れの選手：
+                        <RequiredBadge variant="optional" />
+                      </Label>
+                      <FullInput name="admired_player" value={formData.admired_player} onChange={handleChange} />
+                      {errors.admired_player && <p className="text-red-500 text-sm">{errors.admired_player}</p>}
+                    </div>
+
+                    <div className="space-y-2 my-3 py-3">
+                      <Label>
+                        自己紹介：
+                        <RequiredBadge variant="optional" />
+                      </Label>
+                      <FullInput
+                        name="introduction"
+                        type="textarea"
+                        height="300px"
+                        value={formData.introduction}
+                        onChange={handleChange}
+                      />
+                      {errors.introduction && <p className="text-red-500 text-sm">{errors.introduction}</p>}
+                    </div>
+                    <div className="text-center mt-6">
+                      <AlertMessage status={alert.status} message={alert.message} isVisible={alert.isVisible} />
+                      <Buttons type="submit" fontSize="xl">
+                        登録
+                      </Buttons>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            )}
           </Card>
         </main>
         <Footer />
