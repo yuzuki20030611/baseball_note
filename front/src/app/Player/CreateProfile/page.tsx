@@ -9,11 +9,11 @@ import { Label } from '../../../components/component/Label/Label'
 import { FullInput } from '../../../components/component/Input/FullInput'
 import { RequiredBadge } from '../../../components/component/Label/RequiredBadge'
 import { Card } from '../../../components/component/Card/Card'
-import { CreateProfileRequest, DominantHand, Position } from '../../../components/component/type/profile'
+import { CreateProfileRequest, DominantHand, Position } from '../../../types/profile'
 import { profileApi } from '../../../api/client/profile'
 import Image from 'next/image'
 import AlertMessage from '../../../components/component/Alert/AlertMessage'
-import { validateImage, validateProfile, ValidationErrors } from '../../../hooks/useFormValidation'
+import { validateImage, validateProfile, ValidationErrors } from '../../validation/useFormValidation'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 
 const CreateProfile = () => {

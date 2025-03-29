@@ -12,14 +12,12 @@ import { Card } from '../../../components/component/Card/Card'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 
 import { profileApi } from '../../../api/client/profile'
-import { DominantHand, Position, ProfileResponse } from '../../../components/component/type/profile'
-import { useRouter } from 'next/navigation'
+import { DominantHand, Position, ProfileResponse } from '../../../types/profile'
 import Image from 'next/image'
 import AlertMessage from '../../../components/component/Alert/AlertMessage'
-import { validateImage, validateProfile, ValidationErrors } from '../../../hooks/useFormValidation'
+import { validateImage, validateProfile, ValidationErrors } from '../../validation/useFormValidation'
 
 const EditProfile = () => {
-  const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)

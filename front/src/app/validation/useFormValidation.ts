@@ -1,4 +1,4 @@
-import { CreateProfileRequest } from "../components/component/type/profile"
+import { CreateProfileRequest } from "../../types/profile"
 
 export type ValidationErrors = {
     name?: string, 

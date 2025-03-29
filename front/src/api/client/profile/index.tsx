@@ -1,4 +1,4 @@
-import { CreateProfileRequest } from '../../../components/component/type/profile'
+import { CreateProfileRequest } from '../../../types/profile'
 import axios from 'axios'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
