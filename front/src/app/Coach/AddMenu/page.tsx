@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Header } from '../../../components/component/Header/Header '
+import { Header } from '../../../components/component/Header/Header'
 import { Footer } from '../../../components/component/Footer/Footer'
 import { PageTitle } from '../../../components/component/Title/PageTitle'
 import { Label } from '../../../components/component/Label/Label'
@@ -11,7 +11,7 @@ import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 const AddMenu = () => {
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      <Header href="/Coach/Home">ホーム画面</Header>
+      <Header role="coach">ホーム画面</Header>
 
       <main className="max-w-4xl mx-auto p-6 w-full">
         <Card>

@@ -73,6 +73,7 @@ services:
     volumes:
       - .:/backend
       - /backend/.venv
+      - ./uploads:/backend/uploads  # アップロードディレクトリのマウントを追加
     links:
       - db
     restart: always
@@ -84,6 +85,9 @@ volumes:
     driver: local
   test_db_volume:
     driver: local
+  uploads_volume:  # 新しいボリュームを追加
+    driver: local
+
 
 networks:
   fastapi_network:
