@@ -8,13 +8,15 @@ import { InfoItem } from '../../../components/component/InfoItem/InfoItem'
 import { Card } from '../../../components/component/Card/Card'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 import { ProfileResponse } from '../../../types/profile'
-import { profileApi } from '../../../api/client/profile'
+import { profileApi } from '../../../api/client/profile/profileApi'
 import { LinkButton } from '../../../components/component/Button/LoginPageButton'
 import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import AlertMessage from '../../../components/component/Alert/AlertMessage'
+import { useAuth } from '../../../contexts/AuthContext'
 
 const ProfileDetail = () => {
+  const { user } = useAuth()
   const [profile, setProfile] = useState<ProfileResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -28,18 +30,18 @@ const ProfileDetail = () => {
   const searchParams = useSearchParams()
   const success = searchParams.get('success')
 
-  //現在、ログイン機能を作成していないので現在はこちらのダミーデータを使用して進めております
-  const userId = '8ec182db-d09c-44d1-a6e9-cfbe1581896b'
+  const userId = user?.uid || ''
 
   useEffect(() => {
+    if (!userId) {
+      setLoading(false)
+      return
+    }
+
     const fetchProfile = async () => {
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-      if (!uuidRegex.test(userId)) {
-        console.error('無効なUUID形式:', userId)
-        throw new Error('ユーザーIDの形式が正しくありません')
-      }
       try {
         setLoading(true)
+        console.log('プロフィール取得開始:', userId)
         const data = await profileApi.get(userId)
         setProfile(data)
         setError(null)
@@ -50,7 +52,9 @@ const ProfileDetail = () => {
         setLoading(false)
       }
     }
-    fetchProfile()
+    if (userId) {
+      fetchProfile()
+    }
   }, [userId])
 
   const formatBirthday = (dateString: string | undefined) => {

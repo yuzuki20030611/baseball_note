@@ -8,17 +8,19 @@ import { PageTitle } from '../../../components/component/Title/PageTitle'
 import { Card } from '../../../components/component/Card/Card'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 
-import { profileApi } from '../../../api/client/profile'
+import { profileApi } from '../../../api/client/profile/profileApi'
 
 import ProtectedRoute from '../../../components/ProtectedRoute'
 import { AccountRole } from '../../../types/account'
+import { useAuth } from '../../../contexts/AuthContext'
 
 const PlayerHome = () => {
+  const { user } = useAuth()
   const [hasProfile, setHasProfile] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const userId = '8ec182db-d09c-44d1-a6e9-cfbe1581896b'
+  const userId = user?.uid || ''
 
   //ホームページを開いたらまずここの処理が動く。
   //userIdでこちらのIdのプロフィール情報を取得する。
@@ -30,11 +32,27 @@ const PlayerHome = () => {
         setLoading(true)
         setError(null)
         const profileData = await profileApi.get(userId)
-        //プロフィールデータが入っているかいないかを真偽で決める
-        setHasProfile(!!profileData)
-      } catch (error) {
-        console.log('プロフィール取得中にエラーが発生しました。', error)
-        setHasProfile(false)
+        // プロフィールの存在チェックを改善
+        if (profileData && profileData.id) {
+          console.log('プロフィールが存在します:', profileData.id)
+          setHasProfile(true)
+        } else {
+          console.log('プロフィールが存在しません')
+          setHasProfile(false)
+        }
+      } catch (error: any) {
+        console.error('プロフィール取得エラー:', error)
+
+        // エラーの種類を確認
+        if (error.response && error.response.status === 404) {
+          // 404エラーはプロフィールが存在しないことを意味する
+          console.log('プロフィールが見つかりません (404)')
+          setHasProfile(false)
+        } else {
+          // その他のエラー
+          setError(error.message || 'プロフィール確認中にエラーが発生しました')
+          setHasProfile(false)
+        }
       } finally {
         setLoading(false)
       }
@@ -54,9 +72,20 @@ const PlayerHome = () => {
                   <LinkButtons href="/Player/LoginDetail" className="w-100px">
                     ログイン情報
                   </LinkButtons>
-                  <LinkButtons href="/Player/CreateProfile" className="w-130px">
-                    プロフィール登録
-                  </LinkButtons>
+                  {/* プロフィール状態に応じてボタンを変更 */}
+                  {loading ? (
+                    <button disabled className="px-4 py-2 bg-gray-300 text-gray-600 rounded w-130px">
+                      読み込み中...
+                    </button>
+                  ) : hasProfile ? (
+                    <LinkButtons href="/Player/ProfileDetail" className="w-130px">
+                      プロフィール詳細
+                    </LinkButtons>
+                  ) : (
+                    <LinkButtons href="/Player/CreateProfile" className="w-130px">
+                      プロフィール登録
+                    </LinkButtons>
+                  )}
                 </div>
               </div>
               <PageTitle>野球ノート一覧</PageTitle>

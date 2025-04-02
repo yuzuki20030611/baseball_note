@@ -14,21 +14,25 @@ import { Footer } from '../../components/component/Footer/Footer'
 import { useAuth } from '../../contexts/AuthContext'
 import Link from 'next/link'
 import { Header } from '../../components/component/Header/Header'
+import AlertMessage from '../../components/component/Alert/AlertMessage'
 
 const CreateAccountHome = () => {
   const router = useRouter()
   const { setUserRole } = useAuth()
-
   const [formData, setFormData] = useState<CreateAccountType>({
     email: '',
     password1: '',
     password2: '',
     account_role: AccountRole.PLAYER,
   })
-
   const [validateError, setValidateError] = useState<any>({})
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [alert, setAlert] = useState({
+    status: 'success' as 'success' | 'error',
+    message: '',
+    isVisible: false,
+  })
 
   const onChangeText = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -71,11 +75,18 @@ const CreateAccountHome = () => {
     try {
       await createAccount(formData.email, formData.password1, formData.account_role)
       setUserRole(formData.account_role)
-      if (formData.account_role === AccountRole.PLAYER) {
-        router.push('/Player/Home')
-      } else {
-        router.push('/Coach/Home')
-      }
+      setAlert({
+        status: 'success',
+        message: 'プロフィール作成に成功しました。',
+        isVisible: true,
+      })
+      setTimeout(() => {
+        if (formData.account_role === AccountRole.PLAYER) {
+          router.push('/Player/Home')
+        } else {
+          router.push('/Coach/Home')
+        }
+      }, 3000)
     } catch (error) {
       console.error('アカウント作成に失敗しました。', error)
       setError('プロフィール作成に失敗しました。入力内容を確認してください。')
@@ -156,6 +167,7 @@ const CreateAccountHome = () => {
             </div>
 
             <div className="text-center mt-6">
+              <AlertMessage status={alert.status} message={alert.message} isVisible={alert.isVisible} />
               <Buttons type="submit" disabled={isLoading} className="text-xl" w="90">
                 {isLoading ? '処理中' : 'アカウント作成'}
               </Buttons>
