@@ -2,7 +2,6 @@ import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut,
-    updateProfile,
     sendPasswordResetEmail,
 } from "firebase/auth";
 import type { UserCredential } from "firebase/auth"; // 型のみインポート
@@ -23,12 +22,6 @@ export const createAccount = async(
         // 1. Firebaseでユーザーを作成
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user
-
-        // 2. ユーザーのロールをdisplayNameに設定（簡易的な方法）
-        const rolePrefix = role === AccountRole.PLAYER ? 'user_player' : 'user_coach';
-        await updateProfile(user, {
-            displayName: `${rolePrefix}_${user.uid}`,
-        })
 
         // 3. バックエンドにユーザー情報を保存
 

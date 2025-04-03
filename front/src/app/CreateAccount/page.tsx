@@ -132,6 +132,9 @@ const CreateAccountHome = () => {
                   validateError.password1 ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
+              <p className="text-sm text-gray-600 font-medium text-indigo-600 text-center mt-1">
+                8文字以上の英数字で設定してください
+              </p>
               {validateError.password1 && <p className="text-red-500 text-sm">{validateError.password1}</p>}
             </div>
 
