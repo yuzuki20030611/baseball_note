@@ -1,6 +1,6 @@
 'use client'
 
-import React, { ChangeEvent, FormEvent, useRef, useState } from 'react'
+import React, { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
 import { Header } from '../../../components/component/Header/Header'
 import { PageTitle } from '../../../components/component/Title/PageTitle'
 import { Buttons } from '../../../components/component/Button/Button'
@@ -10,19 +10,21 @@ import { FullInput } from '../../../components/component/Input/FullInput'
 import { RequiredBadge } from '../../../components/component/Label/RequiredBadge'
 import { Card } from '../../../components/component/Card/Card'
 import { CreateProfileRequest, DominantHand, Position } from '../../../types/profile'
-import { profileApi } from '../../../api/client/profile'
+import { profileApi } from '../../../api/client/profile/profileApi'
 import Image from 'next/image'
 import AlertMessage from '../../../components/component/Alert/AlertMessage'
 import { validateImage, validateProfile, ValidationErrors } from '../../validation/useFormValidation'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
+import { useAuth } from '../../../contexts/AuthContext'
 
 const CreateProfile = () => {
+  const { user } = useAuth()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [isCompleted, setIsCompleted] = useState<true | null>(null)
   const [formData, setFormData] = useState<CreateProfileRequest>({
     //現在、ログイン機能を作成していないので現在はこちらのダミーデータを使用して進めております
-    user_id: '8ec182db-d09c-44d1-a6e9-cfbe1581896b',
+    user_id: user?.uid || '', // Firebaseのユーザーuid
     name: '',
     birthday: new Date(),
     team_name: '',
@@ -39,6 +41,17 @@ const CreateProfile = () => {
     message: '',
     isVisible: false,
   })
+
+  // デバッグ情報を追加
+  useEffect(() => {
+    if (user) {
+      console.log('Firebase UID:', user.uid)
+      // UIDの形式を確認
+      if (user.uid.startsWith('$')) {
+        console.log('UIDの先頭に$記号があります')
+      }
+    }
+  }, [user])
   //この型定義で3種類のHTML要素からの変更イベントを処理できる
   // イベントオブジェクト e から name, value, type を抽出
   // 入力変更ハンドラー
@@ -79,11 +92,18 @@ const CreateProfile = () => {
       setAlert({ status: 'error', message: '入力内容に誤りがあります', isVisible: true })
       return
     }
+
+    if (!formData.user_id) {
+      setError('ログインが必要です。再度ログインしてください。')
+      setAlert({ status: 'error', message: 'ログインが必要です', isVisible: true })
+      return
+    }
+
     // ここでUUID形式として有効になっているかについての検証
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-    if (!uuidRegex.test(formData.user_id)) {
-      console.error('無効なUUID形式:', formData.user_id)
-      throw new Error('ユーザーIDの形式が正しくありません')
+    if (!formData.user_id || !/^[A-Za-z0-9]{28}$/.test(formData.user_id)) {
+      console.error('無効なFirebase UID形式:', formData.user_id)
+      setError('ユーザーIDの形式が正しくありません。再度ログインしてください。')
+      return
     }
     const birthdayValue =
       formData.birthday instanceof Date ? formData.birthday.toISOString().split('T')[0] : formData.birthday

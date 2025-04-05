@@ -11,13 +11,17 @@ import { RequiredBadge } from '../../../components/component/Label/RequiredBadge
 import { Card } from '../../../components/component/Card/Card'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 
-import { profileApi } from '../../../api/client/profile'
+import { profileApi } from '../../../api/client/profile/profileApi'
 import { DominantHand, Position, ProfileResponse } from '../../../types/profile'
 import Image from 'next/image'
 import AlertMessage from '../../../components/component/Alert/AlertMessage'
 import { validateImage, validateProfile, ValidationErrors } from '../../validation/useFormValidation'
+import { useAuth } from '../../../contexts/AuthContext'
+import { useRouter } from 'next/navigation'
 
 const EditProfile = () => {
+  const { user } = useAuth()
+  const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -39,9 +43,21 @@ const EditProfile = () => {
     message: '',
     isVisible: false,
   })
-  //現在、ログイン機能を作成していないので現在はこちらのダミーデータを使用して進めております
-  const userId = '8ec182db-d09c-44d1-a6e9-cfbe1581896b'
+
+  const userId = user?.uid || ''
+
+  // 未認証時のリダイレクト処理
   useEffect(() => {
+    // ユーザーがログインしていない場合はログインページにリダイレクト
+    if (!user && !loading) {
+      router.push('/Login')
+    }
+  }, [user, loading, router])
+
+  useEffect(() => {
+    // ユーザーIDが取得できるまで待機
+    if (!userId) return
+
     const fetchProfile = async () => {
       try {
         setLoading(true)

@@ -78,7 +78,7 @@ export const profileApi = {
 
       // バックエンドでのエラー詳細を出力（デバッグに役立つ）
       if (error.response) {
-        console.log('レスポンスエラー', {
+        console.error('サーバーエラー詳細:', {
           status: error.response.status,
           headers: error.response.headers,
           data: error.response.data,
