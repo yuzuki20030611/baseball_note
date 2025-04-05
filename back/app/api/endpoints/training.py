@@ -26,8 +26,7 @@ def create_training_menu(menu: TrainingCreate, db: Session = Depends(get_db)):
 def read_training_menu(db: Session = Depends(get_db)):
     """全てのトレーニングメニュー一覧を取得します"""
     trainings = training_crud.get_all_trainings(db)
-    total = training_crud.get_trainings_count(db)
-    return {"items": trainings, "total": total}
+    return {"items": trainings}
 
 
 @router.delete("/menu/{training_id}", status_code=status.HTTP_204_NO_CONTENT)

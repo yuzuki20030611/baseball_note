@@ -53,9 +53,7 @@ const AddMenu = () => {
         message: 'トレーニングメニューの追加が完了致しました。',
         isVisible: true,
       })
-      setTimeout(() => {
-        router.push('/Coach/TrainingList')
-      }, 3000)
+      router.push('/Coach/TrainingList')
     } catch (error) {
       console.error('メニュー追加に失敗しました', error)
       setError('メニュー追加に失敗しました。後ほど再試行してください。')

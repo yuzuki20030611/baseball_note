@@ -26,4 +26,3 @@ class TrainingResponse(TrainingInDB):
 
 class TrainingList(BaseModel):
     items: List[TrainingResponse]
-    total: int

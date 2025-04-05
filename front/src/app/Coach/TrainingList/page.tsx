@@ -14,7 +14,6 @@ import { addMenuApi } from '@/api/AddMenu/AddMenu'
 const TrainingList = () => {
   const [menuItems, setMenuItems] = useState<MenuItemType[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [totalMenu, setTotalMenu] = useState(0)
   const [error, setError] = useState<string | null>(null)
 
   const fetchMenuItems = async () => {
@@ -22,7 +21,6 @@ const TrainingList = () => {
       setIsLoading(true)
       const response = await addMenuApi.getAll()
       setMenuItems(response.items)
-      setTotalMenu(response.total)
     } catch (error) {
       console.error('トレーニングメニュー詳細一覧の取得に失敗しました。', error)
       setError('メニュー一覧の読み込みに失敗しました。再読み込みしてください。')
@@ -63,7 +61,7 @@ const TrainingList = () => {
               <div className="bg-gray-100 rounded-lg p-6">
                 <h3 className="border-b border-black text-2xl text-center font-bold py-3 my-6">基礎トレーニング</h3>
                 <div className="text-right mb-3 text-gray-700">
-                  登録済みメニュー数：<span className="font-bold">{totalMenu}</span>件
+                  登録済みメニュー数：<span className="font-bold">{menuItems.length}</span>件
                 </div>
                 <div className="max-h-[500px] overflow-y-auto pr-4">
                   {isLoading ? (

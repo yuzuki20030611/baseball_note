@@ -19,7 +19,7 @@ export const addMenuApi = {
   },
 
   // 一覧取得
-  getAll: async (): Promise<{ items: MenuItemType[]; total: number }> => {
+  getAll: async (): Promise<{ items: MenuItemType[] }> => {
     //[]は複数のオブジェクトを取ってくるので配列にする必要がある。
     try {
       const response = await axios.get(`${BASE_URL}/training/menu`)

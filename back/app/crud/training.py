@@ -19,10 +19,6 @@ def get_all_trainings(db: Session) -> List[Trainings]:
     return db.query(Trainings).all()
 
 
-def get_trainings_count(db: Session) -> int:
-    return db.query(Trainings).count()
-
-
 def delete_training(db: Session, training_id: UUID) -> bool:
     db_training = db.query(Trainings).filter(Trainings.id == training_id).first()
     if not db_training:
