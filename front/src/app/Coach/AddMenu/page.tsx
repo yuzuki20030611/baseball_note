@@ -50,7 +50,7 @@ const AddMenu = () => {
       await addMenuApi.create(formData)
       setAlert({
         status: 'success',
-        message: 'プロフィール作成に成功しました。',
+        message: 'トレーニングメニューの追加が完了致しました。',
         isVisible: true,
       })
       setTimeout(() => {
