@@ -10,10 +10,10 @@ import { FullInput } from '../../../components/component/Input/FullInput'
 import { RequiredBadge } from '../../../components/component/Label/RequiredBadge'
 import { Card } from '../../../components/component/Card/Card'
 import { CreateProfileRequest, DominantHand, Position } from '../../../types/profile'
-import { profileApi } from '../../../api/client/profile'
+import { profileApi } from '../../../api/client/profile/profileApi'
 import Image from 'next/image'
 import AlertMessage from '../../../components/component/Alert/AlertMessage'
-import { validateImage, validateProfile, ValidationErrors } from '../../validation/useFormValidation'
+import { validateImage, validateProfile, ProfilleValidationErrors } from '../../validation/useFormValidation'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 
 const CreateProfile = () => {
@@ -32,7 +32,7 @@ const CreateProfile = () => {
     introduction: '',
     image: null,
   })
-  const [validateError, setValidateError] = useState<ValidationErrors>({})
+  const [validateError, setValidateError] = useState<ProfilleValidationErrors>({})
   const [error, setError] = useState<string | null>(null)
   const [alert, setAlert] = useState({
     status: 'success' as 'success' | 'error',

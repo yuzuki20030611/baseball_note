@@ -11,7 +11,7 @@ import { RequiredBadge } from '../../../components/component/Label/RequiredBadge
 import { Card } from '../../../components/component/Card/Card'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 
-import { profileApi } from '../../../api/client/profile'
+import { profileApi } from '../../../api/client/profile/profileApi'
 import { DominantHand, Position, ProfileResponse } from '../../../types/profile'
 import Image from 'next/image'
 import AlertMessage from '../../../components/component/Alert/AlertMessage'
