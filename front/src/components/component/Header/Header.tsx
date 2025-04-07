@@ -21,7 +21,7 @@ export const Header = ({ children, href, role }: HeaderProps) => {
       await logout()
       router.push('/Login')
     } catch (error) {
-      console.log('ログアウトエラー', error)
+      console.error('ログアウトエラー', error)
     }
   }
 

@@ -12,6 +12,7 @@ import { FormInput } from '../../components/component/Input/FormInput'
 import { Buttons } from '../../components/component/Button/Button'
 import Link from 'next/link'
 import { Footer } from '../../components/component/Footer/Footer'
+import ProtectedRoute from '@/components/ProtectedRoute'
 
 const LoginPage = () => {
   const router = useRouter()
@@ -55,73 +56,81 @@ const LoginPage = () => {
         // ロールが不明な場合は汎用ページへ
         router.push('/')
       }
-    } catch (error) {
-      setError(
-        'ログインに失敗しました。パスワードかメールアドレスが間違っている可能性がありますので、確認して再度ログインをしてみてください'
-      )
-      console.error(
-        'ログインに失敗しました。パスワードかメールアドレスが間違っている可能性がありますので、確認して再度ログインをしてみてください',
-        error
-      )
+    } catch (error: any) {
+      if (error.code === 'auth/invalid-email') {
+        setError('メールアドレスの形式がおかしい')
+      } else if (error.code === 'auth/user-disabled') {
+        setError('ユーザが無効になっている')
+      } else if (error.code === 'auth/user-not-found') {
+        setError('ユーザが存在しない')
+      } else if (error.code === 'auth/wrong-password') {
+        setError('パスワードが間違っている')
+      } else if (error.code === 'auth/too-many-requests') {
+        setError('何度もパスワードを間違えた')
+      } else {
+        setError('再度時間をあけてからログインをやり直してください')
+      }
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header>ログアウト</Header>
-      <main className="bg-white flex-1 flex flex-col items-center p-8 w-full">
-        <Card>
-          <PageTitle>野球ノート</PageTitle>
-          {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{error}</div>}
-          <form onSubmit={handleSubmit} className="bg-gray-100 p-8 rounded-lg shadow-sm w-full max-w-md mt-6">
-            <div className="mb-6">
-              <Label>メールアドレス：</Label>
-              <FormInput
-                value={formData.email}
-                onChange={onChangeText}
-                placeholder="メールアドレスを入力してください"
-                type="email"
-                name="email"
-              />
-            </div>
+    <ProtectedRoute authRequired={false}>
+      <div className="min-h-screen flex flex-col">
+        <Header>ログアウト</Header>
+        <main className="bg-white flex-1 flex flex-col items-center p-8 w-full">
+          <Card>
+            <PageTitle>野球ノート</PageTitle>
+            {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{error}</div>}
+            <form onSubmit={handleSubmit} className="bg-gray-100 p-8 rounded-lg shadow-sm w-full max-w-md mt-6">
+              <div className="mb-6">
+                <Label>メールアドレス：</Label>
+                <FormInput
+                  value={formData.email}
+                  onChange={onChangeText}
+                  placeholder="メールアドレスを入力してください"
+                  type="email"
+                  name="email"
+                />
+              </div>
 
-            <div className="mb-6">
-              <Label>パスワード：</Label>
-              <FormInput
-                value={formData.password}
-                onChange={onChangeText}
-                placeholder="パスワードを入力してください"
-                type="password"
-                name="password"
-              />
-            </div>
+              <div className="mb-6">
+                <Label>パスワード：</Label>
+                <FormInput
+                  value={formData.password}
+                  onChange={onChangeText}
+                  placeholder="パスワードを入力してください"
+                  type="password"
+                  name="password"
+                />
+              </div>
 
-            <div className="text-center mt-6">
-              <Buttons type="submit" className="w-full text-2xl mt-3" disabled={isLoading}>
-                {isLoading ? 'ログイン中...' : 'ログイン'}
-              </Buttons>
-            </div>
+              <div className="text-center mt-6">
+                <Buttons type="submit" className="w-full text-2xl mt-3" disabled={isLoading}>
+                  {isLoading ? 'ログイン中...' : 'ログイン'}
+                </Buttons>
+              </div>
 
-            <div className="text-center mt-4 space-y-2">
-              <p className="text-sm text-gray-600">
-                アカウントをお持ちでない方は{' '}
-                <Link href="/CreateAccount" className="font-medium text-indigo-600 hover:text-indigo-500">
-                  新規登録
-                </Link>
-              </p>
-              <p className="text-sm text-gray-600">
-                <Link href="/ChangePassword" className="font-medium text-indigo-600 hover:text-indigo-500">
-                  パスワードをお忘れの方
-                </Link>
-              </p>
-            </div>
-          </form>
-        </Card>
-      </main>
-      <Footer />
-    </div>
+              <div className="text-center mt-4 space-y-2">
+                <p className="text-sm text-gray-600">
+                  アカウントをお持ちでない方は{' '}
+                  <Link href="/CreateAccount" className="font-medium text-indigo-600 hover:text-indigo-500">
+                    新規登録
+                  </Link>
+                </p>
+                <p className="text-sm text-gray-600">
+                  <Link href="/ChangePassword" className="font-medium text-indigo-600 hover:text-indigo-500">
+                    パスワードをお忘れの方
+                  </Link>
+                </p>
+              </div>
+            </form>
+          </Card>
+        </main>
+        <Footer />
+      </div>
+    </ProtectedRoute>
   )
 }
 

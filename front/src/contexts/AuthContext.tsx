@@ -54,9 +54,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 const fetchUserRole = async (uid: string): Promise<AccountRole | undefined> => {
   const apiUrl = `${API_URL}/auth/users/firebase/${uid}/role`
-  console.log('完全なURL:', apiUrl)
-  console.log('NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL)
-  console.log('API_URL:', API_URL) // auth.tsの場合
+
   try {
     const response = await fetch(apiUrl)
     if (!response.ok) {

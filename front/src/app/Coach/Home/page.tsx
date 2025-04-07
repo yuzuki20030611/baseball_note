@@ -11,7 +11,7 @@ import { AccountRole } from '../../../types/account'
 
 const CoachHome = () => {
   return (
-    <ProtectedRoute requiredRole={AccountRole.COACH}>
+    <ProtectedRoute requiredRole={AccountRole.COACH} authRequired={true}>
       <div className="min-h-screen">
         <div className="flex flex-col min-h-screen">
           <Header />

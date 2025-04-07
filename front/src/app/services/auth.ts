@@ -30,7 +30,6 @@ export const createAccount = async(
             email: user.email,
             role: role,
         };
-        console.log("バックエンドへのリクエスト:", `${API_URL}/auth/users`, requestBody);
 
 
         const response = await fetch(`${API_URL}/auth/users`, {//エンドポイントauthファイルのusersのパス
@@ -45,7 +44,6 @@ export const createAccount = async(
             }),
         });
 
-        console.log("バックエンドレスポンス:", response.status);
 
         if(!response.ok) {
             const errorData = await response.json();
@@ -66,15 +64,6 @@ export const createAccount = async(
     }
 }
 
-// Firebaseでログイン
-export const login = async (email: string, password: string): Promise<UserCredential> => {
-    try {
-        return await signInWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-        console.error("Firebase ログインエラー：", error);
-        throw error
-    }
-}
 
 // ログインしてからログインした者の役割の情報をとってくる
 export const loginWithRoleCheck = async (
@@ -114,45 +103,13 @@ export const resetPassword = async(email: string): Promise<void> => {
 }
 
 
-export const registerUserInBackend = async(
-    uid: string,
-    email: string,
-    role: AccountRole
-): Promise<void> => {
-    try{
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"}/api/users/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                firebase_uid: uid,
-                email,
-                account_role: role,
-            }),
-        });
-        if(!response.ok) {
-            throw new Error("バックエンドでのユーザー登録に失敗しました。")
-        }
-    } catch(error) {
-        console.error("バックエンド連携エラー:", error);
-        // Firebaseには登録されているが、バックエンドに登録失敗した場合の対応
-        // こちらは要件に応じて調整
-        throw new Error('アカウント作成は完了しましたが、プロフィール情報の登録に失敗しました');
-    }
-}
 
 // バックエンドからユーザーロールを取得
 export const fetchUserRole = async (firebaseUid: string): Promise<AccountRole | undefined> => {
     const apiUrl = `${API_URL}/auth/users/firebase/${firebaseUid}/role`;
-    console.log("完全なURL:", apiUrl);
-    console.log("NEXT_PUBLIC_API_URL:", process.env.NEXT_PUBLIC_API_URL);
-    console.log("API_URL:", API_URL);  // auth.tsの場合
 
     try {
-        console.log("Making request to:", apiUrl);
         const response = await fetch(apiUrl);
-        console.log("Response status:", response.status);
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -161,7 +118,6 @@ export const fetchUserRole = async (firebaseUid: string): Promise<AccountRole | 
         }
 
         const data = await response.json();
-        console.log("Role data:", data);
         return data.role;
     } catch (error) {
         console.error('ロール取得エラー詳細:', error);

@@ -34,10 +34,8 @@ const PlayerHome = () => {
         const profileData = await profileApi.get(userId)
         // プロフィールの存在チェックを改善
         if (profileData && profileData.id) {
-          console.log('プロフィールが存在します:', profileData.id)
           setHasProfile(true)
         } else {
-          console.log('プロフィールが存在しません')
           setHasProfile(false)
         }
       } catch (error: any) {
@@ -46,7 +44,6 @@ const PlayerHome = () => {
         // エラーの種類を確認
         if (error.response && error.response.status === 404) {
           // 404エラーはプロフィールが存在しないことを意味する
-          console.log('プロフィールが見つかりません (404)')
           setHasProfile(false)
         } else {
           // その他のエラー
@@ -60,7 +57,7 @@ const PlayerHome = () => {
     checkProfile()
   }, [userId])
   return (
-    <ProtectedRoute requiredRole={AccountRole.PLAYER}>
+    <ProtectedRoute requiredRole={AccountRole.PLAYER} authRequired={true}>
       <div className="min-h-screen">
         <div className="flex flex-col min-h-screen">
           <Header />

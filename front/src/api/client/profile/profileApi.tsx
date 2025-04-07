@@ -28,10 +28,6 @@ export const profileApi = {
         formData.append('image', data.image)
       }
 
-      // デバッグ用でリクエスト情報をログに出力
-      console.log('リクエスト先のURL', `${BASE_URL}/profile/`)
-      console.log('user_id値確認:', userId, typeof userId)
-
       const response = await axios.post(`${BASE_URL}/profile/`, formData, {
         timeout: 10000, // 10秒のタイムアウト
         headers: {
@@ -40,7 +36,6 @@ export const profileApi = {
         withCredentials: false, // CORS関連設定 クッキーなどの認証情報を含めるかどうかを指定している
       })
 
-      console.log('レスポンス', response.data)
       return response.data
     } catch (error: any) {
       console.error('プロフィール作成エラー：', error)
@@ -71,10 +66,8 @@ export const profileApi = {
       return response.data
     } catch (error: any) {
       if (error.response && error.response.status === 404) {
-        console.log(`ユーザー${userId}のプロフィールが存在しません`)
         return null
       }
-      console.log('プロフィール取得エラー', error)
 
       // バックエンドでのエラー詳細を出力（デバッグに役立つ）
       if (error.response) {
@@ -114,7 +107,6 @@ export const profileApi = {
       if (data.image instanceof File) {
         formData.append('image', data.image)
       }
-      console.log('プロフィール更新リクエスト', profileId)
 
       const response = await axios.put(`${BASE_URL}/profile/${profileId}`, formData, {
         timeout: 10000,
@@ -123,7 +115,6 @@ export const profileApi = {
         },
         withCredentials: false,
       })
-      console.log('更新レスポンス', response.data)
       return response.data
     } catch (error: any) {
       console.error('プロフィール更新エラー:', error)
