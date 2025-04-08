@@ -7,6 +7,7 @@ import { DeleteButton } from '../../../components/component/Button/Delete'
 import { Card } from '../../../components/component/Card/Card'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 import ProtectedRoute from '@/components/ProtectedRoute'
+import { AccountRole } from '@/types/account'
 
 const TrainingList = () => {
   return (

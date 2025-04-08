@@ -6,6 +6,8 @@ import { PageTitle } from '../../../components/component/Title/PageTitle'
 import { InfoItem } from '../../../components/component/InfoItem/InfoItem'
 import { Card } from '../../../components/component/Card/Card'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
+import ProtectedRoute from '@/components/ProtectedRoute'
+import { AccountRole } from '@/types/account'
 
 const LoginDetail = () => {
   return (

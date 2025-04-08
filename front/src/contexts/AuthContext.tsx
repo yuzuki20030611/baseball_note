@@ -19,12 +19,20 @@ interface AuthContextType extends UserData {
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
+// こちらのファイルをproviders.tsxファイルでインポートすることで全てのページの認証状態を管理している
+// 各ページの情報を取得し、ログイン状態に応じての処理をProtectRoute.tsxで記述してこちらの関数を各ファイルで
+// インポートしてログイン状態に応じて詳細な対処をしている。
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [userData, setUSerData] = useState<UserData>({
     user: null,
     role: undefined,
     loading: true,
   })
+
+  // onAuthStateChangedについて、IDトークンの有効期限は1時間で、リフレッシュトークンの有効期限は二週間
+  // ユーザーが1時間以上アプリを使用しなかった場合、アプリを再利用したとき、リフレッシュトークンを使って新しいIDトークンが取得する
+  // 1時間使用しなかった場合、リフレッシュトークンを使用してIDトークンを取得できればログアウトはされないが、取得に失敗した場合はログアウトになる
 
   // Firebaseの認証状態変更を監視
   useEffect(() => {
@@ -38,6 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.error('ユーザーロール取得エラー', error)
           setUSerData({ user, loading: false })
         }
+        // ここが実行される！トークンが期限切れになった場合
       } else {
         setUSerData({ user: null, loading: false })
       }

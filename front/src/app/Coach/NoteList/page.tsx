@@ -6,6 +6,8 @@ import { PageTitle } from '../../../components/component/Title/PageTitle'
 import { Buttons } from '../../../components/component/Button/Button'
 import { Card } from '../../../components/component/Card/Card'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
+import ProtectedRoute from '@/components/ProtectedRoute'
+import { AccountRole } from '@/types/account'
 
 const NoteList = () => {
   return (

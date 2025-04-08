@@ -221,19 +221,21 @@ const EditProfile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen">
-        <div className="flex flex-col min-h-screen">
-          <Header role="player">ホーム画面</Header>
-          <main className="flex-grow container mx-auto px-6 py-6 overflow-y-auto h-[calc(100vh-200px)]">
-            <Card>
-              <PageTitle>プロフィール編集</PageTitle>
-              <div className="max-w-4xl mx-auto p-8 flex justify-center">
-                <p className="text-xl">読み込み中...</p>
-              </div>
-            </Card>
-          </main>
+      <ProtectedRoute requiredRole={AccountRole.PLAYER} authRequired={true}>
+        <div className="min-h-screen">
+          <div className="flex flex-col min-h-screen">
+            <Header role="player">ホーム画面</Header>
+            <main className="flex-grow container mx-auto px-6 py-6 overflow-y-auto h-[calc(100vh-200px)]">
+              <Card>
+                <PageTitle>プロフィール編集</PageTitle>
+                <div className="max-w-4xl mx-auto p-8 flex justify-center">
+                  <p className="text-xl">読み込み中...</p>
+                </div>
+              </Card>
+            </main>
+          </div>
         </div>
-      </div>
+      </ProtectedRoute>
     )
   }
 

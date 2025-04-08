@@ -57,19 +57,14 @@ const LoginPage = () => {
         router.push('/')
       }
     } catch (error: any) {
-      if (error.code === 'auth/invalid-email') {
-        setError('メールアドレスの形式がおかしい')
-      } else if (error.code === 'auth/user-disabled') {
-        setError('ユーザが無効になっている')
-      } else if (error.code === 'auth/user-not-found') {
-        setError('ユーザが存在しない')
-      } else if (error.code === 'auth/wrong-password') {
-        setError('パスワードが間違っている')
-      } else if (error.code === 'auth/too-many-requests') {
-        setError('何度もパスワードを間違えた')
+      if (error.code === 'auth/invalid-credential') {
+        setError('メールアドレスまたはパスワードが正しくありません')
+      } else if (error.code === 'auth/invalid-email') {
+        setError('メールアドレスの形式を修正してください')
       } else {
-        setError('再度時間をあけてからログインをやり直してください')
+        setError('ログインに失敗しました。再度お試しください')
       }
+      console.error('エラーコード:', error.code)
     } finally {
       setIsLoading(false)
     }

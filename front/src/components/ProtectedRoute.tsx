@@ -15,9 +15,12 @@ export default function ProtectedRoute({ children, requiredRole, authRequired = 
   const { user, role, loading } = useAuth()
   const router = useRouter()
 
+  // 各ページで、AuthContext.tsxで認証管理をして、こちらのファイルでローディング状態、
+  // ユーザーの状態に対しての処理を記述している
   useEffect(() => {
     if (!loading) {
       if (authRequired && !user) {
+        // ここが実行される！user = null になったため
         router.push('/Login')
       } else if (user && requiredRole !== undefined && role !== requiredRole) {
         // ユーザーはログインしているが、必要なロールがない場合

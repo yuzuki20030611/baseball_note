@@ -75,13 +75,11 @@ const CreateAccountHome = () => {
         message: 'プロフィール作成に成功しました。',
         isVisible: true,
       })
-      setTimeout(() => {
-        if (formData.account_role === AccountRole.PLAYER) {
-          router.push('/Player/Home')
-        } else {
-          router.push('/Coach/Home')
-        }
-      }, 3000)
+      if (formData.account_role === AccountRole.PLAYER) {
+        router.push('/Player/Home')
+      } else {
+        router.push('/Coach/Home')
+      }
     } catch (error: any) {
       console.error('アカウント作成に失敗しました。', error)
 
@@ -89,12 +87,8 @@ const CreateAccountHome = () => {
         setError('このメールアドレスは既に使用されています。別のメールアドレスを使用してください。')
       } else if (error.code === 'auth/invalid-email') {
         setError('メールアドレスの形式が正しくありません。')
-      } else if (error.code === 'auth/weak-password') {
-        setError('パスワードは8文字以上の強力なものを設定してください。')
-      } else if (error.code === 'auth/too-many-requests') {
-        setError('短時間に多くのリクエストが発生しました。しばらくしてからもう一度お試しください。')
       } else {
-        setError('プロフィール作成に失敗しました。入力内容を確認してください。')
+        setError('メールアドレス作成に失敗しました。入力内容を確認してください。')
       }
     } finally {
       setIsLoading(false)
