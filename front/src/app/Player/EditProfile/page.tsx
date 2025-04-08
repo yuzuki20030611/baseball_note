@@ -171,9 +171,7 @@ const EditProfile = () => {
         message: 'プロフィール編集に成功しました。',
         isVisible: true,
       })
-      setTimeout(() => {
-        setIsCompleted(true)
-      }, 3000)
+      setIsCompleted(true)
     } catch (error: any) {
       console.error('プロフィール更新エラー:', error)
       setError('プロフィール更新に失敗しました。')

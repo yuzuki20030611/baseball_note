@@ -112,9 +112,7 @@ const CreateProfile = () => {
         message: 'プロフィール作成に成功しました。',
         isVisible: true,
       })
-      setTimeout(() => {
-        setIsCompleted(true)
-      }, 3000)
+      setIsCompleted(true)
     } catch (error: any) {
       // エラーメッセージを設定する処理
       console.error('エラー：', error)
