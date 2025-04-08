@@ -83,12 +83,23 @@ const CreateAccountHome = () => {
     } catch (error: any) {
       console.error('アカウント作成に失敗しました。', error)
 
-      if (error.code === 'auth/email-already-in-use') {
-        setError('このメールアドレスは既に使用されています。別のメールアドレスを使用してください。')
-      } else if (error.code === 'auth/invalid-email') {
-        setError('メールアドレスの形式が正しくありません。')
-      } else {
-        setError('メールアドレス作成に失敗しました。入力内容を確認してください。')
+      // エラーメッセージがある場合はそれを使用
+      if (error.message) {
+        setError(error.message)
+      }
+      // FirebaseのエラーコードがあればFirebaseエラーとして処理
+      else if (error.code) {
+        if (error.code === 'auth/email-already-in-use') {
+          setError('このメールアドレスは既に使用されています。別のメールアドレスを使用するか、ログインしてください。')
+        } else if (error.code === 'auth/invalid-email') {
+          setError('メールアドレスの形式が正しくありません。')
+        } else {
+          setError('アカウント作成に失敗しました。入力内容を確認してください。')
+        }
+      }
+      // それ以外のエラー
+      else {
+        setError('アカウント作成に失敗しました。入力内容を確認してください。')
       }
     } finally {
       setIsLoading(false)
