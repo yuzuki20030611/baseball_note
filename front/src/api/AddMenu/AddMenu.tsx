@@ -25,7 +25,7 @@ export const addMenuApi = {
       const response = await axios.get(`${BASE_URL}/training/menu`)
       return response.data
     } catch (error) {
-      console.error('プロフィール一覧の取得に失敗しました', error)
+      console.error('トレーニングメニュー一覧の取得に失敗しました', error)
       throw error
     }
   },

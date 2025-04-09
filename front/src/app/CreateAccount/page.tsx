@@ -72,7 +72,7 @@ const CreateAccountHome = () => {
       setUserRole(formData.account_role)
       setAlert({
         status: 'success',
-        message: 'プロフィール作成に成功しました。',
+        message: 'アカウント作成に成功しました。',
         isVisible: true,
       })
       if (formData.account_role === AccountRole.PLAYER) {
