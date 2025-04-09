@@ -7,10 +7,11 @@ import { Input, Textarea } from '@chakra-ui/react'
 type InputFieldProps = {
   type?: 'text' | 'number' | 'textarea' | 'password' | 'email'
   placeholder?: string
-  defaultValue?: string | number
+  value?: string | number
   onChange?: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
   children?: ReactNode
   rows?: number
+  name?: string
   className?: string
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full' | string // 許可される値を明示的に定義
   name?: string
@@ -19,10 +20,11 @@ type InputFieldProps = {
 export const FormInput = ({
   type = 'text',
   placeholder,
-  defaultValue,
+  value,
   onChange,
   children,
   rows = 3,
+  name,
   maxWidth = 'md',
   className = '',
   name,
@@ -32,7 +34,7 @@ export const FormInput = ({
     return (
       <Textarea
         placeholder={placeholder}
-        defaultValue={defaultValue}
+        value={value}
         padding="3px 10px"
         onChange={onChange}
         rows={rows}
@@ -56,7 +58,7 @@ export const FormInput = ({
       type={type}
       placeholder={placeholder}
       backgroundColor="white"
-      defaultValue={defaultValue}
+      value={value}
       padding="3px 10px"
       autoComplete="new-password"
       onChange={onChange}

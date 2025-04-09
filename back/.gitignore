@@ -3,7 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-uploads/
+# 画像をgithubにあげないように記述しました。
+uploads/profile_images/
+
 # C extensions
 *.so
 

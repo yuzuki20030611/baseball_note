@@ -15,6 +15,9 @@ import { AddMenuValidationErrors, validateAddMenu } from '../../../app/validatio
 import { addMenuApi } from '../../../api/AddMenu/AddMenu'
 import { useRouter } from 'next/navigation'
 import AlertMessage from '@/components/component/Alert/AlertMessage'
+import ProtectedRoute from '@/components/ProtectedRoute'
+import { AccountRole } from '@/types/account'
+
 
 const AddMenu = () => {
   const router = useRouter()
@@ -79,8 +82,9 @@ const AddMenu = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <Header role="coach">ホーム画面</Header>
+    <ProtectedRoute requiredRole={AccountRole.COACH} authRequired={true}>
+      <div className="min-h-screen flex flex-col bg-white">
+        <Header role="coach">ホーム画面</Header>
 
       <main className="max-w-4xl mx-auto p-6 w-full">
         <Card>
@@ -118,8 +122,9 @@ const AddMenu = () => {
         </Card>
       </main>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </ProtectedRoute>
   )
 }
 

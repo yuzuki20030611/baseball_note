@@ -8,6 +8,8 @@ from app.crud import profile as profile_crud
 from app.schemas.profile import CreateProfile, ResponseProfile, UpdateProfile
 from app.core.logger import get_logger
 from app.utils.image import save_profile_image, delete_profile_image, validate_image
+from app.models.base import Users
+from sqlalchemy import select
 
 logger = get_logger(__name__)
 
@@ -78,6 +80,19 @@ async def create_profile_endpoint(
             raise HTTPException(
                 status_code=400, detail="生年月日の形式が正しくありません"
             )
+            
+        try:
+            # UUIDとして解析を試みる
+            user_id = UUID(user_id)
+        except ValueError:
+            # UUIDでない場合、Firebase UIDとしてユーザーを検索
+            user_result = await db.execute(
+                select(Users).where(Users.firebase_uid == user_id)
+            )
+            user = user_result.scalar_one_or_none()
+            if not user:
+                raise HTTPException(status_code=404, detail="ユーザーが見つかりません")
+            user_id = user.id
 
         # 画像がアップロードされた場合は保存
         image_path = None  # プロフィール作成なので、画像は保存されていない状態
@@ -91,7 +106,7 @@ async def create_profile_endpoint(
         # CreateProfileモデルを作成
         try:
             profile_data = CreateProfile(
-                user_id=UUID(user_id),
+                user_id=user_id,
                 name=name,
                 team_name=team_name,
                 birthday=birth_date,
@@ -121,15 +136,23 @@ async def create_profile_endpoint(
 
 
 @router.get("/{user_id}", response_model=ResponseProfile, operation_id="get_profile")
-async def get_profile_endpoint(user_id: UUID, db: AsyncSession = Depends(get_async_db)):
+async def get_profile_endpoint(user_id: str, db: AsyncSession = Depends(get_async_db)):
     try:
-        logger.info("プロフィール取得リクエスト成功")
+        logger.info("プロフィール取得リクエスト受信成功")
         # プロフィール取得
-        profile = await profile_crud.get_profile_by_user_id(db, user_id)
-        logger.info("プロフィール取得成功")
+        try:
+            uuid_user_id = UUID(user_id)
+            # UUIDの場合、UUIDで検索
+            profile = await profile_crud.get_profile_by_user_id(db, uuid_user_id)
+        except ValueError:
+            # UUIDでない場合、Firebase UIDとして検索
+            profile = await profile_crud.get_profile_by_firebase_uid(db, user_id)
+
         if profile is None:
             logger.info(f"ユーザー{user_id}のプロフィールが存在しません")
             raise HTTPException(status_code=404, detail="プロフィールが存在しません")
+
+        logger.info("プロフィール取得成功")
         response_profile = ResponseProfile.model_validate(profile)
         return response_profile
     except HTTPException:

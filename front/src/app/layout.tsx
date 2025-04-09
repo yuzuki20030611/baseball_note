@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import { Providers } from '../app/providers'
 import '../styles/globals.css'
 import { auth } from '../auth'
+import { AuthProvider } from '..//contexts/AuthContext'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -20,7 +21,9 @@ export default async function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <body className={inter.className}>
-        <Providers session={session}>{children}</Providers>
+        <Providers session={session}>
+          <AuthProvider>{children}</AuthProvider>
+        </Providers>
       </body>
     </html>
   )

@@ -10,6 +10,8 @@ import { Card } from '../../../components/component/Card/Card'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 import { MenuItemType } from '@/types/AddMenu'
 import { addMenuApi } from '@/api/AddMenu/AddMenu'
+import ProtectedRoute from '@/components/ProtectedRoute'
+import { AccountRole } from '@/types/account'
 
 const TrainingList = () => {
   const [menuItems, setMenuItems] = useState<MenuItemType[]>([])
@@ -47,6 +49,7 @@ const TrainingList = () => {
   }
 
   return (
+        <ProtectedRoute requiredRole={AccountRole.COACH} authRequired={true}>
     <div>
       <div className="flex flex-col min-h-screen">
         <Header role="coach">ホーム画面</Header>
@@ -85,12 +88,12 @@ const TrainingList = () => {
                   <LinkButtons href="/Coach/AddMenu">追加</LinkButtons>
                 </div>
               </div>
-            </div>
-          </Card>
-        </main>
-        <Footer />
+            </Card>
+          </main>
+          <Footer />
+        </div>
       </div>
-    </div>
+    </ProtectedRoute>
   )
 }
 
