@@ -4,6 +4,7 @@ import { SWRConfig } from 'swr'
 import NextTopLoader from 'nextjs-toploader'
 import { SessionProvider } from 'next-auth/react'
 import { Provider } from '../components/ui/provider'
+import { AuthProvider } from '../contexts/AuthContext'
 
 export function Providers({ children, session }: { children: React.ReactNode; session: any }) {
   return (
@@ -16,7 +17,7 @@ export function Providers({ children, session }: { children: React.ReactNode; se
           }}
         >
           <NextTopLoader color="#d53f8c92" height={2} showSpinner={false} />
-          {children}
+          <AuthProvider>{children}</AuthProvider>
         </SWRConfig>
       </Provider>
     </SessionProvider>
