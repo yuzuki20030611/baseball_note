@@ -27,7 +27,7 @@ export const profileApi = {
       if (data.image instanceof File) {
         formData.append('image', data.image)
       }
-
+      
       const response = await axios.post(`${BASE_URL}/profile/`, formData, {
         timeout: 10000, // 10秒のタイムアウト
         headers: {

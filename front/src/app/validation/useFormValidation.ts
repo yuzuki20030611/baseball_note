@@ -1,6 +1,6 @@
 import { CreateProfileRequest } from "../../types/profile"
 
-export type ValidationErrors = {
+export type ProfilleValidationErrors = {
     name?: string, 
     birthday?: string, 
     team_name?: string, 
@@ -17,8 +17,8 @@ export type ValidationErrors = {
  * @returns エラーメッセージの連想配列。問題なければ空のオブジェクト
  */
 
-export const validateProfile = (data: CreateProfileRequest): ValidationErrors => {
-    const errors: ValidationErrors = {}
+export const validateProfile = (data: CreateProfileRequest): ProfilleValidationErrors => {
+    const errors: ProfilleValidationErrors = {}
 
     // 名前のバリデーション
     if(!data.name || data.name.trim() === "") {

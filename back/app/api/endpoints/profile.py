@@ -80,7 +80,7 @@ async def create_profile_endpoint(
             raise HTTPException(
                 status_code=400, detail="生年月日の形式が正しくありません"
             )
-
+            
         try:
             # UUIDとして解析を試みる
             user_id = UUID(user_id)
