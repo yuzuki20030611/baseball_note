@@ -11,7 +11,7 @@ import { Footer } from '../../components/component/Footer/Footer'
 import { resetPassword } from '../services/auth'
 import { Buttons } from '../../components/component/Button/Button'
 import Link from 'next/link'
-import ProtectedRoute from '@/components/ProtectedRoute'
+import ProtectedRoute from '../../components/ProtectedRoute'
 
 const ChangePassword = () => {
   const [email, setEmail] = useState('')

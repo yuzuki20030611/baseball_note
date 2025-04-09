@@ -15,7 +15,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import Link from 'next/link'
 import { Header } from '../../components/component/Header/Header'
 import AlertMessage from '../../components/component/Alert/AlertMessage'
-import ProtectedRoute from '@/components/ProtectedRoute'
+import ProtectedRoute from '../../components/ProtectedRoute'
 
 const CreateAccountHome = () => {
   const router = useRouter()

@@ -14,7 +14,6 @@ type InputFieldProps = {
   name?: string
   className?: string
   maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full' | string // 許可される値を明示的に定義
-  name?: string
 }
 
 export const FormInput = ({
@@ -27,7 +26,6 @@ export const FormInput = ({
   name,
   maxWidth = 'md',
   className = '',
-  name,
   ...props
 }: InputFieldProps) => {
   if (type === 'textarea') {

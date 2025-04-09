@@ -7,8 +7,8 @@ import { PageTitle } from '../../../components/component/Title/PageTitle'
 import { Label } from '../../../components/component/Label/Label'
 import { Card } from '../../../components/component/Card/Card'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
-import ProtectedRoute from '@/components/ProtectedRoute'
-import { AccountRole } from '@/types/account'
+import ProtectedRoute from '../../../components/ProtectedRoute'
+import { AccountRole } from '../../../types/account'
 
 const EditLogin = () => {
   return (

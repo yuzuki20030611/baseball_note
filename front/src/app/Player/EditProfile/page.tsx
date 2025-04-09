@@ -15,11 +15,11 @@ import { profileApi } from '../../../api/client/profile/profileApi'
 import { DominantHand, Position, ProfileResponse } from '../../../types/profile'
 import Image from 'next/image'
 import AlertMessage from '../../../components/component/Alert/AlertMessage'
-import { validateImage, validateProfile, ValidationErrors } from '../../validation/useFormValidation'
+import { validateImage, validateProfile, ProfilleValidationErrors } from '../../validation/useFormValidation'
 import { useAuth } from '../../../contexts/AuthContext'
 import { useRouter } from 'next/navigation'
-import { AccountRole } from '@/types/account'
-import ProtectedRoute from '@/components/ProtectedRoute'
+import { AccountRole } from '../../../types/account'
+import ProtectedRoute from '../../../components/ProtectedRoute'
 
 const EditProfile = () => {
   const { user } = useAuth()
@@ -28,7 +28,7 @@ const EditProfile = () => {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
-  const [validateError, setValidateError] = useState<ValidationErrors>({})
+  const [validateError, setValidateError] = useState<ProfilleValidationErrors>({})
   const [profile, setProfile] = useState<ProfileResponse | null>(null)
   const [name, setName] = useState<string>('')
   const [birthday, setBirthday] = useState<string>('')

@@ -10,8 +10,8 @@ import { Card } from '../../../components/component/Card/Card'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 import { LinkButton } from '../../../components/component/Button/LoginPageButton'
 import { Comment } from '../../../components/component/Chat/Comment'
-import ProtectedRoute from '@/components/ProtectedRoute'
-import { AccountRole } from '@/types/account'
+import ProtectedRoute from '../../../components/ProtectedRoute'
+import { AccountRole } from '../../../types/account'
 
 const CoachNoteDetail = () => {
   return (

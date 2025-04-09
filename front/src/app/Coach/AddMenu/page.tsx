@@ -14,10 +14,8 @@ import { Buttons } from '../../../components/component/Button/Button'
 import { AddMenuValidationErrors, validateAddMenu } from '../../../app/validation/AddMenuValidation'
 import { addMenuApi } from '../../../api/AddMenu/AddMenu'
 import { useRouter } from 'next/navigation'
-import AlertMessage from '@/components/component/Alert/AlertMessage'
-import ProtectedRoute from '@/components/ProtectedRoute'
-import { AccountRole } from '@/types/account'
-
+import ProtectedRoute from '../../../components/ProtectedRoute'
+import { AccountRole } from '../../../types/account'
 
 const AddMenu = () => {
   const router = useRouter()
@@ -27,11 +25,6 @@ const AddMenu = () => {
     menu: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [alert, setAlert] = useState({
-    status: 'success' as 'success' | 'error',
-    message: '',
-    isVisible: false,
-  })
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -44,23 +37,16 @@ const AddMenu = () => {
     if (Object.keys(validationErrors).length > 0) {
       setValidateError(validationErrors)
       setError('入力内容に誤りがあります。各項目を確認してください。')
-      setAlert({ status: 'error', message: '入力内容に誤りがあります', isVisible: true })
       return
     }
 
     try {
       setIsSubmitting(true)
       await addMenuApi.create(formData)
-      setAlert({
-        status: 'success',
-        message: 'トレーニングメニューの追加が完了致しました。',
-        isVisible: true,
-      })
       router.push('/Coach/TrainingList')
     } catch (error) {
       console.error('メニュー追加に失敗しました', error)
       setError('メニュー追加に失敗しました。後ほど再試行してください。')
-      setAlert({ status: 'error', message: 'プロフィール作成に失敗しました', isVisible: true })
     } finally {
       setIsSubmitting(false)
     }
@@ -86,41 +72,39 @@ const AddMenu = () => {
       <div className="min-h-screen flex flex-col bg-white">
         <Header role="coach">ホーム画面</Header>
 
-      <main className="max-w-4xl mx-auto p-6 w-full">
-        <Card>
-          <form onSubmit={handleSubmit}>
-            <PageTitle>トレーニングメニュー追加</PageTitle>
-            <div className="space-y-6">
-              <div className="mt-14">
-                <Label fontSize="24px">トレーニング名： </Label>
-                {/* エラーメッセージの表示部分 */}
-                {error && (
-                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-                    {error}
-                  </div>
-                )}
-                <FormInput
-                  type="text"
-                  name="menu"
-                  defaultValue={formData.menu}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded p-2"
-                />
-                {validateError.menu && <p className="text-red-500 text-sm mt-1">{validateError.menu}</p>}
-                <div className="text-center pt-4 mt-3">
-                  <AlertMessage status={alert.status} message={alert.message} isVisible={alert.isVisible} />
+        <main className="max-w-4xl mx-auto p-6 w-full">
+          <Card>
+            <form onSubmit={handleSubmit}>
+              <PageTitle>トレーニングメニュー追加</PageTitle>
+              <div className="space-y-6">
+                <div className="mt-14">
+                  <Label fontSize="24px">トレーニング名： </Label>
+                  {/* エラーメッセージの表示部分 */}
+                  {error && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                      {error}
+                    </div>
+                  )}
+                  <FormInput
+                    type="text"
+                    name="menu"
+                    value={formData.menu}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded p-2"
+                  />
+                  {validateError.menu && <p className="text-red-500 text-sm mt-1">{validateError.menu}</p>}
+                  <div className="text-center pt-4 mt-3"></div>
+                </div>
+                <div className="flex justify-center space-x-4 pt-6 pb-4">
+                  <LinkButtons href="/Coach/TrainingList">トレーニング一覧に戻る</LinkButtons>
+                  <Buttons type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? '送信中...' : '追加'}
+                  </Buttons>
                 </div>
               </div>
-              <div className="flex justify-center space-x-4 pt-6 pb-4">
-                <LinkButtons href="/Coach/TrainingList">トレーニング一覧に戻る</LinkButtons>
-                <Buttons type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? '送信中...' : '追加'}
-                </Buttons>
-              </div>
-            </div>
-          </form>
-        </Card>
-      </main>
+            </form>
+          </Card>
+        </main>
 
         <Footer />
       </div>

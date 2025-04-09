@@ -11,8 +11,8 @@ import { DeleteButton } from '../../../components/component/Button/Delete'
 import { FormInput } from '../../../components/component/Input/FormInput'
 import { Card } from '../../../components/component/Card/Card'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
-import { AccountRole } from '@/types/account'
-import ProtectedRoute from '@/components/ProtectedRoute'
+import { AccountRole } from '../../../types/account'
+import ProtectedRoute from '../../../components/ProtectedRoute'
 
 const CreateNote = () => {
   return (

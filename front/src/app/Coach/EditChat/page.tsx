@@ -5,8 +5,8 @@ import { Footer } from '../../../components/component/Footer/Footer'
 import { PageTitle } from '../../../components/component/Title/PageTitle'
 import { Card } from '../../../components/component/Card/Card'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
-import ProtectedRoute from '@/components/ProtectedRoute'
-import { AccountRole } from '@/types/account'
+import ProtectedRoute from '../../../components/ProtectedRoute'
+import { AccountRole } from '../../../types/account'
 
 const EditChat = () => {
   return (

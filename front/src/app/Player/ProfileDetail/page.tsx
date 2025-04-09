@@ -14,8 +14,8 @@ import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import AlertMessage from '../../../components/component/Alert/AlertMessage'
 import { useAuth } from '../../../contexts/AuthContext'
-import ProtectedRoute from '@/components/ProtectedRoute'
-import { AccountRole } from '@/types/account'
+import ProtectedRoute from '../../../components/ProtectedRoute'
+import { AccountRole } from '../../../types/account'
 
 const ProfileDetail = () => {
   const { user } = useAuth()

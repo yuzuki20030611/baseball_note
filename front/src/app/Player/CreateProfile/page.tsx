@@ -1,6 +1,6 @@
 'use client'
 
-import React, { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
+import React, { ChangeEvent, FormEvent, useRef, useState } from 'react'
 import { Header } from '../../../components/component/Header/Header'
 import { PageTitle } from '../../../components/component/Title/PageTitle'
 import { Buttons } from '../../../components/component/Button/Button'
@@ -16,8 +16,8 @@ import AlertMessage from '../../../components/component/Alert/AlertMessage'
 import { validateImage, validateProfile, ProfilleValidationErrors } from '../../validation/useFormValidation'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 import { useAuth } from '../../../contexts/AuthContext'
-import ProtectedRoute from '@/components/ProtectedRoute'
-import { AccountRole } from '@/types/account'
+import ProtectedRoute from '../../../components/ProtectedRoute'
+import { AccountRole } from '../../../types/account'
 
 const CreateProfile = () => {
   const { user } = useAuth()

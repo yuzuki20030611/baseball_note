@@ -12,7 +12,7 @@ import { FormInput } from '../../components/component/Input/FormInput'
 import { Buttons } from '../../components/component/Button/Button'
 import Link from 'next/link'
 import { Footer } from '../../components/component/Footer/Footer'
-import ProtectedRoute from '@/components/ProtectedRoute'
+import ProtectedRoute from '../../components/ProtectedRoute'
 
 const LoginPage = () => {
   const router = useRouter()
