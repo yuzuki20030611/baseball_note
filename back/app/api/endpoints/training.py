@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from uuid import UUID
 
@@ -21,9 +21,9 @@ def create_training_menu(training_data: TrainingCreate, db: Session = Depends(ge
     return training_crud.create_training(db, training_data)
 
 
-@router.get("/menu/{firebase_uid}", response_model=TrainingList)
+@router.get("/menu/list", response_model=TrainingList)
 def read_training_menu(
-    firebase_uid: str,
+    firebase_uid: str = Query(..., description="ユーザーのFirebase UID"),
     db: Session = Depends(get_db),
 ):
     """自分で追加したトレーニングメニュー一覧を取得します"""

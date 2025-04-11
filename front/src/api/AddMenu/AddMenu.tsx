@@ -21,7 +21,12 @@ export const addMenuApi = {
   getAll: async (firebase_uid: string): Promise<{ items: MenuItemType[] }> => {
     //[]は複数のオブジェクトを取ってくるので配列にする必要がある。
     try {
-      const response = await axios.get(`${BASE_URL}/training/menu/${firebase_uid}`)
+      const response = await axios.get(`${BASE_URL}/training/menu/list`, {
+        params: { firebase_uid },
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
       return response.data
     } catch (error) {
       console.error('トレーニングメニュー一覧の取得に失敗しました', error)
