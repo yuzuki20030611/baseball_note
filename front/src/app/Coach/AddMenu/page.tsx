@@ -16,12 +16,15 @@ import { addMenuApi } from '../../../api/AddMenu/AddMenu'
 import { useRouter } from 'next/navigation'
 import ProtectedRoute from '../../../components/ProtectedRoute'
 import { AccountRole } from '../../../types/account'
+import { useAuth } from '../../../contexts/AuthContext'
 
 const AddMenu = () => {
+  const { user } = useAuth()
   const router = useRouter()
   const [validateError, setValidateError] = useState<AddMenuValidationErrors>({})
   const [error, setError] = useState<null | string>(null)
   const [formData, setFormData] = useState<CreateAddMenu>({
+    firebase_uid: user?.uid || '',
     menu: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)

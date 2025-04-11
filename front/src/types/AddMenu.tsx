@@ -1,4 +1,5 @@
 export type CreateAddMenu = {
+  firebase_uid: string
   menu: string
 }
 

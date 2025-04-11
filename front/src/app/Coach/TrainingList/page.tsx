@@ -12,17 +12,22 @@ import { MenuItemType } from '../../../types/AddMenu'
 import { addMenuApi } from '../../../api/AddMenu/AddMenu'
 import ProtectedRoute from '../../../components/ProtectedRoute'
 import { AccountRole } from '../../../types/account'
+import { useAuth } from '../../../contexts/AuthContext'
 
 const TrainingList = () => {
+  const { user } = useAuth()
   const [menuItems, setMenuItems] = useState<MenuItemType[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const firebase_uid = user?.uid || ''
 
   const fetchMenuItems = async () => {
     try {
       setIsLoading(true)
-      const response = await addMenuApi.getAll()
-      setMenuItems(response.items)
+      if (firebase_uid) {
+        const response = await addMenuApi.getAll(firebase_uid)
+        setMenuItems(response.items)
+      }
     } catch (error) {
       console.error('トレーニングメニュー詳細一覧の取得に失敗しました。', error)
       setError('メニュー一覧の読み込みに失敗しました。再読み込みしてください。')

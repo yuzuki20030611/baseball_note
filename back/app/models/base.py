@@ -101,6 +101,9 @@ class Users(Base, ModelBaseMixin):
     notes: Mapped["Notes"] = relationship(
         "Notes", back_populates="user", cascade="all, delete-orphan"
     )
+    trainings: Mapped["Trainings"] = relationship(
+        "Trainings", back_populates="user", cascade="all, delete-orphan"
+    )
 
 
 class Position(str, PyEnum):
@@ -192,6 +195,7 @@ class Trainings(Base, ModelBaseMixinWithoutUpdatedAt):
     id: Mapped[UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True
     )
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
 
     menu: Mapped[str] = mapped_column(Text, nullable=False)
 
@@ -200,6 +204,7 @@ class Trainings(Base, ModelBaseMixinWithoutUpdatedAt):
         back_populates="training",
         cascade="all, delete-orphan",  # トレーニングが削除されたとき、関連するtraining_notesも削除
     )
+    user: Mapped["Users"] = relationship("Users", back_populates="trainings")
 
 
 class Comments(Base, ModelBaseMixin):
