@@ -23,7 +23,7 @@ export enum DominantHand {
 }
 
 export type CreateProfileRequest = {
-  user_id: string
+  firebase_uid: string
   name: string
   team_name: string
   birthday: Date | string

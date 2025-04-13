@@ -4,14 +4,14 @@ import axios from 'axios'
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
 
 export const profileApi = {
-  create: async (data: CreateProfileRequest, userId: string) => {
+  create: async (data: CreateProfileRequest, firebase_uid: string) => {
     try {
       // 日付の変換
       const formattedBirthday =
         data.birthday instanceof Date ? data.birthday.toISOString().split('T')[0] : data.birthday
 
       const formData = new FormData()
-      formData.append('user_id', userId)
+      formData.append('firebase_uid', firebase_uid)
       formData.append('name', data.name)
       formData.append('team_name', data.team_name)
       formData.append('birthday', formattedBirthday)
@@ -27,7 +27,7 @@ export const profileApi = {
       if (data.image instanceof File) {
         formData.append('image', data.image)
       }
-      
+
       const response = await axios.post(`${BASE_URL}/profile/`, formData, {
         timeout: 10000, // 10秒のタイムアウト
         headers: {
@@ -60,9 +60,9 @@ export const profileApi = {
       }
     }
   },
-  get: async (userId: string) => {
+  get: async (firebase_uid: string) => {
     try {
-      const response = await axios.get(`${BASE_URL}/profile/${userId}`)
+      const response = await axios.get(`${BASE_URL}/profile/${firebase_uid}`)
       return response.data
     } catch (error: any) {
       if (error.response && error.response.status === 404) {

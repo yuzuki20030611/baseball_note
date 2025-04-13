@@ -25,8 +25,7 @@ const CreateProfile = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [isCompleted, setIsCompleted] = useState<true | null>(null)
   const [formData, setFormData] = useState<CreateProfileRequest>({
-    //現在、ログイン機能を作成していないので現在はこちらのダミーデータを使用して進めております
-    user_id: user?.uid || '', // Firebaseのユーザーuid
+    firebase_uid: user?.uid || '', // Firebaseのユーザーuid
     name: '',
     birthday: new Date(),
     team_name: '',
@@ -85,15 +84,15 @@ const CreateProfile = () => {
       return
     }
 
-    if (!formData.user_id) {
+    if (!formData.firebase_uid) {
       setError('ログインが必要です。再度ログインしてください。')
       setAlert({ status: 'error', message: 'ログインが必要です', isVisible: true })
       return
     }
 
     // ここでUUID形式として有効になっているかについての検証
-    if (!formData.user_id || !/^[A-Za-z0-9]{28}$/.test(formData.user_id)) {
-      console.error('無効なFirebase UID形式:', formData.user_id)
+    if (!formData.firebase_uid || !/^[A-Za-z0-9]{28}$/.test(formData.firebase_uid)) {
+      console.error('無効なFirebase UID形式:', formData.firebase_uid)
       setError('ユーザーIDの形式が正しくありません。再度ログインしてください。')
       return
     }
@@ -106,7 +105,7 @@ const CreateProfile = () => {
     }
     // リクエストする型定義に問題がなければリクエストを開始
     try {
-      await profileApi.create(dataToSubmit, dataToSubmit.user_id)
+      await profileApi.create(dataToSubmit, dataToSubmit.firebase_uid)
       setAlert({
         status: 'success',
         message: 'プロフィール作成に成功しました。',

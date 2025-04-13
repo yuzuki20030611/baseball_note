@@ -46,7 +46,7 @@ const EditProfile = () => {
     isVisible: false,
   })
 
-  const userId = user?.uid || ''
+  const firebase_uid = user?.uid || ''
 
   // 未認証時のリダイレクト処理
   useEffect(() => {
@@ -58,12 +58,12 @@ const EditProfile = () => {
 
   useEffect(() => {
     // ユーザーIDが取得できるまで待機
-    if (!userId) return
+    if (!firebase_uid) return
 
     const fetchProfile = async () => {
       try {
         setLoading(true)
-        const data = await profileApi.get(userId)
+        const data = await profileApi.get(firebase_uid)
         setProfile(data)
         setName(data.name)
         setTeamName(data.team_name)
@@ -88,7 +88,7 @@ const EditProfile = () => {
       }
     }
     fetchProfile()
-  }, [userId])
+  }, [firebase_uid])
   const handleImageClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click()
@@ -131,7 +131,7 @@ const EditProfile = () => {
       introduction: introduction || '',
       image,
       // validateProfileの型に合わせるためにuser_idを追加
-      user_id: userId,
+      firebase_uid: firebase_uid,
     }
     const validationErrors = validateProfile(formData)
     if (image) {

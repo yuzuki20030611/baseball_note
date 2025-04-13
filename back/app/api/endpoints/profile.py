@@ -32,7 +32,7 @@ async def create_profile_endpoint(
     birthday: str = Form(...),
     player_dominant: str = Form(...),
     player_position: str = Form(...),
-    user_id: str = Form(...),
+    firebase_uid: str = Form(...),
     admired_player: Optional[str] = Form(None),
     introduction: Optional[str] = Form(None),
     image: Optional[UploadFile] = File(None),
@@ -84,7 +84,7 @@ async def create_profile_endpoint(
         try:
             # Firebase UIDとしてユーザーを検索
             user_result = await db.execute(
-                select(Users).where(Users.firebase_uid == user_id)
+                select(Users).where(Users.firebase_uid == firebase_uid)
             )
             user = user_result.scalar_one_or_none()
             user_id = user.id
@@ -132,21 +132,25 @@ async def create_profile_endpoint(
         )
 
 
-@router.get("/{user_id}", response_model=ResponseProfile, operation_id="get_profile")
-async def get_profile_endpoint(user_id: str, db: AsyncSession = Depends(get_async_db)):
+@router.get(
+    "/{firebase_uid}", response_model=ResponseProfile, operation_id="get_profile"
+)
+async def get_profile_endpoint(
+    firebase_uid: str, db: AsyncSession = Depends(get_async_db)
+):
     try:
         logger.info("プロフィール取得リクエスト受信成功")
         # プロフィール取得
         try:
             # Firebase UIDとして検索
-            profile = await profile_crud.get_profile_by_firebase_uid(db, user_id)
+            profile = await profile_crud.get_profile_by_firebase_uid(db, firebase_uid)
         except ValueError as e:
             raise HTTPException(
                 status_code=404, detail=f"{e}プロフィールが存在しません"
             )
 
         if profile is None:
-            logger.info(f"ユーザー{user_id}のプロフィールが存在しません")
+            logger.info(f"ユーザー{firebase_uid}のプロフィールが存在しません")
 
         logger.info("プロフィール取得成功")
         response_profile = ResponseProfile.model_validate(profile)
