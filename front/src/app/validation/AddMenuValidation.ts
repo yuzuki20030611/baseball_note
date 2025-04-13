@@ -1,6 +1,7 @@
 import { CreateAddMenu } from "../../types/AddMenu"
 
 export type AddMenuValidationErrors = {
+    firebase_uid?: string
     menu?: string,
 }
 

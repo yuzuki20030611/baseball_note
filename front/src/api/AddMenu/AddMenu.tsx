@@ -11,7 +11,6 @@ export const addMenuApi = {
           'Content-Type': 'application/json', //送信するデータがjson形式であることを伝えている
         },
       })
-      console.log('レスポンス', response.data)
       return response.data
     } catch (error) {
       console.error('メニュー追加に失敗しました', error)
@@ -19,10 +18,15 @@ export const addMenuApi = {
   },
 
   // 一覧取得
-  getAll: async (): Promise<{ items: MenuItemType[] }> => {
+  getAll: async (firebase_uid: string): Promise<{ items: MenuItemType[] }> => {
     //[]は複数のオブジェクトを取ってくるので配列にする必要がある。
     try {
-      const response = await axios.get(`${BASE_URL}/training/menu`)
+      const response = await axios.get(`${BASE_URL}/training/menu/list`, {
+        params: { firebase_uid },
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
       return response.data
     } catch (error) {
       console.error('トレーニングメニュー一覧の取得に失敗しました', error)

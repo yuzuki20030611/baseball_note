@@ -9,11 +9,13 @@ class TrainingBase(BaseModel):
 
 
 class TrainingCreate(TrainingBase):
+    firebase_uid: str = Field(...)
     pass
 
 
 class TrainingInDB(TrainingBase):
     id: UUID
+    user_id: UUID
     created_at: datetime
 
     class Config:
