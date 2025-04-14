@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Form, UploadFile, File, status
+from fastapi import APIRouter, Depends, HTTPException, Form, UploadFile, File
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
@@ -91,14 +91,11 @@ async def create_profile_endpoint(
         except ValueError as e:
             raise HTTPException(status_code=404, detail=f"{e}ユーザーが見つかりません")
 
-        # 画像がアップロードされた場合は保存
         image_path = None  # プロフィール作成なので、画像は保存されていない状態
-        # imageオブジェクト自体が存在し、値が None ではない）image オブジェクトに filename 属性が存在している場合
+        # Firebaseに保存してから、URLを作成するためのパスのみを取得している
+        # image_pathにしているのはデータベースに保存するため
         if image and image.filename:
-            await validate_image(image)
-            image_path = await save_profile_image(
-                image
-            )  # image_pathにしているのはデータベースに保存するため
+            image_path = await save_profile_image(image)
 
         # CreateProfileモデルを作成
         try:

@@ -51,6 +51,7 @@ services:
     environment:
       SQLALCHEMY_WARN_20: 1
       DATABASE_URL: "postgresql://docker:docker@db:5432/baseball_note"
+      FIREBASE_STORAGE_BUCKET: "web-baseball.firebasestorage.app"
     healthcheck:
       test: "curl -f http://localhost:80/docs || exit 1"
       interval: 5s
@@ -74,6 +75,7 @@ services:
       - .:/backend
       - /backend/.venv
       - ./uploads:/backend/uploads  # アップロードディレクトリのマウントを追加
+      - ./.firebase-service-account-key:/backend/app/.firebase-service-account-key.json
     links:
       - db
     restart: always

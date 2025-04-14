@@ -76,8 +76,8 @@ const EditProfile = () => {
         setPlayerPosition(data.player_position)
         setAdmiredPlayer(data.admired_player)
         setIntroduction(data.introduction)
-        if (data.image_path) {
-          setImagePreview(`${process.env.NEXT_PUBLIC_API_URL}${data.image_path}`)
+        if (data.image_url) {
+          setImagePreview(data.image_url)
         }
         setError(null)
       } catch (error: any) {

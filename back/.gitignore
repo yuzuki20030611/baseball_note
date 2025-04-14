@@ -5,7 +5,7 @@ __pycache__/
 
 # 画像をgithubにあげないように記述しました。
 uploads/profile_images/
-
+.firebase-service-account-key.json
 # C extensions
 *.so
 

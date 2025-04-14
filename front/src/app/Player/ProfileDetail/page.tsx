@@ -11,8 +11,6 @@ import { ProfileResponse } from '../../../types/profile'
 import { profileApi } from '../../../api/client/profile/profileApi'
 import { LinkButton } from '../../../components/component/Button/LoginPageButton'
 import Image from 'next/image'
-import { useSearchParams } from 'next/navigation'
-import AlertMessage from '../../../components/component/Alert/AlertMessage'
 import { useAuth } from '../../../contexts/AuthContext'
 import ProtectedRoute from '../../../components/ProtectedRoute'
 import { AccountRole } from '../../../types/account'
@@ -22,15 +20,6 @@ const ProfileDetail = () => {
   const [profile, setProfile] = useState<ProfileResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [alert, setAlert] = useState({
-    status: 'success' as 'success' | 'error',
-    message: '',
-    isVisible: false,
-  })
-
-  // URLパラメータを取得
-  const searchParams = useSearchParams()
-  const success = searchParams.get('success')
 
   const userId = user?.uid || ''
 
@@ -91,10 +80,6 @@ const ProfileDetail = () => {
               </div>
             ) : (
               <>
-                {/* アラートメッセージを追加 */}
-                <div className="max-w-4xl mx-auto">
-                  <AlertMessage status={alert.status} message={alert.message} isVisible={alert.isVisible} />
-                </div>
                 {/* カード内 */}
                 <div className="max-w-4xl mx-auto p-8">
                   <div className="text-right pb-1 pr-8 mr-8">
@@ -107,10 +92,10 @@ const ProfileDetail = () => {
                     </div>
                     {/* プロフィールとメイン情報 */}
                     <div className="flex flex-col items-center mb-8">
-                      {profile.image_path ? (
+                      {profile.image_url ? (
                         <div className="w-40 h-40 rounded-full overflow-hidden mb-4">
                           <Image
-                            src={`${process.env.NEXT_PUBLIC_API_URL}${profile.image_path}`}
+                            src={profile.image_url}
                             alt="プロフィール画像"
                             width={160}
                             height={160}
