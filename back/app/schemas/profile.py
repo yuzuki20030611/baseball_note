@@ -1,10 +1,13 @@
-from pydantic import BaseModel, Field, ConfigDict, field_validator, validator
+from pydantic import BaseModel, Field, ConfigDict, field_validator, model_validator
 from datetime import date, datetime
 from typing import Optional
 from uuid import UUID
 from app.models.base import Position, DominantHand
+from app.core.logger import get_logger
 
 # ここでプロフィール作成のリクエスト、レスポンス、更新の型を作成していく/
+
+logger = get_logger(__name__)
 
 
 # リクエストモデル
@@ -25,6 +28,11 @@ class CreateProfile(BaseModel):
     )
     image_path: Optional[str] = None
 
+    class Config:
+        # SQLAlchemyモデルとの互換性を確保
+        from_attributes = True
+        populate_by_name = True
+
     @field_validator("birthday")
     @classmethod
     def validate_birthday(cls, v: date) -> date:
@@ -36,11 +44,6 @@ class CreateProfile(BaseModel):
         if v < min_date:
             raise ValueError("生年月日は1900年以降の日付を入力してください")
         return v
-
-    class Config:
-        # SQLAlchemyモデルとの互換性を確保
-        from_attributes = True
-        populate_by_name = True
 
 
 # レスポンスモデル
@@ -55,6 +58,7 @@ class ResponseProfile(BaseModel):
     admired_player: Optional[str] = None
     introduction: Optional[str] = None
     image_path: Optional[str] = None
+    image_url: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
@@ -63,6 +67,18 @@ class ResponseProfile(BaseModel):
         from_attributes=True,  # SQLAlchemyモデルからの変換を可能にする
         populate_by_name=True,  # 名前でフィールドをマッピング
     )
+
+    # 全ての型定義の検証が終わった後にデータベーに保存しているpathを使用してFirebaseStorageに
+    # 保存しているpathから一致するものを取得し、そのpathからURL生成する
+    @model_validator(mode="after")
+    def generate_image_url(self):
+        """image_pathからURLを生成"""
+        if self.image_path and not self.image_url:
+            from app.utils.image import get_image_url
+
+            self.image_url = get_image_url(self.image_path)
+
+        return self
 
 
 # 更新モデル

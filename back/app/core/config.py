@@ -4,6 +4,7 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 # coreディレクトリは、アプリケーションの中核となる設定や機能を格納する場所です
 # アプリケーション全体の設定
 # データベース設定
@@ -37,6 +38,9 @@ class Settings(BaseSettings):
     PROFILE_IMAGE_DIR: str = "profile_images"
     MAX_IMAGE_SIZE: int = 5 * 1024 * 1024  # 5MB
 
+    # Firebase設定
+    FIREBASE_STORAGE_BUCKET: str = "web-baseball.firebasestorage.app"
+    FIREBASE_SERVICE_ACCOUNT_KEY_PATH: str = ".firebase-service-account-key.json"
 
     def get_database_url(self, is_async: bool = False) -> str:
         if is_async:

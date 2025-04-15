@@ -200,7 +200,7 @@ const CreateProfile = () => {
                               alt="プロフィール画像"
                               width={128}
                               height={128}
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-cover rounded-full"
                             />
                           ) : (
                             <svg

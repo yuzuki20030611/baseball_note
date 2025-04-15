@@ -45,6 +45,7 @@ export type ProfileResponse = {
   admired_player: string | null
   introduction: string | null
   image_path: string | null
+  image_url: string | null
   created_at: string
   updated_at: string
 }
