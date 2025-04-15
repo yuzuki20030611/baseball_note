@@ -20,10 +20,10 @@ const PlayerHome = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const userId = user?.uid || ''
+  const firebase_uid = user?.uid || ''
 
   //ホームページを開いたらまずここの処理が動く。
-  //userIdでこちらのIdのプロフィール情報を取得する。
+  //firebase_uidでこちらのIdのプロフィール情報を取得する。
   //setHasProfile(!!profileData)でプロフィール情報が存在するかどうかの真偽を判定
   //存在する場合と存在しない場合を作成し、最終的にsetLoadingをfalseにする
   useEffect(() => {
@@ -31,7 +31,7 @@ const PlayerHome = () => {
       try {
         setLoading(true)
         setError(null)
-        const profileData = await profileApi.get(userId)
+        const profileData = await profileApi.get(firebase_uid)
         // プロフィールの存在チェックを改善
         if (profileData && profileData.id) {
           setHasProfile(true)
@@ -55,7 +55,7 @@ const PlayerHome = () => {
       }
     }
     checkProfile()
-  }, [userId])
+  }, [firebase_uid])
   return (
     <ProtectedRoute requiredRole={AccountRole.PLAYER} authRequired={true}>
       <div className="min-h-screen">

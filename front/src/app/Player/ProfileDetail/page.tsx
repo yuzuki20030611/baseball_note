@@ -21,10 +21,10 @@ const ProfileDetail = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  const userId = user?.uid || ''
+  const firebase_uid = user?.uid || ''
 
   useEffect(() => {
-    if (!userId) {
+    if (!firebase_uid) {
       setLoading(false)
       return
     }
@@ -32,7 +32,7 @@ const ProfileDetail = () => {
     const fetchProfile = async () => {
       try {
         setLoading(true)
-        const data = await profileApi.get(userId)
+        const data = await profileApi.get(firebase_uid)
         setProfile(data)
         setError(null)
       } catch (error: any) {
@@ -42,10 +42,10 @@ const ProfileDetail = () => {
         setLoading(false)
       }
     }
-    if (userId) {
+    if (firebase_uid) {
       fetchProfile()
     }
-  }, [userId])
+  }, [firebase_uid])
 
   const formatBirthday = (dateString: string | undefined) => {
     if (!dateString) return ''
