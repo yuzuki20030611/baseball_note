@@ -32,6 +32,7 @@ export type CreateProfileRequest = {
   admired_player?: string
   introduction?: string
   image?: File | null
+  delete_image?: boolean
 }
 
 export type ProfileResponse = {
