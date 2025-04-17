@@ -104,7 +104,9 @@ export const profileApi = {
       if (data.player_position !== undefined) formData.append('player_position', data.player_position)
       if (data.admired_player !== undefined) formData.append('admired_player', data.admired_player)
       if (data.introduction !== undefined) formData.append('introduction', data.introduction)
-      if (data.image instanceof File) {
+      // 画像削除フラグがtrueの場合、それを送信
+      if (data.delete_image !== undefined) formData.append('delete_image', data.delete_image.toString())
+      if (data.image) {
         formData.append('image', data.image)
       }
 

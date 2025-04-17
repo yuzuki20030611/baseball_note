@@ -24,6 +24,7 @@ const CreateProfile = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [isCompleted, setIsCompleted] = useState<true | null>(null)
+  const [deleteImage, setDeleteImage] = useState<boolean>(false)
   const [formData, setFormData] = useState<CreateProfileRequest>({
     firebase_uid: user?.uid || '', // Firebaseのユーザーuid
     name: '',
@@ -153,6 +154,16 @@ const CreateProfile = () => {
       setImagePreview(imageUrl)
     }
   }
+
+  const handleDeleteImage = () => {
+    if (window.confirm('プロフィールを削除しますか？')) {
+      setDeleteImage(true)
+      setImagePreview(null)
+      const fileInput = document.getElementById('profileImageInput') as HTMLInputElement
+      if (fileInput) fileInput.value = ''
+    }
+  }
+
   // instanceof を使って、Dateであった場合に文字列に変換
   const formatDateForInput = (dateValue: Date | string): string => {
     if (dateValue instanceof Date) {
@@ -226,10 +237,37 @@ const CreateProfile = () => {
                           accept="image/*" //選択できるファイルを画像ファイルのみに制限
                           onChange={handleImageChange}
                           className="hidden"
+                          id="profileImageInput"
                         />
-                        <Buttons width="100px" type="button" onClick={handleImageSelect}>
-                          写真を選ぶ
-                        </Buttons>
+                        <div className="flex flex-justify-center space-x-3">
+                          <Buttons width="120px" type="button" onClick={handleImageSelect}>
+                            <span className="flex items-center">
+                              <svg className="w-4 h-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path
+                                  fillRule="evenodd"
+                                  d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                              写真を選ぶ
+                            </span>
+                          </Buttons>
+                          {imagePreview && (
+                            <Buttons width="90px" onClick={handleDeleteImage}>
+                              <span className="flex items-center">
+                                <svg className="w-4 h-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                                削除
+                              </span>
+                            </Buttons>
+                          )}
+                        </div>
+
                         {validateError.image && <p className="text-red-500 text-sm mt-1">{validateError.image}</p>}
                       </div>
 

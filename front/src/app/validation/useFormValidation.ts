@@ -81,8 +81,12 @@ export const validateProfile = (data: CreateProfileRequest): ProfilleValidationE
  * @returns エラーメッセージ。問題なければnull
  */
 
-export const validateImage = (file: File | null | undefined): string | null => {
-    if(!file) return null
+export const validateImage = (file: File | null | undefined): string | undefined => {
+    if(!file) return undefined
+
+    if(!(file instanceof File)) {
+        return "有効なファイルオブジェクトではありません。"
+    }
 
     if(file.size > 5 * 1024 * 1024) {
         return "画像のサイズは5MB以下を返してください"
@@ -91,5 +95,5 @@ export const validateImage = (file: File | null | undefined): string | null => {
     if(!file.type.startsWith('image/')) {
         return "画像ファイルを選択してください"
     }
-    return null
+    return undefined
 }
