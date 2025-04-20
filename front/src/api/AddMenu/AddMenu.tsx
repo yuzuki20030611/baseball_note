@@ -44,4 +44,19 @@ export const addMenuApi = {
       throw error
     }
   },
+
+  getAllMenus: async (): Promise<{ items: MenuItemType[] }> => {
+    try {
+      const response = await axios.get(`${BASE_URL}/training/menu/all`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      return response.data
+    } catch (error) {
+      console.error('トレーニングメニュー一覧の取得に失敗しました', error)
+      // ここに return 文がない
+      throw error // throwされるが、型には反映されていない
+    }
+  },
 }

@@ -14,6 +14,9 @@ type InputFieldProps = {
   rows?: number
   height?: string | number
   className?: string
+  maxWidth?: string | number
+  min?: number
+  step?: number | string
 }
 
 export const FullInput = ({
@@ -21,10 +24,13 @@ export const FullInput = ({
   placeholder,
   value,
   name,
+  min,
+  step,
   onChange,
   children,
   rows = 3,
   height,
+  maxWidth = 'full',
   className = '',
   ...props
 }: InputFieldProps) => {
@@ -49,7 +55,7 @@ export const FullInput = ({
         border="2px solid"
         borderColor="black"
         backgroundColor="white"
-        maxWidth="full"
+        maxWidth={maxWidth}
         transition="0.3s"
         height={height}
         className={className}
@@ -67,12 +73,14 @@ export const FullInput = ({
       backgroundColor="white"
       name={name}
       value={formattedValue}
+      min={min}
+      step={step}
       padding="3px 10px"
       onChange={onChange}
       border="2px solid"
       autoComplete="new-password"
       borderColor="black"
-      maxWidth="full"
+      maxWidth={maxWidth}
       className={className}
       transition="0.3s"
       {...props}

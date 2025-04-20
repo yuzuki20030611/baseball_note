@@ -34,7 +34,7 @@ export default function ProtectedRoute({ children, requiredRole, authRequired = 
         }
       }
     }
-  }, [user, loading, authRequired, router])
+  }, [user, role, loading, router, requiredRole, authRequired])
 
   if (loading) {
     return <div>Loading...</div>
