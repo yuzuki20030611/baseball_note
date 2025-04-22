@@ -54,3 +54,14 @@ class NoteResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class NoteListItem(BaseModel):
+    id: UUID
+    created_at: datetime
+    theme: str
+    assignment: str
+
+
+class NoteListResponse(BaseModel):
+    items: List[NoteListItem]

@@ -1,13 +1,23 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Form, File, UploadFile
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status,
+    Form,
+    File,
+    UploadFile,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 import json
 
-from app.core.database import get_async_db
-from app.schemas.note import NoteResponse
+from app.core.database import get_async_db, get_db
+from app.schemas.note import NoteResponse, NoteListResponse
 from app.crud import note as note_crud
 from app.utils.video import validate_video, save_note_video
 from app.core.logger import get_logger
+from sqlalchemy.orm import Session
+from uuid import UUID
 
 logger = get_logger(__name__)
 router = APIRouter()
@@ -114,3 +124,36 @@ async def create_note(
     except Exception as e:
         logger.error(f"ノート作成エラー: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail="サーバーエラーが発生しました")
+
+
+@router.get("/get/{firebase_uid}", response_model=NoteListResponse)
+def get_user_notes(
+    firebase_uid: str,
+    db: Session = Depends(get_db),
+):
+    """自分で作成したノートの一覧を取得します"""
+    try:
+        # ユーザーの取得
+        user = note_crud.get_user_by_firebase_uid_sync(db, firebase_uid)
+        if not user:
+            logger.warning(f"ユーザーが見つかりません: {firebase_uid}")
+            raise HTTPException(status_code=404, detail="ユーザーが見つかりません")
+
+        notes = note_crud.get_login_user_note_sync(db, user.id)
+        return {"items": notes}
+    except Exception as e:
+        logger.error(f"ノート取得エラー:{str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=500, detail=f"ノート取得中にエラーが発生しました: {str(e)}"
+        )
+
+
+@router.delete("/{note_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_note(note_id: UUID, db: Session = Depends(get_db)):
+    """指定されたIDのノートを論理削除します"""
+    success = note_crud.delete_note(db, note_id)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="ノートが見つかりません"
+        )
+    return None

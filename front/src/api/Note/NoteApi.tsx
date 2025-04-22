@@ -1,9 +1,10 @@
 import axios from 'axios'
-import { CreateNoteRequest } from '../../types/note'
+import { CreateNoteRequest, NoteListResponse } from '../../types/note'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
 
 export const noteApi = {
+  // ノート作成の関数
   createNote: async (data: CreateNoteRequest, firebase_uid: string) => {
     if (!firebase_uid) {
       throw new Error('ユーザーが認証されていません')
@@ -68,6 +69,28 @@ export const noteApi = {
       }
 
       // エラーを外部に投げる
+      throw error
+    }
+  },
+
+  // ログインしているユーザーが作成したノートの一覧を取得
+  getLoginUserNote: async (firebase_uid: string): Promise<NoteListResponse> => {
+    try {
+      const response = await axios.get(`${BASE_URL}/note/get/${firebase_uid}`)
+      return response.data
+    } catch (error: any) {
+      console.error('ノート一覧の取得に失敗しました', error)
+      throw error
+    }
+  },
+
+  // 指定したノートを論理削除で削除する
+  deleteNote: async (noteId: string): Promise<boolean> => {
+    try {
+      await axios.delete(`${BASE_URL}/note/${noteId}`)
+      return true
+    } catch (error) {
+      console.error('ノート削除に失敗しました', error)
       throw error
     }
   },

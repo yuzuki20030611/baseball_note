@@ -13,19 +13,22 @@ import { profileApi } from '../../../api/client/profile/profileApi'
 import ProtectedRoute from '../../../components/ProtectedRoute'
 import { AccountRole } from '../../../types/account'
 import { useAuth } from '../../../contexts/AuthContext'
+import { noteApi } from '../../../api/Note/NoteApi'
+import { NoteListItem } from '../../../types/note'
 
 const PlayerHome = () => {
   const { user } = useAuth()
   const [hasProfile, setHasProfile] = useState(false)
+  const [notes, setNotes] = useState<NoteListItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [notesLoading, setNotesLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
+  const ITEMS_PER_PAGE = 3
 
   const firebase_uid = user?.uid || ''
 
-  //ホームページを開いたらまずここの処理が動く。
-  //firebase_uidでこちらのIdのプロフィール情報を取得する。
-  //setHasProfile(!!profileData)でプロフィール情報が存在するかどうかの真偽を判定
-  //存在する場合と存在しない場合を作成し、最終的にsetLoadingをfalseにする
+  // プロフィール情報の取得
   useEffect(() => {
     const checkProfile = async () => {
       try {
@@ -56,11 +59,81 @@ const PlayerHome = () => {
     }
     checkProfile()
   }, [firebase_uid])
+
+  // ノート一覧の取得
+  useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        if (!firebase_uid) return
+
+        setNotesLoading(true)
+        const response = await noteApi.getLoginUserNote(firebase_uid)
+
+        // response.itemsが配列であることを確認
+        if (response && response.items && Array.isArray(response.items)) {
+          setNotes(response.items)
+        } else {
+          console.error('APIレスポンスの形式が不正です:', response)
+          setNotes([])
+        }
+      } catch (error) {
+        console.error('ノート取得エラー:', error)
+        setError('ノート一覧の取得に失敗しました。')
+        setNotes([])
+      } finally {
+        setNotesLoading(false)
+      }
+    }
+    if (firebase_uid) {
+      fetchNotes()
+    }
+  }, [firebase_uid])
+
+  const handleDelete = async (noteId: string) => {
+    if (window.confirm('このノートを削除してもよろしいでしょうか？')) {
+      try {
+        setNotesLoading(true)
+        await noteApi.deleteNote(noteId)
+        // 削除したいノートと一致しないノートのみを残すように更新する
+        setNotes(notes.filter((note) => note.id !== noteId))
+
+        alert('削除に成功しました')
+      } catch (error) {
+        console.error('削除に失敗しました')
+        setError('ノートの削除に失敗しました')
+      } finally {
+        setNotesLoading(false)
+      }
+    }
+  }
+
+  // 日付のフォーマット
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString)
+      return date.toISOString().split('T')[0] // YYYY-MM-DD形式
+    } catch (e) {
+      console.error('日付変換エラー:', e)
+      return dateString || ''
+    }
+  }
+
+  // さらに表示をクリックした時の処理
+  const loadMore = () => {
+    setPage((prevPage) => prevPage + 1)
+  }
+
+  // 表示するノートのリスト（取得したノートを何個表示するのかについての関数）
+  const displayedNotes = notes.slice(0, page * ITEMS_PER_PAGE)
+  // さらに表示ボタンを表示するか、しないかを決める変数
+  const hasMore = notes.length > page * ITEMS_PER_PAGE
+
   return (
     <ProtectedRoute requiredRole={AccountRole.PLAYER} authRequired={true}>
       <div className="min-h-screen">
         <div className="flex flex-col min-h-screen">
-          <Header />
+          <Header role="player" />
+          <p>{error}</p>
 
           <main className="flex-grow container mx-auto p-6 overflow-y-auto h-[calc(100vh-200px)]">
             <Card>
@@ -94,51 +167,71 @@ const PlayerHome = () => {
                 </LinkButtons>
               </div>
 
-              <table className="w-full">
+              <table className="w-full table-fixed border-collapse">
+                <colgroup>
+                  <col className="w-[15%]" /> {/* 日付 */}
+                  <col className="w-[30%]" /> {/* 本日のテーマ */}
+                  <col className="w-[30%]" /> {/* 課題 */}
+                  <col className="w-[12.5%]" /> {/* 詳細 */}
+                  <col className="w-[12.5%]" /> {/* 削除 */}
+                </colgroup>
                 <thead className="bg-gray-100 border-b-2 border-gray-200">
                   <tr>
                     <th className="px-1 py-3 text-center text-xl font-semibold text-gray-700">日付</th>
                     <th className="px-1 py-3 text-center text-xl font-semibold text-gray-700">本日のテーマ</th>
                     <th className="px-1 py-3 text-center text-xl font-semibold text-gray-700">課題</th>
                     <th className="px-1 py-3 text-center text-xl font-semibold text-gray-700">詳細</th>
+                    <th className="px-1 py-3 text-center text-xl font-semibold text-gray-700">削除</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  <tr className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-center text-sm text-gray-600">2025-02-02</td>
-                    <td className="px-6 py-4 text-center text-sm text-gray-600">バッティング</td>
-                    <td className="px-6 py-4 text-center text-sm text-gray-600">守備</td>
-                    <td className="px-6 py-4 text-center">
-                      <LinkButtons href="/Player/NoteDetail" className="text-3xl">
-                        📖⇨
-                      </LinkButtons>
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-center text-sm text-gray-600">2025-02-02</td>
-                    <td className="px-6 py-4 text-center text-sm text-gray-600">バッティング</td>
-                    <td className="px-6 py-4 text-center text-sm text-gray-600">守備</td>
-                    <td className="px-6 py-4 text-center">
-                      <LinkButtons href="/Player/NoteDetail" className="text-3xl">
-                        📖⇨
-                      </LinkButtons>
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-center text-sm text-gray-600">2025-02-02</td>
-                    <td className="px-6 py-4 text-center text-sm text-gray-600">バッティング</td>
-                    <td className="px-6 py-4 text-center text-sm text-gray-600">守備</td>
-                    <td className="px-6 py-4 text-center">
-                      <LinkButtons href="/Player/NoteDetail" className="text-3xl">
-                        📖⇨
-                      </LinkButtons>
-                    </td>
-                  </tr>
+                  {notesLoading ? (
+                    <tr>
+                      <td colSpan={4} className="px-6 py-4 text-center text-sm text-gray-600">
+                        読み込み中...
+                      </td>
+                    </tr>
+                  ) : displayedNotes.length > 0 ? (
+                    displayedNotes.map((note) => (
+                      <tr key={note.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 text-center text-sm text-gray-600">{formatDate(note.created_at)}</td>
+                        <td className="px-6 py-4 text-center text-sm text-gray-600">
+                          <div className="truncate mx-auto" title={note.theme}>
+                            {note.theme}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-center text-sm text-gray-600">
+                          <div className="truncate mx-auto" title={note.assignment || ''}>
+                            {note.assignment || ''}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-center w-[100px]">
+                          <LinkButtons href={`/Player/NoteDetail/${note.id}`} className="text-md ">
+                            詳細
+                          </LinkButtons>
+                        </td>
+                        <td className="px-6 py-4 text-center w-[100px]">
+                          <Buttons onClick={() => handleDelete(note.id)}>削除</Buttons>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="px-6 py-4 text-center text-sm text-gray-600">
+                        ノートが見つかりません
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
-              <div className="flex justify-center pt-10">
-                <Buttons width="130px">さらに表示</Buttons>
-              </div>
+
+              {hasMore && (
+                <div className="flex justify-center pt-10">
+                  <Buttons width="130px" onClick={loadMore}>
+                    さらに表示
+                  </Buttons>
+                </div>
+              )}
             </Card>
           </main>
         </div>

@@ -15,3 +15,14 @@ export type TrainingInput = {
   training_id: string
   count: number
 }
+
+export type NoteListItem = {
+  id: string
+  created_at: string
+  theme: string
+  assignment: string
+}
+
+export type NoteListResponse = {
+  items: NoteListItem[]
+}
