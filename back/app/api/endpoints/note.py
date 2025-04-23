@@ -8,15 +8,17 @@ from fastapi import (
     UploadFile,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
+
 from typing import Optional
 import json
 
 from app.core.database import get_async_db, get_db
-from app.schemas.note import NoteResponse, NoteListResponse
+from app.schemas.note import NoteResponse, NoteListResponse, NoteDetailResponse
 from app.crud import note as note_crud
 from app.utils.video import validate_video, save_note_video
 from app.core.logger import get_logger
-from sqlalchemy.orm import Session
+
 from uuid import UUID
 
 logger = get_logger(__name__)
@@ -157,3 +159,63 @@ def delete_note(note_id: UUID, db: Session = Depends(get_db)):
             status_code=status.HTTP_404_NOT_FOUND, detail="ノートが見つかりません"
         )
     return None
+
+
+@router.get("/detail/{note_id}", response_model=NoteDetailResponse)
+def get_note_detail(note_id: UUID, db: Session = Depends(get_db)):
+    """ノートの詳細情報を取得します"""
+    try:
+        # ノート詳細の取得
+        note_detail = note_crud.get_note_detail(db, note_id)
+        if not note_detail:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="ノートが見つかりません"
+            )
+
+        # training_notesというカラムにnote_detail.training_notesの情報を入れる際、リスト形式で情報を入れたい
+        # ですが、元々はオブジェクトになっていてエラーが出るため無理矢理にリスト形式に変換している
+        training_notes_list = []
+        if note_detail.training_notes:
+            # コレクションタイプをチェック
+            if isinstance(note_detail.training_notes, list):
+                training_notes_list = note_detail.training_notes
+            else:
+                # 単一のオブジェクトの場合はリストに変換
+                training_notes_list = [note_detail.training_notes]
+
+        response_data = {
+            "id": note_detail.id,
+            "user_id": note_detail.user_id,
+            "theme": note_detail.theme,
+            "assignment": note_detail.assignment,
+            "practice_video": note_detail.practice_video,
+            "my_video": note_detail.my_video,
+            "weight": note_detail.weight,
+            "sleep": note_detail.sleep,
+            "looked_day": note_detail.looked_day,
+            "practice": note_detail.practice,
+            "created_at": note_detail.created_at,
+            "updated_at": note_detail.updated_at,
+            "training_notes": [
+                {
+                    "id": tn.id,
+                    "training_id": tn.training_id,
+                    "note_id": tn.note_id,
+                    "count": tn.count,
+                    "created_at": tn.created_at,
+                    "updated_at": tn.updated_at,
+                    "training": {"id": tn.training.id, "menu": tn.training.menu}
+                    if tn.training
+                    else None,
+                }
+                for tn in training_notes_list
+            ],
+        }
+
+        return NoteDetailResponse.model_validate(response_data)
+    except Exception as e:
+        logger.error(f"ノート詳細取得エラー: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"ノート詳細取得中にエラーが発生しました: {str(e)}",
+        )

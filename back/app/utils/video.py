@@ -73,3 +73,31 @@ async def save_note_video(video: UploadFile) -> str:
     except Exception as e:
         logger.error(f"動画保存エラー: {str(e)}")
         raise HTTPException(status_code=500, detail=f"動画保存に失敗しました: {str(e)}")
+
+
+def get_video_url(video_path: str) -> str:
+    """Firebase Storageの動画を取得する"""
+    if not video_path:
+        logger.info("ビデオのパスが見つかりません")
+        return None
+    try:
+        # バケット取得
+        bucket = storage.bucket()
+
+        # 作成していたblob取得を取得
+        blob = bucket.blob(video_path)
+
+        # blobが存在するか確認
+        exists = blob.exists()
+
+        if not exists:
+            logger.warning(f"動画が見つかりません: {video_path}")
+            return None
+
+        # 署名付きURL生成（1時間有効）
+        url = blob.generate_signed_url(version="v4", expiration=3600, method="GET")
+        logger.info(f"動画URL生成方法: {url[:50]}...")
+        return url
+    except Exception as e:
+        logger.info(f"URL生成エラー: {str(e)}", exc_info=True)
+        return None

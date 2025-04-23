@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { CreateNoteRequest, NoteListResponse } from '../../types/note'
+import { CreateNoteRequest, NoteDetailResponse, NoteListResponse } from '../../types/note'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
 
@@ -91,6 +91,17 @@ export const noteApi = {
       return true
     } catch (error) {
       console.error('ノート削除に失敗しました', error)
+      throw error
+    }
+  },
+
+  // 1つのノートの詳細な情報を全て取得
+  getNoteDetail: async (noteId: string): Promise<NoteDetailResponse> => {
+    try {
+      const response = await axios.get(`${BASE_URL}/note/detail/${noteId}`)
+      return response.data
+    } catch (error) {
+      console.error('ノート詳細の取得に失敗しました', error)
       throw error
     }
   },

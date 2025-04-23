@@ -1,12 +1,11 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Optional
+
 from uuid import UUID
 import json
-from typing import List, Dict
+from typing import List, Dict, Optional
 import datetime
-
-from sqlalchemy import select, desc
 from app.models.base import Notes, TrainingNotes, Users
 
 
@@ -51,8 +50,6 @@ async def create_note(
 
 async def get_user_by_firebase_uid(db: Session, firebase_uid: str) -> Optional[Users]:
     """Firebase UIDからユーザーを取得（非同期バージョン）"""
-    from sqlalchemy import select
-    from app.models.base import Users
 
     result = await db.execute(select(Users).where(Users.firebase_uid == firebase_uid))
     return result.scalar_one_or_none()
@@ -60,8 +57,6 @@ async def get_user_by_firebase_uid(db: Session, firebase_uid: str) -> Optional[U
 
 def get_user_by_firebase_uid_sync(db: Session, firebase_uid: str) -> Optional[Users]:
     """Firebase UIDからユーザーを取得（同期バージョン）"""
-    from sqlalchemy import select
-    from app.models.base import Users
 
     result = db.execute(select(Users).where(Users.firebase_uid == firebase_uid))
     return result.scalar_one_or_none()
@@ -104,3 +99,20 @@ def delete_note(db: Session, note_id: UUID) -> bool:
     note.deleted_at = datetime.datetime.now()
     db.commit()
     return True
+
+
+def get_note_detail(db: Session, note_id: UUID):
+    """ノートの詳細情報を取得する"""
+
+    # ノートとトレーニングノート、トレーニング情報を一緒に取得
+    note = (
+        db.query(Notes)
+        .options(joinedload(Notes.training_notes).joinedload(TrainingNotes.training))
+        .filter(Notes.id == note_id, Notes.deleted_at.is_(None))
+        .first()
+    )
+
+    if not note:
+        return None
+
+    return note

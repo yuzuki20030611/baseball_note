@@ -89,6 +89,7 @@ const PlayerHome = () => {
     }
   }, [firebase_uid])
 
+  // ノート削除の関数
   const handleDelete = async (noteId: string) => {
     if (window.confirm('このノートを削除してもよろしいでしょうか？')) {
       try {
@@ -180,8 +181,8 @@ const PlayerHome = () => {
                     <th className="px-1 py-3 text-center text-xl font-semibold text-gray-700">日付</th>
                     <th className="px-1 py-3 text-center text-xl font-semibold text-gray-700">本日のテーマ</th>
                     <th className="px-1 py-3 text-center text-xl font-semibold text-gray-700">課題</th>
-                    <th className="px-1 py-3 text-center text-xl font-semibold text-gray-700">詳細</th>
-                    <th className="px-1 py-3 text-center text-xl font-semibold text-gray-700">削除</th>
+                    <th className="px-1 py-3 text-center text-xl font-semibold text-gray-700">ノート詳細</th>
+                    <th className="px-1 py-3 text-center text-xl font-semibold text-gray-700">ノート削除</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
