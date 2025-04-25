@@ -65,9 +65,8 @@ async def save_note_video(video: UploadFile) -> str:
             content_type = "video/x-ms-wmv"
 
         # アップロード
-        blob.upload_from_string(contents, content_type=content_type)
+        blob.upload_from_string(contents, content_type=content_type, timeout=300)
 
-        logger.info(f"動画保存成功: {storage_path}")
         return storage_path
 
     except Exception as e:
@@ -101,3 +100,28 @@ def get_video_url(video_path: str) -> str:
     except Exception as e:
         logger.info(f"URL生成エラー: {str(e)}", exc_info=True)
         return None
+
+
+async def delete_note_video(video_path: str) -> bool:
+    """Firebase Storageから動画を削除する"""
+    if not video_path:
+        return False
+
+    try:
+        # バケット取得
+        bucket = storage.bucket()
+
+        # blob取得
+        blob = bucket.blob(video_path)
+
+        # 存在確認して削除
+        if blob.exists():
+            blob.delete()
+            logger.info(f"動画削除成功: {video_path}")
+            return True
+        else:
+            logger.warning(f"削除対象の動画が見つかりません: {video_path}")
+            return False
+    except Exception as e:
+        logger.error(f"動画削除エラー: {str(e)}")
+        return False

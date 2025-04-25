@@ -54,3 +54,20 @@ export type NoteDetailResponse = {
     } | null
   }[]
 }
+
+export type UpdateNoteRequest = {
+  firebase_uid: string
+  theme: string
+  assignment: string
+  practice_video?: string
+  my_video?: File | null
+  delete_video?: boolean
+  weight: number | string
+  sleep: number | string
+  looked_day: string
+  practice?: string
+  trainings: {
+    training_id: string
+    count: number
+  }[]
+}

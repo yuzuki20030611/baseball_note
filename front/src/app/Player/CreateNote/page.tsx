@@ -183,8 +183,8 @@ const CreateNote = () => {
     try {
       setIsLoading(true)
       // noteApiを呼び出す
-      const result = await noteApi.createNote(formData, formData.firebase_uid)
-      console.log(result, 'レスポンスデータ')
+      await noteApi.createNote(formData, formData.firebase_uid)
+      alert('ノートの作成に成功しました！')
       router.push('/Player/Home')
     } catch (error) {
       console.error('ノート作成に失敗しました', error)

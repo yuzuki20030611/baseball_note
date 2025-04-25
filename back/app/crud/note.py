@@ -7,6 +7,9 @@ import json
 from typing import List, Dict, Optional
 import datetime
 from app.models.base import Notes, TrainingNotes, Users
+from app.core.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 async def create_note(
@@ -102,7 +105,7 @@ def delete_note(db: Session, note_id: UUID) -> bool:
 
 
 def get_note_detail(db: Session, note_id: UUID):
-    """ノートの詳細情報を取得する"""
+    """ノートの詳細情報を取得する(同期バージョン)"""
 
     # ノートとトレーニングノート、トレーニング情報を一緒に取得
     note = (
@@ -114,5 +117,76 @@ def get_note_detail(db: Session, note_id: UUID):
 
     if not note:
         return None
+
+    return note
+
+
+async def get_note_by_id(db: AsyncSession, note_id: UUID) -> Optional[Notes]:
+    """IDでノートを取得する（非同期版）"""
+    result = await db.execute(
+        select(Notes).where(Notes.id == note_id, Notes.deleted_at.is_(None))
+    )
+    return result.scalar_one_or_none()
+
+
+async def update_note(db: AsyncSession, note_id: UUID, note_data: dict) -> Notes:
+    """野球ノートを更新する"""
+    # 既存のノートを取得
+    stmt = select(Notes).where(Notes.id == note_id, Notes.deleted_at.is_(None))
+    result = await db.execute(stmt)
+    note = result.scalar_one_or_none()
+
+    if not note:
+        return None
+
+    # 既存のノートに新しいデータを挿入して上書きする
+    note.theme = note_data["theme"]
+    note.assignment = note_data["assignment"]
+    note.practice_video = note_data.get("practice_video")
+
+    # 動画は条件付きで更新
+    if "my_video" in note_data:
+        note.my_video = note_data["my_video"]
+
+    note.weight = float(note_data["weight"])
+    note.sleep = float(note_data["sleep"])
+    note.looked_day = note_data["looked_day"]
+    note.practice = note_data.get("practice")
+
+    # トレーニングの更新
+    if "trainings" in note_data:
+        # 既存のトレーニングノートを削除
+        delete_stmt = select(TrainingNotes).where(TrainingNotes.note_id == note_id)
+        existing_trainings = await db.execute(delete_stmt)
+        for training in existing_trainings.scalars().all():
+            await db.delete(training)
+
+        # 新しいトレーニングノートを追加
+        trainings_data = json.loads(note_data["trainings"])
+        for training in trainings_data:
+            training_note = TrainingNotes(
+                note_id=note_id,
+                training_id=UUID(training["training_id"]),
+                count=int(training["count"]),
+            )
+            db.add(training_note)
+
+    # 変更をコミット　noteをリターンしているけど、そこにトレーニングが入っていないことに注意
+    await db.commit()
+    await db.refresh(note)  # 最新の状態にしてリターンするために
+
+    return note
+
+
+async def get_note_detail_async(db: AsyncSession, note_id: UUID):
+    """ノートの詳細情報を取得する（非同期版）"""
+    stmt = (
+        select(Notes)
+        .options(joinedload(Notes.training_notes).joinedload(TrainingNotes.training))
+        .where(Notes.id == note_id, Notes.deleted_at.is_(None))
+    )
+
+    result = await db.execute(stmt)
+    note = result.unique().scalar_one_or_none()
 
     return note

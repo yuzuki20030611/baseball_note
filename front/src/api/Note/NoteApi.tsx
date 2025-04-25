@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { CreateNoteRequest, NoteDetailResponse, NoteListResponse } from '../../types/note'
+import { CreateNoteRequest, NoteDetailResponse, NoteListResponse, UpdateNoteRequest } from '../../types/note'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
 
@@ -102,6 +102,56 @@ export const noteApi = {
       return response.data
     } catch (error) {
       console.error('ノート詳細の取得に失敗しました', error)
+      throw error
+    }
+  },
+
+  updateNote: async (noteId: string, data: UpdateNoteRequest): Promise<NoteDetailResponse> => {
+    try {
+      if (!data.firebase_uid) {
+        console.error('Firebase UIDが空です')
+        throw new Error('認証情報が不足しています')
+      }
+
+      const formData = new FormData()
+
+      formData.append('firebase_uid', data.firebase_uid)
+      formData.append('theme', data.theme)
+      formData.append('assignment', data.assignment)
+      formData.append('weight', typeof data.weight === 'number' ? data.weight.toString() : data.weight)
+      formData.append('sleep', typeof data.sleep === 'number' ? data.sleep.toString() : data.sleep)
+      formData.append('looked_day', data.looked_day)
+
+      // 任意フィールド
+      formData.append('practice_video', data.practice_video || '')
+      formData.append('practice', data.practice || '')
+
+      // トレーニングデータ
+      formData.append('trainings', JSON.stringify(data.trainings))
+
+      // 動画ファイルの処理
+      if (data.my_video instanceof File) {
+        formData.append('my_video', data.my_video)
+      }
+
+      // 動画削除フラグ
+      if (data.delete_video) {
+        formData.append('delete_video', 'true')
+      }
+
+      // APIエンドポイントのURLを確認（バックエンドの実装に依存）
+      const response = await axios.put(`${BASE_URL}/note/${noteId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+
+      return response.data
+    } catch (error: any) {
+      if (error.response) {
+        console.error('詳細エラー情報:', error.response.data) // 詳細エラーの表示
+      }
+      console.error('ノート更新エラー:', error)
       throw error
     }
   },

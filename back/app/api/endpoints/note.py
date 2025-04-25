@@ -8,7 +8,7 @@ from fastapi import (
     UploadFile,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from typing import Optional
 import json
@@ -16,8 +16,10 @@ import json
 from app.core.database import get_async_db, get_db
 from app.schemas.note import NoteResponse, NoteListResponse, NoteDetailResponse
 from app.crud import note as note_crud
+from app.models.base import TrainingNotes
 from app.utils.video import validate_video, save_note_video
 from app.core.logger import get_logger
+from app.utils.video import delete_note_video
 
 from uuid import UUID
 
@@ -171,17 +173,14 @@ def get_note_detail(note_id: UUID, db: Session = Depends(get_db)):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="ノートが見つかりません"
             )
-
-        # training_notesというカラムにnote_detail.training_notesの情報を入れる際、リスト形式で情報を入れたい
-        # ですが、元々はオブジェクトになっていてエラーが出るため無理矢理にリスト形式に変換している
-        training_notes_list = []
-        if note_detail.training_notes:
-            # コレクションタイプをチェック
-            if isinstance(note_detail.training_notes, list):
-                training_notes_list = note_detail.training_notes
-            else:
-                # 単一のオブジェクトの場合はリストに変換
-                training_notes_list = [note_detail.training_notes]
+        # トレーニングデータを別途取得（確実に全件取得するため）
+        # joinして、TrainingNotes テーブルと、それとリレーションを持つ training テーブルを内部結合して、一緒に情報を取得する
+        training_notes = (
+            db.query(TrainingNotes)
+            .join(TrainingNotes.training)
+            .filter(TrainingNotes.note_id == note_id)
+            .all()
+        )
 
         response_data = {
             "id": note_detail.id,
@@ -208,7 +207,7 @@ def get_note_detail(note_id: UUID, db: Session = Depends(get_db)):
                     if tn.training
                     else None,
                 }
-                for tn in training_notes_list
+                for tn in training_notes
             ],
         }
 
@@ -218,4 +217,142 @@ def get_note_detail(note_id: UUID, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"ノート詳細取得中にエラーが発生しました: {str(e)}",
+        )
+
+
+@router.put("/{note_id}", response_model=NoteDetailResponse)
+async def update_note(
+    note_id: UUID,
+    firebase_uid: str = Form(...),
+    theme: str = Form(...),
+    assignment: str = Form(...),
+    weight: float = Form(...),
+    sleep: float = Form(...),
+    looked_day: str = Form(...),
+    practice_video: Optional[str] = Form(""),
+    practice: Optional[str] = Form(""),
+    trainings: str = Form(...),  # JSONデータが文字列として送信される
+    my_video: Optional[UploadFile] = File(None),
+    delete_video: bool = Form(False),
+    db: AsyncSession = Depends(get_async_db),
+):
+    """野球ノートを更新する"""
+    try:
+        # ユーザーの取得と認証
+        user = await note_crud.get_user_by_firebase_uid(db, firebase_uid)
+        if not user:
+            logger.warning(f"ユーザーが見つかりません: {firebase_uid}")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="ユーザーが見つかりません"
+            )
+
+        # ノートの存在確認と所有権チェック(dbを非同期処理で行っているので、こちらの取得方法も非同期処理で統一している。)
+        note = await note_crud.get_note_detail_async(db, note_id)
+        if not note:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="ノートが見つかりません"
+            )
+
+        if note.user_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="このノートを編集する権限がありません",
+            )
+
+        # 動画ファイルの処理
+        video_path = note.my_video  # もともと存在していた動画のパス
+
+        # 新しく送信された動画のパスがあった場合
+        if my_video:
+            await validate_video(my_video)
+
+            # 既存の動画がある場合は削除
+            if note.my_video:
+                await delete_note_video(note.my_video)
+                pass
+
+            # 新しい動画を保存
+            video_path = await save_note_video(my_video)
+
+        # 動画削除フラグがあり、動画を削除する場合
+        elif delete_video:
+            # もともと存在していた動画のパスが存在した場合、削除
+            if note.my_video:
+                await delete_note_video(note.my_video)
+                pass
+            video_path = None
+
+        # FormDataから受け取ったデータの整形
+        # フロントから送信する際にtrainingsをJSON.stringifyしているのでパースしないといけない
+        note_data = {
+            "theme": theme,
+            "assignment": assignment,
+            "practice_video": practice_video if practice_video else None,
+            "my_video": video_path,
+            "weight": weight,
+            "sleep": sleep,
+            "looked_day": looked_day,
+            "practice": practice if practice else None,
+            "trainings": trainings,  # 文字列のまま渡してCRUD内でパースする
+        }
+
+        # ノートの更新
+        updated_note = await note_crud.update_note(
+            db=db, note_id=note_id, note_data=note_data
+        )
+        # レスポンスデータの構築（get_note_detailと同様の方法で）
+        from sqlalchemy import select
+        from app.models.base import TrainingNotes
+
+        # トレーニングノートを明示的に取得（updated_noteにトレーニングはリターンされていないため、手動で取得してレスポンスに挿入する）
+        stmt = (
+            select(TrainingNotes)
+            .options(joinedload(TrainingNotes.training))
+            .where(TrainingNotes.note_id == note_id)
+        )
+        result = await db.execute(stmt)
+        training_notes = result.unique().scalars().all()
+
+        response_data = {
+            "id": updated_note.id,
+            "user_id": updated_note.user_id,
+            "theme": updated_note.theme,
+            "assignment": updated_note.assignment,
+            "practice_video": updated_note.practice_video,
+            "my_video": updated_note.my_video,
+            "weight": updated_note.weight,
+            "sleep": updated_note.sleep,
+            "looked_day": updated_note.looked_day,
+            "practice": updated_note.practice,
+            "created_at": updated_note.created_at,
+            "updated_at": updated_note.updated_at,
+            "training_notes": [
+                {
+                    "id": tn.id,
+                    "training_id": tn.training_id,
+                    "note_id": tn.note_id,
+                    "count": tn.count,
+                    "created_at": tn.created_at,
+                    "updated_at": tn.updated_at,
+                    "training": {"id": tn.training.id, "menu": tn.training.menu}
+                    if tn.training
+                    else None,
+                }
+                for tn in training_notes
+            ],
+        }
+
+        return NoteDetailResponse.model_validate(response_data)
+    except json.JSONDecodeError:
+        logger.error("トレーニングデータのJSON解析エラー")
+        raise HTTPException(
+            status_code=400, detail="トレーニングデータの形式が不正です"
+        )
+    except ValueError as e:
+        logger.error(f"値エラー: {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"ノート更新エラー: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=500, detail=f"ノート更新中にエラーが発生しました: {str(e)}"
         )
