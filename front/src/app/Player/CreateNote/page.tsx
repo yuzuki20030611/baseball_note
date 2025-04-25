@@ -19,6 +19,8 @@ import { addMenuApi } from '../../../api/AddMenu/AddMenu'
 import { NoteValidationErrors, validateNote, validateMyVideo } from '../../validation/CreateNoteValidation'
 import { noteApi } from '../../../api/Note/NoteApi'
 import { useRouter } from 'next/navigation'
+import { SimpleVideoEmbed } from '../../../components/component/video/practiceVideo'
+import { VideoPlayer } from '../../../components/component/video/videoDisplay'
 
 const CreateNote = () => {
   const { user } = useAuth()
@@ -29,6 +31,8 @@ const CreateNote = () => {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [fetcTrainings, setFetchTrainings] = useState<MenuItemType[]>([])
+  const [practiceVideoPreview, setPracticeVideoPreview] = useState<string | null>(null)
+  const [myVideoPreview, setMyVideoPreview] = useState<string | null>(null)
   const [formData, setFormData] = useState<CreateNoteRequest>({
     firebase_uid: firebase_uid || '', // Firebaseのユーザーuid
     theme: '',
@@ -72,7 +76,6 @@ const CreateNote = () => {
     }
   }, [firebase_uid])
 
-  // handleChangeを修正
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
 
@@ -105,6 +108,11 @@ const CreateNote = () => {
         ...prev,
         [name]: value,
       }))
+
+      // 参考動画URLが変更された際に、プレビューも更新
+      if (name === 'practice_video') {
+        setPracticeVideoPreview(value || null)
+      }
     }
   }
 
@@ -142,22 +150,42 @@ const CreateNote = () => {
       if (files && files.length > 0) {
         const file = files[0]
 
+        // 既存のプレビューURLがある場合は解放
+        if (myVideoPreview && myVideoPreview.startsWith('blob:')) {
+          URL.revokeObjectURL(myVideoPreview)
+        }
+
+        // 新しいプレビューURLを作成
+        const localPreviewUrl = URL.createObjectURL(file)
+
         // フォームデータ更新
         setFormData((prev) => ({
           ...prev,
           my_video: file,
         }))
+
+        // プレビュー状態を更新
+        setMyVideoPreview(localPreviewUrl)
       }
     }
   }
 
   const handleDeleteVideo = () => {
+    // プレビューをクリア
+    if (myVideoPreview && myVideoPreview.startsWith('blob:')) {
+      URL.revokeObjectURL(myVideoPreview)
+    }
+
+    setMyVideoPreview(null)
+
     setFormData((prev) => ({
       ...prev,
       my_video: null,
     }))
-    const fileInput = document.getElementById('profileImageInput') as HTMLInputElement
-    if (fileInput) fileInput.value = ''
+    // ファイル入力をリセット
+    if (myVideoInputRef.current) {
+      myVideoInputRef.current.value = ''
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -329,6 +357,12 @@ const CreateNote = () => {
                       {validateError.practice_video && (
                         <p className="text-red-500 text-sm">{validateError.practice_video}</p>
                       )}
+                      {practiceVideoPreview && (
+                        <div className="mt-4">
+                          <Label>参考動画プレビュー：</Label>
+                          <SimpleVideoEmbed url={practiceVideoPreview} title="" />
+                        </div>
+                      )}
                     </div>
                     <div className="space-y-2 my-3 py-3">
                       <Label>
@@ -374,6 +408,12 @@ const CreateNote = () => {
                           </div>
                         )}
                       </div>
+                      {myVideoPreview && (
+                        <div className="mt-4" key={myVideoPreview}>
+                          <Label>練習動画プレビュー：</Label>
+                          <VideoPlayer src={myVideoPreview} title="" />
+                        </div>
+                      )}
                       {validateError.my_video && <p className="text-red-500 text-sm">{validateError.my_video}</p>}
                     </div>
                     <div className="space-y-2 my-3 py-3">
