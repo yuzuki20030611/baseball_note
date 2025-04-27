@@ -50,7 +50,6 @@ const PlayerHome = () => {
           setHasProfile(false)
         } else {
           // その他のエラー
-          setError(error.message || 'プロフィール確認中にエラーが発生しました')
           setHasProfile(false)
         }
       } finally {
