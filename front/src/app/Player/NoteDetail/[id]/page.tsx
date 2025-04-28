@@ -67,7 +67,7 @@ const PlayerNoteDetail = () => {
   }
 
   // created_atをdate型で表示するための関数
-  const formatData = (dateString: string) => {
+  const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString)
       return date.toISOString().split('T')[0]
@@ -103,7 +103,7 @@ const PlayerNoteDetail = () => {
                   </div>
                   <div className="bg-gray-100 rounded-lg p-6">
                     <div className="flex justify-between items-center mb-10">
-                      <div className="text-lg">{formatData(noteDetail.created_at)}</div>
+                      <div className="text-lg">{formatDate(noteDetail.created_at)}</div>
                       <div className="space-x-3">
                         <Buttons fontSize="18px" onClick={handleDelete}>
                           削除

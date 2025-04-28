@@ -223,10 +223,10 @@ const EditNote = () => {
     setIsSubmitting(true)
 
     // firebase_uidが空の場合は更新
-    if (!formData.firebase_uid && user?.uid) {
+    if (!formData.firebase_uid && firebase_uid) {
       setFormData((prev) => ({
         ...prev,
-        firebase_uid: user.uid,
+        firebase_uid: firebase_uid,
       }))
     }
 
