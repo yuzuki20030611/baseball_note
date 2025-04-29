@@ -3,6 +3,9 @@ import {
     signInWithEmailAndPassword,
     signOut,
     sendPasswordResetEmail,
+    EmailAuthProvider,
+    reauthenticateWithCredential,
+    updatePassword,
 } from "firebase/auth";
 import type { UserCredential } from "firebase/auth"; // 型のみインポート
 
@@ -124,3 +127,35 @@ export const fetchUserRole = async (firebaseUid: string): Promise<AccountRole | 
         return undefined;
     }
 };
+
+
+
+export const updateUserPassword = async(currentPassword: string, newPassword: string): Promise<void> => {
+    try {
+        const user = auth.currentUser
+        if(!user || !user.email) {
+            throw new Error("ログインしていないか、メールアドレスが取得できません。")
+        }
+
+        // 認証情報の再確認
+        const credential = EmailAuthProvider.credential(user.email, currentPassword)
+
+        // 再認証
+        await reauthenticateWithCredential(user, credential)
+
+        // パスワードの更新
+        await updatePassword(user, newPassword)
+    } catch (error: any) {
+        console.error("パスワード更新エラー:", error)
+        if(error.code === "auth/requires-recent-login") {
+            throw new Error("セキュリティ上の理由により、再度ログインが必要です")
+        } else if (error.code === "auth/weak-password") {
+            throw new Error("パスワードが弱すぎます。より強力なパスワードを設定してください。")
+        } else if (error.code === 'auth/invalid-credential') {
+            throw new Error("現在のパスワードが正しくありません");
+          } else {
+            throw error;
+          }
+    }
+}
+
