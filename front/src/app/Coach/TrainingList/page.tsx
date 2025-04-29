@@ -13,6 +13,7 @@ import { addMenuApi } from '../../../api/AddMenu/AddMenu'
 import ProtectedRoute from '../../../components/ProtectedRoute'
 import { AccountRole } from '../../../types/account'
 import { useAuth } from '../../../contexts/AuthContext'
+import { Buttons } from '../../../components/component/Button/Button'
 
 const TrainingList = () => {
   const { user } = useAuth()
@@ -83,7 +84,9 @@ const TrainingList = () => {
                         {menuItems.map((item) => (
                           <div key={item.id} className="flex justify-between items-center mb-6">
                             <span className="text-lg">・{item.menu}</span>
-                            <DeleteButton onClick={() => handleDelete(item.id)}>[削除]</DeleteButton>
+                            <Buttons height="35px" width="60px" className="p-1" onClick={() => handleDelete(item.id)}>
+                              削除
+                            </Buttons>
                           </div>
                         ))}
                       </div>

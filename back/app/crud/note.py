@@ -98,6 +98,15 @@ def delete_note(db: Session, note_id: UUID) -> bool:
     )
     if not note:
         return False
+    training_notes = (
+        db.query(TrainingNotes)
+        .filter(TrainingNotes.note_id == note_id, TrainingNotes.deleted_at.is_(None))
+        .all()
+    )
+    # 関連するトレーニングノートがあれば論理削除
+    if training_notes:
+        for training_note in training_notes:
+            training_note.deleted_at = datetime.datetime.now()
 
     note.deleted_at = datetime.datetime.now()
     db.commit()

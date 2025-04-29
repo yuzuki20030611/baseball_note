@@ -103,14 +103,14 @@ const PlayerNoteDetail = () => {
                   </div>
                   <div className="bg-gray-100 rounded-lg p-6">
                     <div className="flex justify-between items-center mb-10">
-                      <div className="text-lg">{formatDate(noteDetail.created_at)}</div>
+                      <div className="text-xl font-semibold">作成日時：{formatDate(noteDetail.created_at)}</div>
                       <div className="space-x-3">
-                        <Buttons fontSize="18px" onClick={handleDelete}>
-                          削除
-                        </Buttons>
                         <LinkButtons href={`/Player/EditNote/${id}`} className="text-lg">
                           編集
                         </LinkButtons>
+                        <Buttons fontSize="18px" onClick={handleDelete}>
+                          削除
+                        </Buttons>
                       </div>
                     </div>
                     <div className="space-y-2 mb-3">
