@@ -42,7 +42,7 @@ const LoginDetail = () => {
                 </div>
 
                 <div className="text-right pt-5">
-                  <LinkButtons href="/Coach/EditLogin">編集</LinkButtons>
+                  <LinkButtons href="/Coach/EditLogin">ログイン情報を変更</LinkButtons>
                 </div>
               </form>
             </div>

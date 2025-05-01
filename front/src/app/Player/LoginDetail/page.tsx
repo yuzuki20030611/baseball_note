@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React from 'react'
 
 import { Header } from '../../../components/component/Header/Header'
 import { Footer } from '../../../components/component/Footer/Footer'
@@ -37,12 +37,12 @@ const LoginDetail = () => {
                 </div>
 
                 <div className="mb-6">
-                  <InfoItem label="現在のパスワード：" value="・・・・・・" className="md:w-96" type="password" />
+                  <InfoItem label="現在のパスワード：" value="・・・・" className="md:w-96" type="password" />
                   <p className="text-sum text-gray-500 mt-1">セキュリティ上の理由により表示されません</p>
                 </div>
 
                 <div className="text-right pt-5">
-                  <LinkButtons href="/Player/EditLogin">パスワード変更</LinkButtons>
+                  <LinkButtons href="/Player/EditLogin">ログイン情報を変更</LinkButtons>
                 </div>
               </form>
             </div>
