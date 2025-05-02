@@ -46,105 +46,166 @@ const EditLogin = () => {
       [name]: undefined,
     }))
 
+    // 関連するエラーメッセージをクリア
+    if (name === 'newPassword' || name === 'confirmPassword') {
+      setPasswordMessage({ type: '', text: '' })
+    }
+
+    if (name === 'newEmail' || name === 'confirmEmail') {
+      setEmailMessage({ type: '', text: '' })
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
 
+    // 変更がない場合は処理を中断
+    if (!formData.newPassword && !formData.newEmail) {
+      alert('変更箇所がありません')
+      return
+    }
+
+    // バリデーションチェック
     const validate = validateLoginEdit(formData)
     if (Object.keys(validate).length > 0) {
       setValidateError(validate)
       return
     }
 
-    // 何も変更がない場合
-    if (!formData.newPassword && !formData.newEmail) {
-      alert('変更する項目がありません')
-      return
-    }
-
     setIsSubmitting(true)
+    setPasswordMessage({ type: '', text: '' })
+    setEmailMessage({ type: '', text: '' })
 
-    // 成功フラグ
-    let passwordSuccess = false
-    let emailSuccess = false
-
-    // メールアドレス変更処理
-    if (formData.newEmail) {
-      try {
-        // sendEmailChangeVerification の代わりに updateUserEmail を使用
+    try {
+      // メールアドレスとパスワードの両方を変更する場合
+      if (formData.newEmail && formData.newPassword) {
+        // 一連の処理として実行
         await updateUserEmail(formData.currentPassword, formData.newEmail)
+        await updateUserPassword(formData.currentPassword, formData.newPassword)
 
+        // 両方成功した場合のメッセージ設定
         setEmailMessage({
           type: 'success',
-          text: '現在のメールアドレス宛に確認メールを送信しました。メール内のリンクをクリックして変更プロセスを続けてください',
+          text: '新しいメールアドレス宛に確認メールを送信しました。メール内のリンクをクリックして変更を完了してください',
         })
-        // ユーザーに明示的な確認を促す
-        alert(`
-          新しいメールアドレス(${formData.newEmail})宛に確認メールを送信しました。
-          数分以内にメールが届かない場合は、再度お試しいただくか、別のメールアドレスをお試しください。
-          迷惑メールフォルダも確認してください。
-          メールをクリックした後、再度ローディングを行なってから、新しいメールアドレスでログインをしてください
-        `)
-        emailSuccess = true
-      } catch (error: any) {
-        console.error('メールアドレス更新エラー', error)
-        setEmailMessage({
-          type: 'error',
-          text: error.message || 'メール送信中にエラーが発生しました',
-        })
-      }
-    }
-
-    // パスワード変更処理
-    if (formData.newPassword) {
-      try {
-        await updateUserPassword(formData.currentPassword, formData.newPassword)
         setPasswordMessage({
           type: 'success',
           text: 'パスワードが正常に更新されました',
         })
-        passwordSuccess = true
-      } catch (error: any) {
-        console.error('パスワード更新エラー', error)
+
+        // 成功メッセージ表示
+        alert(`
+            パスワードの変更に成功しました。
+            メールアドレス変更のため、新しいメールアドレス宛に確認メールを送信しました。
+            メール内のリンクをクリックして変更を完了してください。
+          `)
+
+        // フォームリセットとページ遷移
+        setFormData({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+          newEmail: '',
+          confirmEmail: '',
+        })
+
+        setTimeout(() => {
+          router.push('/Coach/LoginDetail')
+        }, 1000)
+      }
+      // メールアドレスのみ変更
+      else if (formData.newEmail) {
+        await updateUserEmail(formData.currentPassword, formData.newEmail)
+
+        setEmailMessage({
+          type: 'success',
+          text: '新しいメールアドレス宛に確認メールを送信しました。メール内のリンクをクリックして変更を完了してください',
+        })
+
+        alert(`
+            新しいメールアドレス(${formData.newEmail})宛に確認メールを送信しました。
+            メール内のリンクをクリックして変更を完了してください。
+          `)
+
+        // フォームリセットとページ遷移
+        setFormData({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+          newEmail: '',
+          confirmEmail: '',
+        })
+
+        setTimeout(() => {
+          router.push('/Coach/LoginDetail')
+        }, 1000)
+      }
+      // パスワードのみ変更
+      else if (formData.newPassword) {
+        await updateUserPassword(formData.currentPassword, formData.newPassword)
+
+        setPasswordMessage({
+          type: 'success',
+          text: 'パスワードが正常に更新されました',
+        })
+
+        alert('パスワードの変更に成功しました。')
+
+        // フォームリセットとページ遷移
+        setFormData({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+          newEmail: '',
+          confirmEmail: '',
+        })
+
+        setTimeout(() => {
+          router.push('/Coach/LoginDetail')
+        }, 1000)
+      }
+    } catch (error: any) {
+      console.error('更新エラー:', error)
+
+      // エラーメッセージの設定
+      if (error.message && error.message.includes('メールアドレス')) {
+        setEmailMessage({
+          type: 'error',
+          text: error.message || 'メールアドレス更新中にエラーが発生しました',
+        })
+      } else if (error.message && error.message.includes('パスワード')) {
         setPasswordMessage({
           type: 'error',
           text: error.message || 'パスワード更新中にエラーが発生しました',
         })
+      } else {
+        // エラーの種類が特定できない場合
+        if (formData.newEmail && formData.newPassword) {
+          // 両方変更しようとしていた場合は両方にエラーメッセージを表示
+          setEmailMessage({
+            type: 'error',
+            text: '更新処理中にエラーが発生しました',
+          })
+          setPasswordMessage({
+            type: 'error',
+            text: '更新処理中にエラーが発生しました',
+          })
+        } else if (formData.newEmail) {
+          setEmailMessage({
+            type: 'error',
+            text: error.message || 'メールアドレス更新中にエラーが発生しました',
+          })
+        } else if (formData.newPassword) {
+          setPasswordMessage({
+            type: 'error',
+            text: error.message || 'パスワード更新中にエラーが発生しました',
+          })
+        }
       }
-    }
-
-    // 全ての処理が完了したら
-    setIsSubmitting(false)
-
-    if (passwordSuccess || emailSuccess) {
-      let message = ''
-
-      if (passwordSuccess) {
-        message += 'パスワードの変更に成功しました。'
-      }
-
-      if (emailSuccess) {
-        message +=
-          'メールアドレス変更のため、新しいメールアドレス宛に確認メールを送信しました。メール内のリンクをクリックして変更を完了してください。'
-      }
-
-      alert(message)
-
-      // フォームをリセット
-      setFormData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
-        newEmail: '',
-        confirmEmail: '',
-      })
-
-      // 明示的にタイムアウトを設定してページ遷移
-      setTimeout(() => {
-        router.push('/Player/LoginDetail')
-      }, 1000)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 

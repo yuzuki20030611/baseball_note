@@ -160,6 +160,36 @@ export const updateUserEmail = async (
     if (!user || !user.email) {
       throw new Error("ログインしていないか、メールアドレスが取得できません。");
     }
+
+    // 現在のメールアドレスを同じ場合はエラー
+    if (user.email.toLowerCase() === newEmail.toLowerCase()) {
+        alert("現在のメールアドレスと同じです。別のメールアドレスを入力してください。")
+        throw new Error("現在のメールアドレスと同じです。別のメールアドレスを入力してください。")
+    }
+
+    // バックエンドでメールアドレスの重複チェック
+    try {
+        const response = await fetch(`${API_URL}/auth/users/email-exists`, {
+            method: "POST",
+            headers: {
+                "Content-Type": 'application/json',
+            },
+            body: JSON.stringify({ email: newEmail }),
+        })
+        const data = await response.json()
+
+        if (data.exists) {
+            alert("このメールアドレスは既に使用されています。別のメールアドレスを入力してください。")
+            throw new Error("このメールアドレスは既に使用されています。別のメールアドレスを入力してください。")
+        }
+    } catch(error: any) {
+        // バックエンドでのチェックに失敗した場合、エラーをスローせずに続行
+      // Firebase側でも同様のチェックが行われるため
+      if (error.message.includes("既に使用されています")) {
+        throw error; // 明示的に「既に使用されている」エラーは出す
+      }
+      console.warn("バックエンドでのメールアドレスチェックに失敗しました:", error);
+    }
     
     // 1. 再認証
     const credential = EmailAuthProvider.credential(user.email, currentPassword);

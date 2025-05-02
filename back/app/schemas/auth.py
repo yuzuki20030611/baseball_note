@@ -31,3 +31,7 @@ class UserRoleResponse(BaseModel):
 class UserEmailUpdate(BaseModel):
     firebase_uid: str
     new_email: EmailStr
+
+
+class EmailExistsRequest(BaseModel):
+    email: EmailStr

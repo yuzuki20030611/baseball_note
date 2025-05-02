@@ -22,6 +22,8 @@ export const validateLoginEdit = (formData: LoginInfoFormData): LoginInfoValidat
     if (formData.newPassword || formData.confirmPassword) {
         if (!formData.currentPassword) {
             newErrors.currentPassword = '現在のパスワードを入力してください'
+        } else if (formData.currentPassword.length < 8) {
+          newErrors.currentPassword = "パスワードは8文字以上で入力してください"
         }
         
         if (formData.newPassword) {
@@ -39,6 +41,8 @@ export const validateLoginEdit = (formData: LoginInfoFormData): LoginInfoValidat
       if (formData.newEmail || formData.confirmEmail) {
         if (!formData.currentPassword) {
           newErrors.currentPassword = '現在のパスワードを入力してください'
+        } else if (formData.currentPassword.length < 8) {
+          newErrors.currentPassword = "パスワードは8文字以上で入力してください"
         }
         
         if (formData.newEmail) {

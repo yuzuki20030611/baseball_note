@@ -3,7 +3,13 @@ from sqlalchemy.orm import Session
 from typing import Annotated
 
 from app.core.database import get_db
-from app.schemas.auth import UserCreate, UserResponse, UserRoleResponse, UserEmailUpdate
+from app.schemas.auth import (
+    UserCreate,
+    UserResponse,
+    UserRoleResponse,
+    UserEmailUpdate,
+    EmailExistsRequest,
+)
 from app.crud import user as user_crud
 
 import logging
@@ -85,3 +91,14 @@ def update_user_email_endpoint(
         db, email_update.firebase_uid, email_update.new_email
     )
     return updated_user
+
+
+@router.post("/users/email-exists", status_code=status.HTTP_200_OK)
+def check_email_exists(
+    email_req: EmailExistsRequest, db: Annotated[Session, Depends(get_db)]
+):
+    """指定されたメールアドレスが既に存在するかをチェックする"""
+    existing_user = user_crud.get_user_by_email(db, email_req.email)
+    # existing_user is not None は、ユーザーが見つかった場合に True、見つからなかった場合に False となります
+    # 戻り値は {"exists": True} または {"exists": False} というJSON形式になります
+    return {"exists": existing_user is not None}
