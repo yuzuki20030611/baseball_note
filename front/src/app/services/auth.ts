@@ -194,14 +194,6 @@ export const updateUserEmail = async (
     // 1. 再認証
     const credential = EmailAuthProvider.credential(user.email, currentPassword);
     await reauthenticateWithCredential(user, credential);
-    
-    // 2. メール変更情報をローカルストレージに保存（AuthContext側で使用）
-    // 取り出すときにparseが必要です
-    localStorage.setItem('pendingEmailChange', JSON.stringify({
-      firebaseUid: user.uid,
-      newEmail: newEmail,
-      timestamp: Date.now(),
-    }));
 
     // 3. Firebase側のメールアドレス更新前の確認メールを送信
     await verifyBeforeUpdateEmail(user, newEmail);

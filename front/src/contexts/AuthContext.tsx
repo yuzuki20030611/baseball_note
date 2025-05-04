@@ -23,18 +23,25 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 // メール変更検知と同期のための関数
 const syncEmailWithBackend = async (user: User): Promise<void> => {
   try {
-    // ローカルストレージから変更予定のメールアドレス情報を取得
-    const pendingEmailChange = localStorage.getItem('pendingEmailChange')
+    // バックエンドからユーザー情報を取得（メールアドレスを含む）
+    const response = await fetch(`${API_URL}/auth/users/firebase/${user.uid}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
 
-    // 何もなかったらリターン
-    if (!pendingEmailChange) return
+    if (!response.ok) {
+      console.error('バックエンドからユーザー情報の取得に失敗しました')
+      return
+    }
 
-    const { firebaseUid, newEmail } = JSON.parse(pendingEmailChange)
-
+    const userBackData = await response.json()
     // ユーザーIDが一致し、現在のメールが新しいメール（変更後）と一致する場合
-    if (user.uid === firebaseUid && user.email === newEmail) {
-      // バックエンドAPIを呼び出して更新
-      const response = await fetch(`${API_URL}/auth/users/email`, {
+    // firebseのコンソールで保存しているメールアドレスとデータベースで保存しているメールアドレスを比較している
+    if (user.email && userBackData.email && user.email !== userBackData.email) {
+      // メールアドレスが異なる場合、バックエンドを更新
+      const updateResponse = await fetch(`${API_URL}/auth/users/email`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -45,7 +52,7 @@ const syncEmailWithBackend = async (user: User): Promise<void> => {
         }),
       })
 
-      if (!response.ok) {
+      if (!updateResponse.ok) {
         console.error('バックエンドのメールアドレス更新に失敗しました')
       } else {
         // 成功したら保存していた情報を削除
