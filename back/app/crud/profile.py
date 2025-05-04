@@ -4,6 +4,7 @@ from sqlalchemy import select
 from app.models.base import Profiles, Users
 from app.schemas.profile import CreateProfile, UpdateProfile
 from app.core.logger import get_logger
+from typing import List
 
 
 logger = get_logger(__name__)
@@ -29,6 +30,12 @@ async def get_profile_by_user_id(db: AsyncSession, user_id: UUID) -> Profiles | 
     result = await db.execute(select(Profiles).where(Profiles.user_id == user_id))
     profile = result.scalar_one_or_none()
     return profile
+
+
+async def get_all_profile(db: AsyncSession) -> List[Profiles]:
+    """すべてのプロフィールを取得する"""
+    result = await db.execute(select(Profiles))
+    return result.scalars().all()
 
 
 async def update_profile(
