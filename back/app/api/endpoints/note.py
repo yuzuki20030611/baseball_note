@@ -16,6 +16,7 @@ import json
 from app.core.database import get_async_db, get_db
 from app.schemas.note import NoteResponse, NoteListResponse, NoteDetailResponse
 from app.crud import note as note_crud
+from app.crud import user as user_crud
 from app.models.base import TrainingNotes
 from app.utils.video import validate_video, save_note_video
 from app.core.logger import get_logger
@@ -46,7 +47,7 @@ async def create_note(
     """野球ノートを新規作成する"""
     try:
         # ユーザーの取得
-        user = await note_crud.get_user_by_firebase_uid(db, firebase_uid)
+        user = await user_crud.get_user_by_firebase_uid_async(db, firebase_uid)
         if not user:
             logger.warning(f"ユーザーが見つかりません: {firebase_uid}")
             raise HTTPException(status_code=404, detail="ユーザーが見つかりません")
@@ -138,12 +139,12 @@ def get_user_notes(
     """自分で作成したノートの一覧を取得します"""
     try:
         # ユーザーの取得
-        user = note_crud.get_user_by_firebase_uid_sync(db, firebase_uid)
+        user = user_crud.get_user_by_firebase_uid(db, firebase_uid)
         if not user:
             logger.warning(f"ユーザーが見つかりません: {firebase_uid}")
             raise HTTPException(status_code=404, detail="ユーザーが見つかりません")
 
-        notes = note_crud.get_login_user_note_sync(db, user.id)
+        notes = note_crud.get_note_sync(db, user.id)
         return {"items": notes}
     except Exception as e:
         logger.error(f"ノート取得エラー:{str(e)}", exc_info=True)
@@ -239,7 +240,7 @@ async def update_note(
     """野球ノートを更新する"""
     try:
         # ユーザーの取得と認証
-        user = await note_crud.get_user_by_firebase_uid(db, firebase_uid)
+        user = await user_crud.get_user_by_firebase_uid_async(db, firebase_uid)
         if not user:
             logger.warning(f"ユーザーが見つかりません: {firebase_uid}")
             raise HTTPException(

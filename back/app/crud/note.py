@@ -51,21 +51,7 @@ async def create_note(
     return new_note
 
 
-async def get_user_by_firebase_uid(db: Session, firebase_uid: str) -> Optional[Users]:
-    """Firebase UIDからユーザーを取得（非同期バージョン）"""
-
-    result = await db.execute(select(Users).where(Users.firebase_uid == firebase_uid))
-    return result.scalar_one_or_none()
-
-
-def get_user_by_firebase_uid_sync(db: Session, firebase_uid: str) -> Optional[Users]:
-    """Firebase UIDからユーザーを取得（同期バージョン）"""
-
-    result = db.execute(select(Users).where(Users.firebase_uid == firebase_uid))
-    return result.scalar_one_or_none()
-
-
-def get_login_user_note_sync(db: Session, user_id: UUID) -> List[Dict]:
+def get_note_sync(db: Session, user_id: UUID) -> List[Dict]:
     """ユーザーIDに紐づくノート一覧を簡易形式で取得する（id, created_at, theme, assignmentのみ）同期バージョン"""
 
     stmt = (

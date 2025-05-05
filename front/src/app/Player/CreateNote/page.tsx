@@ -19,8 +19,8 @@ import { addMenuApi } from '../../../api/AddMenu/AddMenu'
 import { NoteValidationErrors, validateNote, validateMyVideo } from '../../validation/CreateNoteValidation'
 import { noteApi } from '../../../api/Note/NoteApi'
 import { useRouter } from 'next/navigation'
-import { SimpleVideoEmbed } from '../../../components/component/video/practiceVideo'
-import { VideoPlayer } from '../../../components/component/video/videoDisplay'
+import { ReferenceVideo } from '../../../components/component/video/referenceVideo'
+import { MypracticeVideo } from '../../../components/component/video/mypracticeVideo'
 
 const CreateNote = () => {
   const { user } = useAuth()
@@ -82,7 +82,7 @@ const CreateNote = () => {
     // 入力フィールド変更時に対応するエラーをクリア
     setValidateError((prev) => ({
       ...prev,
-      [name]: undefined,
+      [name]: null,
     }))
 
     // weight と sleep フィールドの処理
@@ -360,7 +360,7 @@ const CreateNote = () => {
                       {practiceVideoPreview && (
                         <div className="mt-4">
                           <Label>参考動画プレビュー：</Label>
-                          <SimpleVideoEmbed url={practiceVideoPreview} title="" />
+                          <ReferenceVideo url={practiceVideoPreview} title="" />
                         </div>
                       )}
                     </div>
@@ -411,7 +411,7 @@ const CreateNote = () => {
                       {myVideoPreview && (
                         <div className="mt-4" key={myVideoPreview}>
                           <Label>練習動画プレビュー：</Label>
-                          <VideoPlayer src={myVideoPreview} title="" />
+                          <MypracticeVideo src={myVideoPreview} title="" />
                         </div>
                       )}
                       {validateError.my_video && <p className="text-red-500 text-sm">{validateError.my_video}</p>}

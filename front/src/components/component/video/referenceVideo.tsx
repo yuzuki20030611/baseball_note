@@ -5,7 +5,7 @@ interface VideoEmbedProps {
   title?: string
 }
 
-export const SimpleVideoEmbed: React.FC<VideoEmbedProps> = ({ url, title = '参考動画' }) => {
+export const ReferenceVideo: React.FC<VideoEmbedProps> = ({ url, title = '参考動画' }) => {
   // YouTube動画IDを抽出する関数
   const getYouTubeVideoId = (url: string): string | null => {
     const match = url.match(/^.*(youtu.be\/|v\/|watch\?v=|&v=)([^#&?]*).*/)

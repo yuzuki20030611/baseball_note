@@ -16,8 +16,8 @@ import { useParams, useRouter } from 'next/navigation'
 import { NoteDetailResponse, UpdateNoteRequest } from '../../../../types/note'
 import { noteApi } from '../../../../api/Note/NoteApi'
 import { Buttons } from '../../../../components/component/Button/Button'
-import { SimpleVideoEmbed } from '../../../../components/component/video/practiceVideo'
-import { VideoPlayer } from '../../../../components/component/video/videoDisplay'
+import { ReferenceVideo } from '../../../../components/component/video/referenceVideo'
+import { MypracticeVideo } from '../../../../components/component/video/mypracticeVideo'
 import { useAuth } from '../../../../contexts/AuthContext'
 import {
   NoteValidationErrors,
@@ -30,7 +30,7 @@ const EditNote = () => {
   const firebase_uid = user?.uid
   const params = useParams()
   const router = useRouter()
-  const id = params.id as string
+  const note_id = params.id as string
   const myVideoInputRef = useRef<HTMLInputElement>(null)
 
   const [noteDetail, setNoteDetail] = useState<NoteDetailResponse | null>(null)
@@ -66,12 +66,12 @@ const EditNote = () => {
       try {
         setLoading(true)
         setError(null)
-        if (!id) {
+        if (!note_id) {
           setError('該当するIDが見つかりません')
           setLoading(false)
           return
         }
-        const data = await noteApi.getNoteDetail(id)
+        const data = await noteApi.getNoteDetail(note_id)
         setNoteDetail(data)
 
         // フォームデータを初期化
@@ -112,7 +112,7 @@ const EditNote = () => {
       }
     }
     fetchNoteDetail()
-  }, [id])
+  }, [note_id])
 
   // ローカルプレビューのクリーンアップ（不必要なメモリを削除）
   useEffect(() => {
@@ -131,7 +131,7 @@ const EditNote = () => {
     // エラーをクリア
     setValidationErrors((prev) => ({
       ...prev,
-      [name]: undefined,
+      [name]: null,
     }))
 
     setFormData((prev) => ({
@@ -257,12 +257,12 @@ const EditNote = () => {
 
     try {
       setError(null)
-      await noteApi.updateNote(id, {
+      await noteApi.updateNote(note_id, {
         ...formData,
       })
 
       alert('ノートの更新に成功しました！')
-      router.push(`/Player/NoteDetail/${id}`)
+      router.push(`/Player/NoteDetail/${note_id}`)
     } catch (error) {
       console.error('ノート更新エラー', error)
       setError('ノートの更新に失敗しました')
@@ -424,7 +424,7 @@ const EditNote = () => {
                         {practiceVideoPreview && (
                           <div className="mt-4">
                             <Label>参考動画プレビュー：</Label>
-                            <SimpleVideoEmbed url={practiceVideoPreview} title="" />
+                            <ReferenceVideo url={practiceVideoPreview} title="" />
                           </div>
                         )}
                       </div>
@@ -458,7 +458,7 @@ const EditNote = () => {
                         {myVideoPreview && (
                           <div className="mt-4" key={myVideoPreview}>
                             <Label>練習動画プレビュー：</Label>
-                            <VideoPlayer src={myVideoPreview} title="" />
+                            <MypracticeVideo src={myVideoPreview} title="" />
                           </div>
                         )}
                         {myVideoError && <p className="text-red-500 text-sm">{myVideoError}</p>}
@@ -480,7 +480,7 @@ const EditNote = () => {
                         )}
                       </div>
                       <div className="flex justify-center space-x-5 mt-5">
-                        <LinkButtons href={`/Player/NoteDetail/${id}`} className="text-lg">
+                        <LinkButtons href={`/Player/NoteDetail/${note_id}`} className="text-lg">
                           詳細画面に戻る
                         </LinkButtons>
                         <Buttons type="submit" className="text-lg" disabled={isSubmitting}>

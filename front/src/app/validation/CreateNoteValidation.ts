@@ -1,5 +1,5 @@
 import { MenuItemType } from "../../types/AddMenu";
-import { CreateNoteRequest, NoteDetailResponse, UpdateNoteRequest } from "../../types/note";
+import { CreateNoteRequest, UpdateNoteRequest } from "../../types/note";
 
 export type NoteValidationErrors = {
   theme?: string;

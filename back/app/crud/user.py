@@ -1,4 +1,6 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.base import Users
 from app.schemas.auth import UserCreate
 from uuid import UUID
@@ -10,6 +12,11 @@ def get_user_by_id(db: Session, user_id: UUID):
 
 def get_user_by_firebase_uid(db: Session, firebase_uid: str):
     return db.query(Users).filter(Users.firebase_uid == firebase_uid).first()
+
+
+async def get_user_by_firebase_uid_async(db: AsyncSession, firebase_uid: str):
+    result = await db.execute(select(Users).where(Users.firebase_uid == firebase_uid))
+    return result.scalar_one_or_none()
 
 
 def get_user_by_email(db: Session, email: str):

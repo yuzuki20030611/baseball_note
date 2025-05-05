@@ -15,13 +15,13 @@ import { AccountRole } from '../../../../types/account'
 import { useParams, useRouter } from 'next/navigation'
 import { NoteDetailResponse } from '../../../../types/note'
 import { noteApi } from '../../../../api/Note/NoteApi'
-import { VideoPlayer } from '../../../../components/component/video/videoDisplay'
-import { SimpleVideoEmbed } from '../../../../components/component/video/practiceVideo'
+import { MypracticeVideo } from '../../../../components/component/video/mypracticeVideo'
+import { ReferenceVideo } from '../../../../components/component/video/referenceVideo'
 
 const PlayerNoteDetail = () => {
   const params = useParams()
   const router = useRouter()
-  const id = params.id as string //idを文字列で取得
+  const note_id = params.id as string //idを文字列で取得
 
   const [noteDetail, setNoteDetail] = useState<NoteDetailResponse | null>(null)
   const [loading, setLoading] = useState(true)
@@ -33,12 +33,12 @@ const PlayerNoteDetail = () => {
       try {
         setLoading(true)
         setError(null)
-        if (!id) {
+        if (!note_id) {
           setError('該当するIDが見つかりません')
           setLoading(false)
           return
         }
-        const data = await noteApi.getNoteDetail(id)
+        const data = await noteApi.getNoteDetail(note_id)
         setNoteDetail(data)
       } catch (error) {
         console.error('ノート詳細取得エラー', error)
@@ -48,15 +48,15 @@ const PlayerNoteDetail = () => {
       }
     }
     fetchNoteDetail()
-  }, [id])
+  }, [note_id])
 
   // ノート削除の関数
   const handleDelete = async () => {
-    if (!id) return
+    if (!note_id) return
 
     if (window.confirm('このノートを削除してもよろしいでしょうか？')) {
       try {
-        await noteApi.deleteNote(id)
+        await noteApi.deleteNote(note_id)
         alert('ノートの削除に成功しました')
         router.push('/Player/Home')
       } catch (error) {
@@ -105,7 +105,7 @@ const PlayerNoteDetail = () => {
                     <div className="flex justify-between items-center mb-10">
                       <div className="text-xl font-semibold">作成日時：{formatDate(noteDetail.created_at)}</div>
                       <div className="space-x-3">
-                        <LinkButtons href={`/Player/EditNote/${id}`} className="text-lg">
+                        <LinkButtons href={`/Player/EditNote/${note_id}`} className="text-lg">
                           編集
                         </LinkButtons>
                         <Buttons fontSize="18px" onClick={handleDelete}>
@@ -148,14 +148,14 @@ const PlayerNoteDetail = () => {
                     {noteDetail.practice_video && (
                       <div className="space-y-2 my-3 py-3">
                         <Label>参考動画：</Label>
-                        <SimpleVideoEmbed url={noteDetail.practice_video} title="" />
+                        <ReferenceVideo url={noteDetail.practice_video} title="" />
                       </div>
                     )}
 
                     {noteDetail && noteDetail.my_video_url && (
                       <div className="space-y-2 my-3 py-3">
                         <Label>練習動画：</Label>
-                        <VideoPlayer src={noteDetail.my_video_url} title="" />
+                        <MypracticeVideo src={noteDetail.my_video_url} title="" />
                       </div>
                     )}
 
