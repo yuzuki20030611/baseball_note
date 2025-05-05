@@ -118,7 +118,11 @@ const CoachHome = () => {
                             <td className="px-6 py-4 text-center text-sm text-gray-600">{data.player_dominant}</td>
                             <td className="px-6 py-4 text-center text-sm text-gray-600">{data.player_position}</td>
                             <td className="px-6 py-4 text-center">
-                              <LinkButtons href={`/Coach/NoteList/${data.id}`}>開く⇨</LinkButtons>
+                              <LinkButtons
+                                href={`/Coach/NoteList/${data.user_id}?name=${encodeURIComponent(data.name)}`}
+                              >
+                                開く⇨
+                              </LinkButtons>
                             </td>
                           </tr>
                         ))

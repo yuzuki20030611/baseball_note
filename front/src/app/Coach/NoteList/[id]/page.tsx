@@ -1,15 +1,52 @@
-import React from 'react'
+'use client'
 
-import { Header } from '../../../components/component/Header/Header'
-import { Footer } from '../../../components/component/Footer/Footer'
-import { PageTitle } from '../../../components/component/Title/PageTitle'
-import { Buttons } from '../../../components/component/Button/Button'
-import { Card } from '../../../components/component/Card/Card'
-import { LinkButtons } from '../../../components/component/Button/LinkButtons'
-import ProtectedRoute from '../../../components/ProtectedRoute'
-import { AccountRole } from '../../../types/account'
+import React, { useEffect, useState } from 'react'
+
+import { Header } from '../../../../components/component/Header/Header'
+import { Footer } from '../../../../components/component/Footer/Footer'
+import { PageTitle } from '../../../../components/component/Title/PageTitle'
+import { Buttons } from '../../../../components/component/Button/Button'
+import { Card } from '../../../../components/component/Card/Card'
+import { LinkButtons } from '../../../../components/component/Button/LinkButtons'
+import ProtectedRoute from '../../../../components/ProtectedRoute'
+import { AccountRole } from '../../../../types/account'
+import { useParams, useSearchParams } from 'next/navigation'
+import { useAuth } from '../../../../contexts/AuthContext'
 
 const NoteList = () => {
+  const params = useParams()
+  const { user } = useAuth()
+  const searchParams = useSearchParams()
+  const userId = params.userId as string
+  const playerName = searchParams.get('name') || '選手'
+  const firebase_uid = user?.uid || ''
+
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  // const [noteList, setNoteList] = useState<NoteListResponse | null>(null)
+
+  useEffect(() => {
+    const fetchNoteList = async () => {
+      try {
+        setLoading(true)
+        // const noteListData = await noteApi.noteList(userId)
+        // setNoteList(noteListData)
+        setError(null)
+      } catch (error: any) {
+        console.error('ノート一覧の取得に失敗しました', error)
+        setError(error.message || 'プロフィール取得に失敗しました')
+      } finally {
+        setLoading(false)
+      }
+    }
+    if (!firebase_uid) {
+      setLoading(false)
+      return
+    } else {
+      fetchNoteList()
+    }
+  }, [firebase_uid])
+
   return (
     <ProtectedRoute requiredRole={AccountRole.COACH} authRequired={true}>
       <div className="min-h-screen">
@@ -18,7 +55,7 @@ const NoteList = () => {
 
           <main className="flex-grow container mx-auto px-6 py-8 overflow-y-auto h-[calc(100vh-200px)]">
             <Card>
-              <PageTitle>多田羅 柚希のノート一覧</PageTitle>
+              <PageTitle>{`${playerName}のノート一覧`}</PageTitle>
               <div className="text-right px-5 py-2">
                 <p className="text-2xl mt-3">指導者</p>
               </div>
