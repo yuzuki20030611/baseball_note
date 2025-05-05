@@ -34,7 +34,7 @@ async def get_profile_by_user_id(db: AsyncSession, user_id: UUID) -> Profiles | 
 
 async def get_all_profile(db: AsyncSession) -> List[Profiles]:
     """すべてのプロフィールを取得する"""
-    result = await db.execute(select(Profiles))
+    result = await db.execute(select(Profiles).order_by(Profiles.created_at.desc()))
     return result.scalars().all()
 
 
