@@ -66,7 +66,7 @@ const PlayerHome = () => {
         if (!firebase_uid) return
 
         setNotesLoading(true)
-        const response = await noteApi.getLoginUserNote(firebase_uid)
+        const response = await noteApi.getUserNote(firebase_uid)
 
         // response.itemsが配列であることを確認
         if (response && response.items && Array.isArray(response.items)) {

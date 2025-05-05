@@ -51,7 +51,7 @@ async def create_note(
     return new_note
 
 
-def get_note_sync(db: Session, user_id: UUID) -> List[Dict]:
+def get_note(db: Session, user_id: UUID) -> List[Dict]:
     """ユーザーIDに紐づくノート一覧を簡易形式で取得する（id, created_at, theme, assignmentのみ）同期バージョン"""
 
     stmt = (

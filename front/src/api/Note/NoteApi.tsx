@@ -74,7 +74,7 @@ export const noteApi = {
   },
 
   // ログインしているユーザーが作成したノートの一覧を取得
-  getLoginUserNote: async (firebase_uid: string): Promise<NoteListResponse> => {
+  getUserNote: async (firebase_uid: string): Promise<NoteListResponse> => {
     try {
       const response = await axios.get(`${BASE_URL}/note/get/${firebase_uid}`)
       return response.data
