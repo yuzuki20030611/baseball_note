@@ -3,6 +3,10 @@ import {
     signInWithEmailAndPassword,
     signOut,
     sendPasswordResetEmail,
+    EmailAuthProvider,
+    reauthenticateWithCredential,
+    updatePassword,
+    verifyBeforeUpdateEmail,
 } from "firebase/auth";
 import type { UserCredential } from "firebase/auth"; // 型のみインポート
 
@@ -22,15 +26,6 @@ export const createAccount = async(
         // 1. Firebaseでユーザーを作成
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user
-
-        // 3. バックエンドにユーザー情報を保存
-
-        const requestBody = {
-            firebase_uid: user.uid,
-            email: user.email,
-            role: role,
-        };
-
 
         const response = await fetch(`${API_URL}/auth/users`, {//エンドポイントauthファイルのusersのパス
             method: 'POST',
@@ -123,4 +118,110 @@ export const fetchUserRole = async (firebaseUid: string): Promise<AccountRole | 
         console.error('ロール取得エラー詳細:', error);
         return undefined;
     }
+};
+
+
+
+export const updateUserPassword = async(currentPassword: string, newPassword: string): Promise<void> => {
+    try {
+        const user = auth.currentUser
+        if(!user || !user.email) {
+            throw new Error("ログインしていないか、メールアドレスが取得できません。")
+        }
+
+        // 認証情報の再確認
+        const credential = EmailAuthProvider.credential(user.email, currentPassword)
+
+        // 再認証
+        await reauthenticateWithCredential(user, credential)
+
+        // パスワードの更新
+        await updatePassword(user, newPassword)
+    } catch (error: any) {
+        console.error("パスワード更新エラー:", error)
+        if(error.code === "auth/requires-recent-login") {
+            throw new Error("セキュリティ上の理由により、再度ログインが必要です")
+        } else if (error.code === "auth/weak-password") {
+            throw new Error("パスワードが弱すぎます。より強力なパスワードを設定してください。")
+        } else if (error.code === 'auth/invalid-credential') {
+            throw new Error("現在のパスワードが正しくありません");
+          } else {
+            throw error;
+          }
+    }
+}
+
+export const updateUserEmail = async (
+  currentPassword: string,
+  newEmail: string
+): Promise<void> => {
+  try {
+    const user = auth.currentUser;
+    if (!user || !user.email) {
+      throw new Error("ログインしていないか、メールアドレスが取得できません。");
+    }
+
+    // 現在のメールアドレスを同じ場合はエラー
+    if (user.email.toLowerCase() === newEmail.toLowerCase()) {
+        alert("現在のメールアドレスと同じです。別のメールアドレスを入力してください。")
+        throw new Error("現在のメールアドレスと同じです。別のメールアドレスを入力してください。")
+    }
+
+    // バックエンドでメールアドレスの重複チェック
+    try {
+        const response = await fetch(`${API_URL}/auth/users/email-exists`, {
+            method: "POST",
+            headers: {
+                "Content-Type": 'application/json',
+            },
+            body: JSON.stringify({ email: newEmail }),
+        })
+        const data = await response.json()
+
+        if (data.exists) {
+            alert("このメールアドレスは既に使用されています。別のメールアドレスを入力してください。")
+            throw new Error("このメールアドレスは既に使用されています。別のメールアドレスを入力してください。")
+        }
+    } catch(error: any) {
+        // バックエンドでのチェックに失敗した場合、エラーをスローせずに続行
+      // Firebase側でも同様のチェックが行われるため
+      if (error.message.includes("既に使用されています")) {
+        throw error; // 明示的に「既に使用されている」エラーは出す
+      }
+      console.warn("バックエンドでのメールアドレスチェックに失敗しました:", error);
+    }
+    
+    // 1. 再認証
+    const credential = EmailAuthProvider.credential(user.email, currentPassword);
+    await reauthenticateWithCredential(user, credential);
+
+    // 3. Firebase側のメールアドレス更新前の確認メールを送信
+    await verifyBeforeUpdateEmail(user, newEmail);
+    
+    // 4. 成功メッセージをユーザーに表示
+    alert(`
+      新しいメールアドレス（${newEmail}）宛に確認メールを送信しました。
+      メール内のリンクをクリックして変更を完了してください。
+      変更完了後、自動的にシステムに反映されます。
+    `);
+
+    return;
+  } catch (error: any) {
+    console.error("メールアドレス更新エラー:", error);
+    
+    // エラーコードによる適切なメッセージ表示
+    if (error.code === "auth/requires-recent-login") {
+      throw new Error("セキュリティのため再度ログインが必要です。ログアウトして再度ログインしてください。");
+    } else if (error.code === "auth/email-already-in-use") {
+      throw new Error("このメールアドレスは既に使用されています。");
+    } else if (error.code === "auth/invalid-email") {
+      throw new Error("メールアドレスの形式が正しくありません。");
+    } else if (error.code === "auth/invalid-credential") {
+      throw new Error("現在のパスワードが正しくありません。");
+    } else if (error.code === "auth/operation-not-allowed") {
+      throw new Error("この操作は現在許可されていません。しばらく経ってから再度お試しください。");
+    } else {
+      throw new Error(`メールアドレスの更新に失敗しました: ${error.message || "不明なエラー"}`);
+    }
+  }
 };

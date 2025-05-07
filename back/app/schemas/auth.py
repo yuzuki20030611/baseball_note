@@ -26,3 +26,12 @@ class UserRoleResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class UserEmailUpdate(BaseModel):
+    firebase_uid: str
+    new_email: EmailStr
+
+
+class EmailExistsRequest(BaseModel):
+    email: EmailStr
