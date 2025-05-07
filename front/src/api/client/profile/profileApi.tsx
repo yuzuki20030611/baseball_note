@@ -1,4 +1,4 @@
-import { CreateProfileRequest } from '../../../types/profile'
+import { CreateProfileRequest, ProfileResponseList } from '../../../types/profile'
 import axios from 'axios'
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
@@ -67,6 +67,34 @@ export const profileApi = {
     } catch (error: any) {
       if (error.response && error.response.status === 404) {
         return null
+      }
+
+      // バックエンドでのエラー詳細を出力（デバッグに役立つ）
+      if (error.response) {
+        console.error('サーバーエラー詳細:', {
+          status: error.response.status,
+          headers: error.response.headers,
+          data: error.response.data,
+        })
+      }
+      if (error.code === 'ERR_NETWORK') {
+        throw new Error('APIサーバーに接続することができません。サーバーが接続されているか確認してください')
+      } else if (error.response) {
+        throw new Error(`プロフィール取得失敗: ${error.response.data.detail || error.response.statusText}`)
+      } else {
+        // その他のエラー
+        throw new Error(`プロフィール取得失敗: ${error.message || '不明なエラー'}`)
+      }
+    }
+  },
+
+  getAll: async (firebase_uid: string): Promise<ProfileResponseList> => {
+    try {
+      const response = await axios.get(`${BASE_URL}/profile/all/${firebase_uid}`)
+      return response.data
+    } catch (error: any) {
+      if (error.response && error.response.status === 404) {
+        throw new Error('プロフィールが存在しなかったです')
       }
 
       // バックエンドでのエラー詳細を出力（デバッグに役立つ）

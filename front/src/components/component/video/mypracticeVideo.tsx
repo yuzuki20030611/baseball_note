@@ -19,7 +19,7 @@ export const MypracticeVideo = ({ src, title }: { src: string; title: string }) 
     <div className="my-4">
       <h3 className="text-lg font-medium mb-2">{title}</h3>
       <video controls className="w-full max-w-2xl rounded-lg shadow-lg" style={{ maxHeight: '400px' }}>
-        <source src={src} type={fileExtension} />
+        <source src={src} type={videoType} />
         お使いのブラウザは動画再生に対応していません
       </video>
     </div>

@@ -50,3 +50,8 @@ export type ProfileResponse = {
   created_at: string
   updated_at: string
 }
+
+// バックエンドからは、items: {}これで返ってくる。これ自体はオブジェクトで、itemsのvalueがリストになっているので、ホーム画面ではProfileResponse[]これで受け取るようにしている
+export type ProfileResponseList = {
+  items: ProfileResponse[]
+}

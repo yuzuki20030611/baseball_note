@@ -6,9 +6,10 @@ type ButtonProps = {
   children: ReactNode
   className?: string
   href: string
+  width?: string
 }
 
-export const LinkButtons = ({ children, href, className = '' }: ButtonProps) => {
+export const LinkButtons = ({ children, href, className = '', width = '90px' }: ButtonProps) => {
   return (
     <Link
       href={href}
@@ -19,7 +20,7 @@ export const LinkButtons = ({ children, href, className = '' }: ButtonProps) => 
         px-6
         py-4
         h-12
-        w-90px
+        w-[${width}]
         rounded-md
         text-md
         bg-blue-500

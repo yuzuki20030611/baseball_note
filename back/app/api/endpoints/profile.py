@@ -5,7 +5,12 @@ from uuid import UUID
 from datetime import datetime, date
 from app.core.database import get_async_db
 from app.crud import profile as profile_crud
-from app.schemas.profile import CreateProfile, ResponseProfile, UpdateProfile
+from app.schemas.profile import (
+    CreateProfile,
+    ResponseProfile,
+    UpdateProfile,
+    ResponseProfileList,
+)
 from app.core.logger import get_logger
 from app.utils.image import save_profile_image, delete_profile_image, validate_image
 from app.models.base import Users
@@ -159,6 +164,43 @@ async def get_profile_endpoint(
         logger.error(f"プロフィール情報取得エラー： {str(e)}")
         raise HTTPException(
             status_code=500, detail=f"プロフィール取得中にエラー： {str(e)}"
+        )
+
+
+@router.get(
+    "/all/{firebase_uid}",
+    response_model=ResponseProfileList,
+    operation_id="get_all_profile",
+)
+async def get_all_profile(firebase_uid: str, db: AsyncSession = Depends(get_async_db)):
+    try:
+        logger.info("全選手のプロフィール取得のリクエスト受信成功")
+        try:
+            all_profiles = await profile_crud.get_all_profile(db)
+
+            if not all_profiles:
+                logger.info("プロフィールが見つかりません")
+                raise HTTPException(
+                    status_code=404, detail="プロフィールが存在しません"
+                )
+
+            # 各プロフィールをResponseProfileモデルに変換
+            response_profiles = [
+                ResponseProfile.model_validate(profile) for profile in all_profiles
+            ]
+
+            return {"items": response_profiles}
+
+        except ValueError as e:
+            raise HTTPException(
+                status_code=404, detail=f"{e}プロフィールが存在しません"
+            )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.info(f"全選手のプロフィール情報取得エラー: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"全選手のプロフィール取得中にエラー: {str(e)}"
         )
 
 

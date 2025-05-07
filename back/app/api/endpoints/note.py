@@ -17,7 +17,7 @@ from app.core.database import get_async_db, get_db
 from app.schemas.note import NoteResponse, NoteListResponse, NoteDetailResponse
 from app.crud import note as note_crud
 from app.crud import user as user_crud
-from app.models.base import TrainingNotes
+from app.models.base import TrainingNotes, Users
 from app.utils.video import validate_video, save_note_video
 from app.core.logger import get_logger
 from app.utils.video import delete_note_video
@@ -144,13 +144,31 @@ def get_user_notes(
             logger.warning(f"ユーザーが見つかりません: {firebase_uid}")
             raise HTTPException(status_code=404, detail="ユーザーが見つかりません")
 
-        notes = note_crud.get_note_sync(db, user.id)
+        notes = note_crud.get_note(db, user.id)
         return {"items": notes}
     except Exception as e:
         logger.error(f"ノート取得エラー:{str(e)}", exc_info=True)
         raise HTTPException(
             status_code=500, detail=f"ノート取得中にエラーが発生しました: {str(e)}"
         )
+
+
+@router.get("/user/{user_id}", response_model=NoteListResponse)
+def get_users_notes_by_user_id(
+    user_id: UUID,
+    db: Session = Depends(get_db),
+):
+    """user_idと一致するノートの一覧を取得します"""
+    try:
+        user = db.query(Users).filter(Users.id == user_id).first()
+        if not user:
+            logger.warning(f"{user_id}: idに該当するユーザーが見つかりません")
+            return {"items": []}
+        notes = note_crud.get_note(db, user_id)
+        return {"items": notes}
+    except Exception as e:
+        logger.info(f"ノート一覧取得に失敗しました: {str(e)}", exc_info=True)
+        return {"items": []}
 
 
 @router.delete("/{note_id}", status_code=status.HTTP_204_NO_CONTENT)

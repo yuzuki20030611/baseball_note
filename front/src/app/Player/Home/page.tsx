@@ -46,7 +46,6 @@ const PlayerHome = () => {
 
         // エラーの種類を確認
         if (error.response && error.response.status === 404) {
-          // 404エラーはプロフィールが存在しないことを意味する
           setHasProfile(false)
         } else {
           // その他のエラー
@@ -133,7 +132,7 @@ const PlayerHome = () => {
       <div className="min-h-screen">
         <div className="flex flex-col min-h-screen">
           <Header role="player" />
-          <p>{error}</p>
+          <p className="px-6 py-4 mt-10 text-center text-xl text-red-600">{error}</p>
 
           <main className="flex-grow container mx-auto p-6 overflow-y-auto h-[calc(100vh-200px)]">
             <Card>

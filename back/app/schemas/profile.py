@@ -4,6 +4,7 @@ from typing import Optional
 from uuid import UUID
 from app.models.base import Position, DominantHand
 from app.core.logger import get_logger
+from typing import List
 
 # ここでプロフィール作成のリクエスト、レスポンス、更新の型を作成していく/
 
@@ -79,6 +80,10 @@ class ResponseProfile(BaseModel):
             self.image_url = get_image_url(self.image_path)
 
         return self
+
+
+class ResponseProfileList(BaseModel):
+    items: List[ResponseProfile]
 
 
 # 更新モデル

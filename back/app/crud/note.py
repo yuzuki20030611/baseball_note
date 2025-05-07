@@ -6,7 +6,7 @@ from uuid import UUID
 import json
 from typing import List, Dict, Optional
 import datetime
-from app.models.base import Notes, TrainingNotes, Users
+from app.models.base import Notes, TrainingNotes
 from app.core.logger import get_logger
 
 logger = get_logger(__name__)
