@@ -41,3 +41,10 @@ def delete_training_menu(training_id: UUID, db: Session = Depends(get_db)):
             detail="トレーニングメニューが見つかりません",
         )
     return None
+
+
+@router.get("/menu/all", response_model=TrainingList)
+def read_all_training_menus(db: Session = Depends(get_db)):
+    """すべてのトレーニングメニューを取得します"""
+    trainings = training_crud.get_all_trainings(db)
+    return {"items": trainings}

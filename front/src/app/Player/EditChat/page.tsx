@@ -16,7 +16,7 @@ const EditChat = () => {
           <Header role="player">ホーム画面</Header>
           <div className="max-w-4xl mx-auto p-6 w-full">
             <Card>
-              <PageTitle>コメント編集</PageTitle>
+              <PageTitle>チャット編集</PageTitle>
               <div className="bg-gray-100 rounded-lg p-6">
                 <div className="space-y-4">
                   <div className="bg-white rounded-lg p-10 h-80 overflow-y-auto space-y-6">
@@ -34,8 +34,8 @@ const EditChat = () => {
 
                   {/* ボタングループ */}
                   <div className="flex justify-center gap-4 mt-6">
-                    <LinkButtons href="/Player/NoteDetail" className="text-lg">
-                      ノート詳細画面に戻る
+                    <LinkButtons href="/Player/Chat" className="text-lg">
+                      チャット画面に戻る
                     </LinkButtons>
                     <LinkButtons href="/Player/NoteDetail" className="text-lg">
                       決定

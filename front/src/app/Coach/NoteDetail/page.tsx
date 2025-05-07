@@ -9,7 +9,6 @@ import { InfoItem } from '../../../components/component/InfoItem/InfoItem'
 import { Card } from '../../../components/component/Card/Card'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 import { LinkButton } from '../../../components/component/Button/LoginPageButton'
-import { Comment } from '../../../components/component/Chat/Comment'
 import ProtectedRoute from '../../../components/ProtectedRoute'
 import { AccountRole } from '../../../types/account'
 
@@ -78,42 +77,9 @@ const CoachNoteDetail = () => {
                       value="っっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっs"
                     />
                   </div>
-                </div>
-              </div>
-              <div className="max-w-4xl mx-auto p-8">
-                <div className="bg-gray-100 rounded-lg p-6">
-                  <div className="space-y-4">
-                    <h1 className="text-center font-semibold">多田羅</h1>
-                    <div className="bg-white rounded-lg p-4 h-80 overflow-y-auto space-y-4">
-                      {/* 相手のメッセージ */}
-                      <div className="flex gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gray-300" />
-                        <div>
-                          <div className="bg-gray-50 p-3 rounded-lg">
-                            <p>頑張りました。</p>
-                          </div>
-                          <p className="text-sm text-gray-500 mt-1">12:07</p>
-                        </div>
-                      </div>
-
-                      {/* 自分のメッセージ */}
-                      <div className="flex gap-3 justify-end">
-                        <div className="flex-grow">
-                          <div className="bg-blue-50 p-3 rounded-lg relative group">
-                            <p>明日も同じような感じで頑張りますよろしく</p>
-                          </div>
-                          <div className="flex justify-end items-center gap-4 mt-1">
-                            <div className="space-x-4">
-                              <LinkButton href="/Coach/EditChat">[編集]</LinkButton>
-                              <LinkButton>[削除]</LinkButton>
-                            </div>
-                            <p className="text-sm text-gray-500">12:07</p>
-                          </div>
-                        </div>
-                        <div className="w-10 h-10 rounded-full bg-gray-300" />
-                      </div>
-                    </div>
-                    <Comment />
+                  <div className="text-center mt-6 flex justify-center space-x-4 py-1 my-2">
+                    <LinkButtons href="/Player/Chat"> 💬 選手とチャットする</LinkButtons>
+                    <LinkButtons href="/Player/Home">ノート一覧に戻る</LinkButtons>
                   </div>
                 </div>
               </div>

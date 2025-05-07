@@ -4,6 +4,7 @@ from uuid import UUID
 
 from app.models.base import Trainings, Users
 from app.schemas.training import TrainingCreate
+from datetime import datetime
 
 
 def create_training(db: Session, training_data: TrainingCreate) -> Trainings:
@@ -22,7 +23,11 @@ def create_training(db: Session, training_data: TrainingCreate) -> Trainings:
 
 def get_specific_trainings(db: Session, firebase_uid: str) -> List[Trainings]:
     user = db.query(Users).filter(Users.firebase_uid == firebase_uid).first()
-    return db.query(Trainings).filter(Trainings.user_id == user.id).all()
+    return (
+        db.query(Trainings)
+        .filter(Trainings.user_id == user.id, Trainings.deleted_at.is_(None))
+        .all()
+    )
 
 
 def delete_training(db: Session, training_id: UUID) -> bool:
@@ -30,6 +35,12 @@ def delete_training(db: Session, training_id: UUID) -> bool:
     if not db_training:
         return False
 
-    db.delete(db_training)
+    # 物理削除から論理削除に変更
+    db_training.deleted_at = datetime.now()
     db.commit()
     return True
+
+
+def get_all_trainings(db: Session) -> List[Trainings]:
+    """すべてのトレーニングメニューを取得する"""
+    return db.query(Trainings).filter(Trainings.deleted_at.is_(None)).all()

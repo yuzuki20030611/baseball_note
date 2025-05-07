@@ -108,7 +108,6 @@ async def delete_profile_image(image_path: str) -> bool:
         # 存在確認して削除
         if blob.exists():
             blob.delete()
-            logger.info(f"画像削除成功: {image_path}")
             return True
         else:
             logger.warning(f"画像が見つかりません: {image_path}")

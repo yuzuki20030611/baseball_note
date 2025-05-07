@@ -6,5 +6,5 @@ export type CreateAddMenu = {
 export type MenuItemType = {
   id: string
   menu: string
-  created_at: string
+  created_at?: string
 }
