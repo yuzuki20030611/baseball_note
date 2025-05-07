@@ -1,18 +1,22 @@
+'use client'
 import React from 'react'
 
-import { Header } from '../../../components/component/Header/Header'
-import { PageTitle } from '../../../components/component/Title/PageTitle'
-import { Footer } from '../../../components/component/Footer/Footer'
-import { Label } from '../../../components/component/Label/Label'
-import { FullInput } from '../../../components/component/Input/FullInput'
-import { InfoItem } from '../../../components/component/InfoItem/InfoItem'
-import { Card } from '../../../components/component/Card/Card'
-import { LinkButtons } from '../../../components/component/Button/LinkButtons'
-import { LinkButton } from '../../../components/component/Button/LoginPageButton'
-import ProtectedRoute from '../../../components/ProtectedRoute'
-import { AccountRole } from '../../../types/account'
+import { Header } from '../../../../components/component/Header/Header'
+import { PageTitle } from '../../../../components/component/Title/PageTitle'
+import { Footer } from '../../../../components/component/Footer/Footer'
+import { Label } from '../../../../components/component/Label/Label'
+import { FullInput } from '../../../../components/component/Input/FullInput'
+import { InfoItem } from '../../../../components/component/InfoItem/InfoItem'
+import { Card } from '../../../../components/component/Card/Card'
+import { LinkButtons } from '../../../../components/component/Button/LinkButtons'
+import { LinkButton } from '../../../../components/component/Button/LoginPageButton'
+import ProtectedRoute from '../../../../components/ProtectedRoute'
+import { AccountRole } from '../../../../types/account'
+import { useParams } from 'next/navigation'
 
 const CoachNoteDetail = () => {
+  const params = useParams()
+  const note_id = params.note_id as string
   return (
     <ProtectedRoute requiredRole={AccountRole.COACH} authRequired={true}>
       <div className="min-h-screen">
