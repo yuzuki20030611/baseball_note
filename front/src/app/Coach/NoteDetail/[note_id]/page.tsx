@@ -1,22 +1,62 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { Header } from '../../../../components/component/Header/Header'
 import { PageTitle } from '../../../../components/component/Title/PageTitle'
 import { Footer } from '../../../../components/component/Footer/Footer'
 import { Label } from '../../../../components/component/Label/Label'
-import { FullInput } from '../../../../components/component/Input/FullInput'
 import { InfoItem } from '../../../../components/component/InfoItem/InfoItem'
 import { Card } from '../../../../components/component/Card/Card'
 import { LinkButtons } from '../../../../components/component/Button/LinkButtons'
-import { LinkButton } from '../../../../components/component/Button/LoginPageButton'
 import ProtectedRoute from '../../../../components/ProtectedRoute'
 import { AccountRole } from '../../../../types/account'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
+import { NoteDetailResponse } from '../../../../types/note'
+import { ReferenceVideo } from '../../../../components/component/video/referenceVideo'
+import { MypracticeVideo } from '../../../../components/component/video/mypracticeVideo'
+import { noteApi } from '../../../../api/Note/NoteApi'
 
 const CoachNoteDetail = () => {
   const params = useParams()
   const note_id = params.note_id as string
+  const searchParams = useSearchParams()
+  const playerName = searchParams.get('name') || '選手'
+  const userId = searchParams.get('user_id') || ''
+
+  const [loading, setLoading] = useState(true)
+  const [noteDetail, setNoteDetail] = useState<NoteDetailResponse | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchNoteDetail = async () => {
+      try {
+        setLoading(true)
+        if (!note_id) {
+          setError('該当するIDが見つかりません')
+          setLoading(false)
+          return
+        }
+        const data = await noteApi.getNoteDetail(note_id)
+        setNoteDetail(data)
+      } catch (error: any) {
+        console.error('ノート詳細情報の取得に失敗しました', error)
+        setError('ノート詳細情報の取得に失敗しました')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchNoteDetail()
+  }, [note_id])
+
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString)
+      return date.toISOString().split('T')[0]
+    } catch (error: any) {
+      return dateString || ''
+    }
+  }
+
   return (
     <ProtectedRoute requiredRole={AccountRole.COACH} authRequired={true}>
       <div className="min-h-screen">
@@ -24,70 +64,100 @@ const CoachNoteDetail = () => {
           <Header role="coach">ホーム画面</Header>
 
           <main className="flex-grow container mx-auto px-6 py-8 overflow-y-auto h-[calc(100vh-200px)]">
-            <Card>
-              <PageTitle>野球ノート詳細</PageTitle>
-              <div className="max-w-4xl mx-auto p-8">
-                <div className="text-right px-5 py-2">
-                  <p className="text-2xl mb-3">指導者</p>
+            {loading ? (
+              <Card>
+                <div className="text-center py-10">読み込み中...</div>
+              </Card>
+            ) : error ? (
+              <Card>
+                <div className="text-cetner py-10">
+                  <LinkButtons href={`/Coach/NoteList/${userId}?name=${encodeURIComponent(playerName)}`}>
+                    ノート一覧に戻る
+                  </LinkButtons>
                 </div>
-                <div className="bg-gray-100 rounded-lg p-6">
-                  <div className="flex justify-between items-center mb-10">
-                    <div className="text-lg">2024-06-11</div>
-                    <LinkButtons href="/Coach/NoteList">ノート一覧画面に戻る</LinkButtons>
+              </Card>
+            ) : !noteDetail ? (
+              <Card>
+                <div className="text-center py-10">
+                  <p className="text-red-500 mb-4">ノートが見つかりません</p>
+                  <LinkButtons href={`/Coach/NoteList/${userId}?name=${encodeURIComponent(playerName)}`}>
+                    ノート一覧に戻る
+                  </LinkButtons>
+                </div>
+              </Card>
+            ) : (
+              <Card>
+                <PageTitle>{playerName}の野球ノート詳細</PageTitle>
+                <div className="max-w-4xl mx-auto p-8">
+                  <div className="text-right px-5 py-2">
+                    <p className="text-2xl mb-3">指導者</p>
                   </div>
-                  <div className="space-y-2 mb-3">
-                    <InfoItem label="1日のテーマ：" value="打撃でホームランを打つ" />
-                  </div>
-                  <div className="space-y-2 my-3 py-3">
-                    <InfoItem label="課題：" value="打撃でセンターに返す" />
-                  </div>
-                  <div className="space-y-2 my-3 py-3">
-                    <Label>基礎トレーニング：</Label>
-                    <InfoItem label="腕立て：" value="100回" />
-                  </div>
-                  <div className="space-y-2 my-3 py-3">
-                    <InfoItem label="腹筋：" value="100回" />
-                  </div>
-                  <div className="space-y-2 my-3 py-3">
-                    <InfoItem label="背筋：" value="100回" />
-                  </div>
-                  <div className="space-y-2 my-3 py-3">
-                    <InfoItem label="バットスイング：" value="100回" />
-                  </div>
-                  <div className="space-y-2 my-3 py-3">
-                    <InfoItem label="ランニング：" value="10キロ" />
-                  </div>
-                  <div className="space-y-2 my-3 py-3">
-                    <InfoItem label="体重：" value="70キロ" />
-                  </div>
-                  <div className="space-y-2 my-3 py-3">
-                    <InfoItem label="睡眠時間：" value="10時間" />
-                  </div>
-                  <div className="space-y-2 my-3 py-3">
-                    <InfoItem
-                      label="その他練習内容："
-                      value="ンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンンn"
-                    />
-                  </div>
-                  <div className="space-y-2 my-3 py-3">
-                    <InfoItem label="参考動画：" value={<FullInput type="textarea" height="400px" />} />
-                  </div>
-                  <div className="space-y-2 my-3 py-3">
-                    <InfoItem label="練習動画：" value={<FullInput type="textarea" height="400px" />} />
-                  </div>
-                  <div className="space-y-2 my-3 py-3">
-                    <InfoItem
-                      label="1日の振り返り："
-                      value="っっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっっs"
-                    />
-                  </div>
-                  <div className="text-center mt-6 flex justify-center space-x-4 py-1 my-2">
-                    <LinkButtons href="/Player/Chat"> 💬 選手とチャットする</LinkButtons>
-                    <LinkButtons href="/Player/Home">ノート一覧に戻る</LinkButtons>
+                  <div className="bg-gray-100 rounded-lg p-6">
+                    <div className="flex justify-between items-center mb-10">
+                      <div className="text-lg font-semibold">作成日： {formatDate(noteDetail.created_at)}</div>
+                    </div>
+                    <div className="space-y-2 mb-3">
+                      <InfoItem label="1日のテーマ：" value={noteDetail.theme} type="text" />
+                    </div>
+                    <div className="space-y-2 my-3 py-3">
+                      <InfoItem label="課題：" value={noteDetail.assignment} type="text" />
+                    </div>
+
+                    {noteDetail.training_notes && noteDetail.training_notes.length > 0 && (
+                      <div className="space-y-2 my-3 py-3">
+                        <Label>基礎トレーニング：</Label>
+                        {noteDetail.training_notes.map((training) => (
+                          <InfoItem
+                            key={training.id}
+                            label={`${training.training?.menu || '未定'}：`}
+                            value={`${training.count}`}
+                            type="number"
+                          />
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="space-y-2 my-3 py-3">
+                      <InfoItem label="体重：" value={noteDetail.weight} type="number" />
+                    </div>
+
+                    <div className="space-y-2 my-3 py-3">
+                      <InfoItem label="睡眠時間：" value={noteDetail.sleep} type="number" />
+                    </div>
+
+                    {noteDetail.practice && (
+                      <div className="space-y-2 my-3 py-3">
+                        <InfoItem label="その他練習内容：" value={`${noteDetail.practice}`} type="text" />
+                      </div>
+                    )}
+
+                    {noteDetail.practice_video && (
+                      <div className="space-y-2 my-3 py-3">
+                        <Label>参考動画：</Label>
+                        <ReferenceVideo url={noteDetail.practice_video} title="" />
+                      </div>
+                    )}
+
+                    {noteDetail.my_video_url && (
+                      <div className="space-y-2 my-3 py-3">
+                        <Label>練習動画：</Label>
+                        <MypracticeVideo src={noteDetail.my_video_url} title="" />
+                      </div>
+                    )}
+
+                    <div className="space-y-2 my-3 py-3">
+                      <InfoItem label="1日の振り返り：" value={noteDetail.looked_day} type="text" />
+                    </div>
+
+                    <div className="space-y-2 my-3 py-3 text-center">
+                      <LinkButtons href={`/Coach/NoteList/${userId}?name=${encodeURIComponent(playerName)}`}>
+                        ノート一覧に戻る
+                      </LinkButtons>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            )}
           </main>
           <Footer />
         </div>

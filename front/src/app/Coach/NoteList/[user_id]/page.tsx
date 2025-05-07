@@ -137,7 +137,7 @@ const NoteList = () => {
                         </td>
                         <td className="px-6 py-4 text-center w-[100px]">
                           <LinkButtons
-                            href={`/Coach/NoteDetail/${note.id}?name=${encodeURIComponent(playerName)}`}
+                            href={`/Coach/NoteDetail/${note.id}?name=${encodeURIComponent(playerName)}&user_id=${encodeURIComponent(userId ? userId : '')}`}
                             width="100px"
                             className="text-md"
                           >

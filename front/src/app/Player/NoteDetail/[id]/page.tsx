@@ -152,7 +152,7 @@ const PlayerNoteDetail = () => {
                       </div>
                     )}
 
-                    {noteDetail && noteDetail.my_video_url && (
+                    {noteDetail.my_video_url && (
                       <div className="space-y-2 my-3 py-3">
                         <Label>練習動画：</Label>
                         <MypracticeVideo src={noteDetail.my_video_url} title="" />
@@ -164,7 +164,6 @@ const PlayerNoteDetail = () => {
                     </div>
 
                     <div className="text-center mt-6 flex justify-center space-x-4 py-1 my-2">
-                      <LinkButtons href="/Player/Chat"> 💬 監督とチャットする</LinkButtons>
                       <LinkButtons href="/Player/Home">ノート一覧に戻る</LinkButtons>
                     </div>
                   </div>
