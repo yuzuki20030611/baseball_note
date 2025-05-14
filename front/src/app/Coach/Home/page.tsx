@@ -10,12 +10,9 @@ import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 import ProtectedRoute from '../../../components/ProtectedRoute'
 import { AccountRole } from '../../../types/account'
 import { profileApi } from '../../../api/client/profile/profileApi'
-import { useAuth } from '../../../contexts/AuthContext'
 import { ProfileResponse } from '../../../types/profile'
 
 const CoachHome = () => {
-  const { user } = useAuth()
-  const firebase_uid = user?.uid
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<null | string>(null)
   const [hasPlayersData, setHasPlayersData] = useState<boolean>(false) //複数なのでリスト形式で取得する
