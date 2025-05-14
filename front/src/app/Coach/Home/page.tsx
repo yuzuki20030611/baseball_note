@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react'
 
 import { Header } from '../../../components/component/Header/Header'
 import { Footer } from '../../../components/component/Footer/Footer'
-import { Buttons } from '../../../components/component/Button/Button'
 import { PageTitle } from '../../../components/component/Title/PageTitle'
 import { Card } from '../../../components/component/Card/Card'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
@@ -19,55 +18,41 @@ const CoachHome = () => {
   const firebase_uid = user?.uid
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<null | string>(null)
-  const [hasPlayersData, setHasPlayersData] = useState<ProfileResponse[] | null>(null) //複数なのでリスト形式で取得する
-  const [page, setPage] = useState(1)
-  const ITEMS_PER_PAGE = 3
-  const canGoBack = page > 1
+  const [hasPlayersData, setHasPlayersData] = useState<boolean>(false) //複数なのでリスト形式で取得する
+  const [playerDataList, setPlayerDataList] = useState<ProfileResponse[]>([])
 
   useEffect(() => {
-    const getPlayerList = async (firebase_uid: string) => {
+    const getPlayerList = async () => {
       try {
         setLoading(true)
         setError(null)
         // ここで前プレイヤーのプロフィール情報を取得して取得した情報でリストを作成、開くボタンの遷移先でノートの情報をリストで表示させる
-        const response = await profileApi.getAll(firebase_uid)
+        const response = await profileApi.getAll()
         // 配列であることを確認
         if (response && Array.isArray(response.items) && response.items.length > 0) {
-          setHasPlayersData(response.items)
+          setHasPlayersData(true)
+          setPlayerDataList(response.items)
+        } else {
+          // 空のレスポンスの場合は正常だが空の配列
+          setHasPlayersData(true) // テーブルを表示するためにtrueに設定
+          setPlayerDataList([])
         }
       } catch (error: any) {
-        console.error('全選手のプロフィール情報の取得に失敗しました', error)
-
-        if (error.message && error.message.includes('プロフィールが存在')) {
-          setHasPlayersData(null)
-          setError('選手のプロフィールが存在しないです')
+        console.error('ノート一覧の取得に失敗しました', error)
+        if (error.response && error.response.status === 404) {
+          setHasPlayersData(true)
+          setPlayerDataList([]) // 404の場合は空の配列を設定
+          setError(null) // エラーメッセージをクリア
         } else {
-          setError('全選手のプロフィール取得中にエラーが発生しました')
-          setHasPlayersData(null)
+          setHasPlayersData(false)
+          setError(error.message || 'ノート一覧の取得に失敗しました')
         }
       } finally {
         setLoading(false)
       }
     }
-    if (firebase_uid) {
-      getPlayerList(firebase_uid)
-    } else {
-      console.error('firebase_uidが存在しないです')
-    }
-  }, [firebase_uid])
-
-  const loadMore = () => {
-    setPage((prevPage) => prevPage + 1)
-  }
-
-  const goBack = () => {
-    if (page > 1) {
-      setPage((prevPage) => prevPage - 1)
-    }
-  }
-
-  const displayPage = hasPlayersData ? hasPlayersData.slice(0, page * ITEMS_PER_PAGE) : []
-  const hasMore = hasPlayersData ? hasPlayersData.length > page * ITEMS_PER_PAGE : false
+    getPlayerList()
+  }, [])
 
   return (
     <ProtectedRoute requiredRole={AccountRole.COACH} authRequired={true}>
@@ -79,7 +64,7 @@ const CoachHome = () => {
             <Card>
               {loading ? (
                 <p className="text-2xl mt-3 text-center">ロード中...</p>
-              ) : (
+              ) : hasPlayersData ? (
                 <div>
                   <div className="text-lefht">
                     <LinkButtons href="/Coach/LoginDetail" className="text-lg">
@@ -111,18 +96,14 @@ const CoachHome = () => {
                             読み込み中...
                           </td>
                         </tr>
-                      ) : displayPage.length > 0 ? (
-                        displayPage.map((data, index) => (
+                      ) : playerDataList.length > 0 ? (
+                        playerDataList.map((data, index) => (
                           <tr className="hover:bg-gray-50" key={index}>
                             <td className="px-6 py-4 text-center text-sm text-gray-600">{data.name}</td>
                             <td className="px-6 py-4 text-center text-sm text-gray-600">{data.player_dominant}</td>
                             <td className="px-6 py-4 text-center text-sm text-gray-600">{data.player_position}</td>
                             <td className="px-6 py-4 text-center">
-                              <LinkButtons
-                                href={`/Coach/NoteList/${data.user_id}?name=${encodeURIComponent(data.name)}`}
-                              >
-                                開く⇨
-                              </LinkButtons>
+                              <LinkButtons href={`/Coach/NoteList/${data.user_id}?`}>開く⇨</LinkButtons>
                             </td>
                           </tr>
                         ))
@@ -135,18 +116,13 @@ const CoachHome = () => {
                       )}
                     </tbody>
                   </table>
-                  <div className="flex justify-center pt-10 gap-10">
-                    {canGoBack && (
-                      <Buttons width="130px" onClick={goBack}>
-                        ←前のページ
-                      </Buttons>
-                    )}
-                    {hasMore && (
-                      <Buttons width="130px" onClick={loadMore}>
-                        さらに表示→
-                      </Buttons>
-                    )}
-                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-10">
+                  <p className="text-lg text-red-500 mb-4">{error || '選手データを取得できませんでした'}</p>
+                  <LinkButtons href="/" className="text-lg">
+                    ログイン画面に戻る
+                  </LinkButtons>
                 </div>
               )}
             </Card>

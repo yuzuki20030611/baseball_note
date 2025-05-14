@@ -10,23 +10,15 @@ import { Card } from '../../../../components/component/Card/Card'
 import { LinkButtons } from '../../../../components/component/Button/LinkButtons'
 import ProtectedRoute from '../../../../components/ProtectedRoute'
 import { AccountRole } from '../../../../types/account'
-import { useParams, useSearchParams } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { NoteListItem } from '../../../../types/note'
 import { noteApi } from '../../../../api/Note/NoteApi'
+import { profileApi } from '../../../../api/client/profile/profileApi'
 
 const NoteList = () => {
   const params = useParams()
-  const searchParams = useSearchParams()
   const userId = params.user_id ? String(params.user_id) : null
-  const playerName = searchParams.get('name') || '選手'
-
-  console.log('NoteList Params:', {
-    userId,
-    playerName,
-    params,
-    paramsType: typeof params,
-    userIdType: typeof userId,
-  })
+  const [playerName, setPlayerName] = useState<string>('選手')
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -44,6 +36,17 @@ const NoteList = () => {
       }
       try {
         setLoading(true)
+        // プロフィール情報の取得
+        try {
+          const profileData = await profileApi.getPlayerNameByUserId(userId)
+          if (profileData && profileData.name) {
+            setPlayerName(profileData.name)
+          }
+        } catch (profileError) {
+          console.error('プロフィール情報の取得に失敗しました', profileError)
+          // プロフィール取得失敗時もノート一覧は表示するため、エラーはスローしない
+        }
+
         const noteListData = await noteApi.getNotesByUserId(userId)
         setNoteList(noteListData.items)
         setError(null)
@@ -136,11 +139,7 @@ const NoteList = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4 text-center w-[100px]">
-                          <LinkButtons
-                            href={`/Coach/NoteDetail/${note.id}?name=${encodeURIComponent(playerName)}&user_id=${encodeURIComponent(userId ? userId : '')}`}
-                            width="100px"
-                            className="text-md"
-                          >
+                          <LinkButtons href={`/Coach/NoteDetail/${note.id}`} width="100px" className="text-md">
                             詳細
                           </LinkButtons>
                         </td>

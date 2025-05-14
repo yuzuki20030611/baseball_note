@@ -88,31 +88,15 @@ export const profileApi = {
     }
   },
 
-  getAll: async (firebase_uid: string): Promise<ProfileResponseList> => {
+  getAll: async (): Promise<ProfileResponseList> => {
     try {
-      const response = await axios.get(`${BASE_URL}/profile/all/${firebase_uid}`)
+      // firebase_uidパラメータを削除
+      const response = await axios.get(`${BASE_URL}/profile/all`)
       return response.data
     } catch (error: any) {
-      if (error.response && error.response.status === 404) {
-        throw new Error('プロフィールが存在しなかったです')
-      }
-
-      // バックエンドでのエラー詳細を出力（デバッグに役立つ）
-      if (error.response) {
-        console.error('サーバーエラー詳細:', {
-          status: error.response.status,
-          headers: error.response.headers,
-          data: error.response.data,
-        })
-      }
-      if (error.code === 'ERR_NETWORK') {
-        throw new Error('APIサーバーに接続することができません。サーバーが接続されているか確認してください')
-      } else if (error.response) {
-        throw new Error(`プロフィール取得失敗: ${error.response.data.detail || error.response.statusText}`)
-      } else {
-        // その他のエラー
-        throw new Error(`プロフィール取得失敗: ${error.message || '不明なエラー'}`)
-      }
+      console.error('プロフィール取得エラー:', error)
+      // エラー時は空のリストを返す
+      return { items: [] }
     }
   },
   update: async (profileId: string, data: Partial<CreateProfileRequest>) => {
@@ -166,6 +150,33 @@ export const profileApi = {
       } else {
         // その他のエラー
         throw new Error(`プロフィール更新失敗: ${error.message || '不明なエラー'}`)
+      }
+    }
+  },
+
+  getPlayerNameByUserId: async (userId: string) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/profile/by-userid/${userId}`)
+      return response.data
+    } catch (error: any) {
+      console.error('ユーザーIDからプロフィール取得エラー:', error)
+      if (error.response && error.response.status === 404) {
+        return { name: '選手' } // 見つからない場合はデフォルト名
+      }
+      if (error.response) {
+        console.error('サーバーエラー詳細:', {
+          status: error.response.status,
+          headers: error.response.headers,
+          data: error.response.data,
+        })
+      }
+      if (error.code === 'ERR_NETWORK') {
+        throw new Error('APIサーバーに接続することができません。サーバーが接続されているか確認してください')
+      } else if (error.response) {
+        throw new Error(`プロフィール取得失敗: ${error.response.data.detail || error.response.statusText}`)
+      } else {
+        // その他のエラー
+        throw new Error(`プロフィール取得失敗: ${error.message || '不明なエラー'}`)
       }
     }
   },

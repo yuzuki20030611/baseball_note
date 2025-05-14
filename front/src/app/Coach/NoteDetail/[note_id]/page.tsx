@@ -10,18 +10,18 @@ import { Card } from '../../../../components/component/Card/Card'
 import { LinkButtons } from '../../../../components/component/Button/LinkButtons'
 import ProtectedRoute from '../../../../components/ProtectedRoute'
 import { AccountRole } from '../../../../types/account'
-import { useParams, useSearchParams } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { NoteDetailResponse } from '../../../../types/note'
 import { ReferenceVideo } from '../../../../components/component/video/referenceVideo'
 import { MypracticeVideo } from '../../../../components/component/video/mypracticeVideo'
 import { noteApi } from '../../../../api/Note/NoteApi'
+import { profileApi } from '../../../../api/client/profile/profileApi'
 
 const CoachNoteDetail = () => {
   const params = useParams()
   const note_id = params.note_id as string
-  const searchParams = useSearchParams()
-  const playerName = searchParams.get('name') || '選手'
-  const userId = searchParams.get('user_id') || ''
+  const [playerName, setPlayerName] = useState<string>('選手')
+  const [userId, setUserId] = useState<string | null>(null)
 
   const [loading, setLoading] = useState(true)
   const [noteDetail, setNoteDetail] = useState<NoteDetailResponse | null>(null)
@@ -38,6 +38,18 @@ const CoachNoteDetail = () => {
         }
         const data = await noteApi.getNoteDetail(note_id)
         setNoteDetail(data)
+        if (data && data.user_id) {
+          setUserId(data.user_id)
+
+          try {
+            const ProfileData = await profileApi.getPlayerNameByUserId(data.user_id)
+            if (ProfileData && ProfileData.name) {
+              setPlayerName(ProfileData.name)
+            }
+          } catch (profileError) {
+            console.error('プロフィール情報の取得に失敗しました', profileError)
+          }
+        }
       } catch (error: any) {
         console.error('ノート詳細情報の取得に失敗しました', error)
         setError('ノート詳細情報の取得に失敗しました')
@@ -71,18 +83,14 @@ const CoachNoteDetail = () => {
             ) : error ? (
               <Card>
                 <div className="text-cetner py-10">
-                  <LinkButtons href={`/Coach/NoteList/${userId}?name=${encodeURIComponent(playerName)}`}>
-                    ノート一覧に戻る
-                  </LinkButtons>
+                  <LinkButtons href={`/Coach/NoteList/${userId}`}>ノート一覧に戻る</LinkButtons>
                 </div>
               </Card>
             ) : !noteDetail ? (
               <Card>
                 <div className="text-center py-10">
                   <p className="text-red-500 mb-4">ノートが見つかりません</p>
-                  <LinkButtons href={`/Coach/NoteList/${userId}?name=${encodeURIComponent(playerName)}`}>
-                    ノート一覧に戻る
-                  </LinkButtons>
+                  <LinkButtons href={`/Coach/NoteList/${userId}`}>ノート一覧に戻る</LinkButtons>
                 </div>
               </Card>
             ) : (
@@ -150,9 +158,7 @@ const CoachNoteDetail = () => {
                     </div>
 
                     <div className="space-y-2 my-3 py-3 text-center">
-                      <LinkButtons href={`/Coach/NoteList/${userId}?name=${encodeURIComponent(playerName)}`}>
-                        ノート一覧に戻る
-                      </LinkButtons>
+                      <LinkButtons href={`/Coach/NoteList/${userId}`}>ノート一覧に戻る</LinkButtons>
                     </div>
                   </div>
                 </div>
