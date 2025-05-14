@@ -16,6 +16,7 @@ import { LoginInfoValidationErrors, validateLoginEdit } from '../../../app/valid
 import { updateUserEmail, updateUserPassword } from '../../../app/services/auth'
 import { FullInput } from '../../../components/component/Input/FullInput'
 import { Buttons } from '../../../components/component/Button/Button'
+import DifyChatBot from '../../../components/component/ChatBot/DifyChatBot'
 
 const EditLogin = () => {
   const { user } = useAuth()
@@ -308,8 +309,10 @@ const EditLogin = () => {
             </div>
           </Card>
         </main>
-
         <Footer />
+        <div className="fixed right-3 top-28 z-50">
+          <DifyChatBot firebase_uid={user?.uid} />
+        </div>
       </div>
     </ProtectedRoute>
   )

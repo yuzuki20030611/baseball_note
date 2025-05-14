@@ -11,8 +11,12 @@ import ProtectedRoute from '../../../components/ProtectedRoute'
 import { AccountRole } from '../../../types/account'
 import { profileApi } from '../../../api/client/profile/profileApi'
 import { ProfileResponse } from '../../../types/profile'
+import DifyChatBot from '../../../components/component/ChatBot/DifyChatBot'
+import { useAuth } from '../../../contexts/AuthContext'
 
 const CoachHome = () => {
+  const { user } = useAuth()
+  const firebase_uid = user?.uid
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<null | string>(null)
   const [hasPlayersData, setHasPlayersData] = useState<boolean>(false) //複数なのでリスト形式で取得する
@@ -78,7 +82,7 @@ const CoachHome = () => {
                   </div>
 
                   <table className="w-full">
-                    <thead className="bg-gray-100 border-b-2 border-gray-200">
+                    <thead className="bg-gray-100 bg-opacity-80 border border-b-2 border-gray-300">
                       <tr>
                         <th className="px-1 py-3 text-center text-xl font-semibold text-gray-700">名前</th>
                         <th className="px-1 py-3 text-center text-xl font-semibold text-gray-700">利き手</th>
@@ -126,6 +130,9 @@ const CoachHome = () => {
           </main>
         </div>
         <Footer />
+        <div className="fixed right-3 top-28 z-50">
+          <DifyChatBot firebase_uid={firebase_uid} />
+        </div>
       </div>
     </ProtectedRoute>
   )

@@ -12,6 +12,15 @@
     font-sans /* フォントファミリー */
     leading-normal /* 行の高さ */
     antialiased; /* フォントのスムージング */
+
+    /* 背景画像とグラデーションの設定 */
+    background-image: 
+      linear-gradient(to bottom, rgba(59, 130, 246, 0.9), rgba(37, 99, 235, 0.8)),
+      url('/images/baseball_icon.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: repeat;
+    background-attachment: fixed;
   }
 
   h1 {
@@ -34,5 +43,22 @@
   /* リンクのデフォルトスタイル */
   a {
     @apply text-blue-600 hover:text-blue-800;
+  }
+}
+
+/* 必要に応じて追加のスタイル */
+@layer components {
+  .baseball-bg-pattern {
+    position: relative;
+  }
+
+  .baseball-bg-pattern::before {
+    content: "";
+    @apply absolute inset-0 w-full h-full pointer-events-none;
+    background-image: url('/images/baseball_icon.png');
+    background-size: 200px;
+    background-repeat: repeat;
+    opacity: 0.1;
+    z-index: -1;
   }
 }
