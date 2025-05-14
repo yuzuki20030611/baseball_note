@@ -13,6 +13,7 @@ import { AccountRole } from '../../../types/account'
 import { profileApi } from '../../../api/client/profile/profileApi'
 import { useAuth } from '../../../contexts/AuthContext'
 import { ProfileResponse } from '../../../types/profile'
+import DifyChatBot from '../../../components/component/ChatBot/DifyChatBot'
 
 const CoachHome = () => {
   const { user } = useAuth()
@@ -86,6 +87,7 @@ const CoachHome = () => {
                       ログイン情報
                     </LinkButtons>
                   </div>
+
                   <PageTitle>選手一覧</PageTitle>
 
                   <div className="flex flex-col space-y-10 items-end mb-6 pr-20">
@@ -96,7 +98,7 @@ const CoachHome = () => {
                   </div>
 
                   <table className="w-full">
-                    <thead className="bg-gray-100 border-b-2 border-gray-200">
+                    <thead className="bg-gray-100 bg-opacity-80 border border-b-2 border-gray-300">
                       <tr>
                         <th className="px-1 py-3 text-center text-xl font-semibold text-gray-700">名前</th>
                         <th className="px-1 py-3 text-center text-xl font-semibold text-gray-700">利き手</th>
@@ -153,6 +155,9 @@ const CoachHome = () => {
           </main>
         </div>
         <Footer />
+        <div className="fixed right-3 top-28 z-50">
+          <DifyChatBot firebase_uid={firebase_uid} />
+        </div>
       </div>
     </ProtectedRoute>
   )
