@@ -13,7 +13,7 @@ router = APIRouter()
 
 # ヘルパー関数: 全テーブル情報の取得
 def get_all_table_data(db: Session) -> Dict[str, List[Dict[str, Any]]]:
-    """システム内の全テーブルデータを取得するヘルパー関数"""
+    """システム内の全テーブルデータを取得する軽量版ヘルパー関数"""
 
     # 全ユーザー情報
     users = []
@@ -25,8 +25,6 @@ def get_all_table_data(db: Session) -> Dict[str, List[Dict[str, Any]]]:
                 "firebase_uid": user.firebase_uid,
                 "email": user.email,
                 "role": user.role,
-                "created_at": user.created_at.isoformat(),
-                "updated_at": user.updated_at.isoformat(),
             }
         )
 
@@ -36,7 +34,6 @@ def get_all_table_data(db: Session) -> Dict[str, List[Dict[str, Any]]]:
     for profile in profile_records:
         profiles.append(
             {
-                "id": str(profile.id),
                 "user_id": str(profile.user_id),
                 "name": profile.name,
                 "team_name": profile.team_name,
@@ -45,8 +42,6 @@ def get_all_table_data(db: Session) -> Dict[str, List[Dict[str, Any]]]:
                 "birthday": profile.birthday.isoformat() if profile.birthday else None,
                 "admired_player": profile.admired_player,
                 "introduction": profile.introduction,
-                "created_at": profile.created_at.isoformat(),
-                "updated_at": profile.updated_at.isoformat(),
             }
         )
 
@@ -64,8 +59,6 @@ def get_all_table_data(db: Session) -> Dict[str, List[Dict[str, Any]]]:
                 "sleep": float(note.sleep) if note.sleep else None,
                 "looked_day": note.looked_day,
                 "practice": note.practice,
-                "created_at": note.created_at.isoformat(),
-                "updated_at": note.updated_at.isoformat(),
             }
         )
 
@@ -78,7 +71,6 @@ def get_all_table_data(db: Session) -> Dict[str, List[Dict[str, Any]]]:
                 "id": str(training.id),
                 "user_id": str(training.user_id),
                 "menu": training.menu,
-                "created_at": training.created_at.isoformat(),
             }
         )
 
@@ -88,12 +80,9 @@ def get_all_table_data(db: Session) -> Dict[str, List[Dict[str, Any]]]:
     for tn in tn_records:
         training_notes.append(
             {
-                "id": str(tn.id),
                 "training_id": str(tn.training_id),
                 "note_id": str(tn.note_id),
                 "count": tn.count,
-                "created_at": tn.created_at.isoformat(),
-                "updated_at": tn.updated_at.isoformat(),
             }
         )
 
@@ -108,7 +97,7 @@ def get_all_table_data(db: Session) -> Dict[str, List[Dict[str, Any]]]:
 
 # 特定ユーザーの関連データ取得
 def get_user_related_data(db: Session, user_id: str) -> Dict[str, Any]:
-    """特定ユーザーの関連データを取得するヘルパー関数"""
+    """特定ユーザーの関連データを取得する軽量版ヘルパー関数"""
 
     # プロフィール情報取得
     my_profile = None
@@ -116,7 +105,6 @@ def get_user_related_data(db: Session, user_id: str) -> Dict[str, Any]:
     if profile:
         my_profile = {
             "id": str(profile.id),
-            "user_id": str(profile.user_id),
             "name": profile.name,
             "team_name": profile.team_name,
             "position": profile.player_position,
@@ -124,8 +112,6 @@ def get_user_related_data(db: Session, user_id: str) -> Dict[str, Any]:
             "birthday": profile.birthday.isoformat() if profile.birthday else None,
             "admired_player": profile.admired_player,
             "introduction": profile.introduction,
-            "created_at": profile.created_at.isoformat(),
-            "updated_at": profile.updated_at.isoformat(),
         }
 
     # ノート情報取得
@@ -135,15 +121,12 @@ def get_user_related_data(db: Session, user_id: str) -> Dict[str, Any]:
         my_notes.append(
             {
                 "id": str(note.id),
-                "user_id": str(note.user_id),
                 "theme": note.theme,
                 "assignment": note.assignment,
                 "weight": float(note.weight) if note.weight else None,
                 "sleep": float(note.sleep) if note.sleep else None,
                 "looked_day": note.looked_day,
                 "practice": note.practice,
-                "created_at": note.created_at.isoformat(),
-                "updated_at": note.updated_at.isoformat(),
             }
         )
 
@@ -154,9 +137,7 @@ def get_user_related_data(db: Session, user_id: str) -> Dict[str, Any]:
         my_trainings.append(
             {
                 "id": str(training.id),
-                "user_id": str(training.user_id),
                 "menu": training.menu,
-                "created_at": training.created_at.isoformat(),
             }
         )
 
@@ -171,12 +152,9 @@ def get_user_related_data(db: Session, user_id: str) -> Dict[str, Any]:
     for tn in training_note_records:
         my_training_notes.append(
             {
-                "id": str(tn.id),
                 "training_id": str(tn.training_id),
                 "note_id": str(tn.note_id),
                 "count": tn.count,
-                "created_at": tn.created_at.isoformat(),
-                "updated_at": tn.updated_at.isoformat(),
             }
         )
 
@@ -210,7 +188,6 @@ async def get_user_data(
         "firebase_uid": user.firebase_uid,
         "email": user.email,
         "role": user.role,
-        "created_at": user.created_at.isoformat(),
     }
 
     # ヘルパー関数を使用してユーザー関連データを取得
@@ -222,7 +199,7 @@ async def get_user_data(
 @router.get("/all-data", response_model=Dict[str, Any])
 async def get_all_data(db: Session = Depends(get_db)):
     """
-    全データを取得するエンドポイント
+    全データを取得するエンドポイント（軽量版）
     Difyチャットボットで使用します
     """
     logger.info("Dify API 全データリクエスト")

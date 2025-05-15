@@ -45,7 +45,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://localhost:8080",
-        "https://b539-112-71-191-8.ngrok-free.app",  # 新しいngrok URL
+        "https://fcb8-112-71-191-8.ngrok-free.app",
         "https://cloud.dify.ai",
         "*",
     ],  # Next.jsのURL
