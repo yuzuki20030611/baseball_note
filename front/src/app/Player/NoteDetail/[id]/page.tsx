@@ -101,7 +101,7 @@ const PlayerNoteDetail = () => {
                   <div className="text-right pr-5 mr-5">
                     <p className="text-2xl mt-3">選手</p>
                   </div>
-                  <div className="bg-gray-100 rounded-lg p-6">
+                  <div className="bg-gray-200 rounded-lg p-6">
                     <div className="flex justify-between items-center mb-10">
                       <div className="text-xl font-semibold">作成日時：{formatDate(noteDetail.created_at)}</div>
                       <div className="space-x-3">

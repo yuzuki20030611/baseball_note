@@ -14,8 +14,12 @@ import { useParams } from 'next/navigation'
 import { NoteListItem } from '../../../../types/note'
 import { noteApi } from '../../../../api/Note/NoteApi'
 import { profileApi } from '../../../../api/client/profile/profileApi'
+import DifyChatBot from '../../../../components/component/ChatBot/DifyChatBot'
+import { useAuth } from '../../../../contexts/AuthContext'
 
 const NoteList = () => {
+  const { user } = useAuth()
+  const firebase_uid = user?.uid
   const params = useParams()
   const userId = params.user_id ? String(params.user_id) : null
   const [playerName, setPlayerName] = useState<string>('選手')
@@ -109,7 +113,7 @@ const NoteList = () => {
                   <col className="w-[35%]" /> {/* 課題 - 幅を増やす */}
                   <col className="w-[10%]" /> {/* 詳細 */}
                 </colgroup>
-                <thead className="bg-gray-100 border-b-2 border-gray-200">
+                <thead className="bg-gray-100 bg-opacity-80 border border-b-2 border-gray-300">
                   <tr>
                     <th className="px-1 py-3 text-center text-xl font-semibold text-gray-700">日付</th>
                     <th className="px-1 py-3 text-center text-xl font-semibold text-gray-700">本日のテーマ</th>
@@ -169,6 +173,9 @@ const NoteList = () => {
             </Card>
           </main>
           <Footer />
+          <div className="fixed right-3 top-28 z-50">
+            <DifyChatBot firebase_uid={firebase_uid} />
+          </div>
         </div>
       </div>
     </ProtectedRoute>

@@ -26,7 +26,7 @@ const LoginDetail = () => {
               <div className="text-right pr-5 mr-5">
                 <p className="text-2xl">選手</p>
               </div>
-              <form className="bg-gray-100 p-8 rounded-lg w-full max-w-md mt-6">
+              <form className="bg-gray-200 p-8 rounded-lg w-full max-w-md mt-6">
                 <div className="mb-6">
                   <InfoItem
                     label="現在のメールアドレス："

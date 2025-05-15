@@ -7,8 +7,8 @@ import { auth } from '../auth'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: '教育サービス',
-  description: '教育サービス',
+  title: 'Web版野球ノート',
+  description: 'Web版野球ノート',
 }
 
 export default async function RootLayout({
@@ -19,7 +19,7 @@ export default async function RootLayout({
   const session = await auth()
   return (
     <html lang="ja" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${inter.className} baseball-bg-pattern`}>
         <Providers session={session}>{children}</Providers>
       </body>
     </html>

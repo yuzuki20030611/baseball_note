@@ -1,4 +1,5 @@
 'use client'
+
 import React from 'react'
 
 import { Header } from '../../../components/component/Header/Header'
@@ -10,6 +11,7 @@ import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 import ProtectedRoute from '../../../components/ProtectedRoute'
 import { AccountRole } from '../../../types/account'
 import { useAuth } from '../../../contexts/AuthContext'
+import DifyChatBot from '../../../components/component/ChatBot/DifyChatBot'
 
 const LoginDetail = () => {
   const { user } = useAuth()
@@ -27,7 +29,7 @@ const LoginDetail = () => {
               <div className="text-right pr-5 mr-5">
                 <p className="text-2xl">指導者</p>
               </div>
-              <form className="bg-gray-100 p-8 rounded-lg shadow-md w-full max-w-md mt-6">
+              <form className="bg-gray-200 p-8 rounded-lg shadow-md w-full max-w-md mt-6">
                 <div className="mb-6">
                   <InfoItem
                     label="現在のメールアドレス："
@@ -48,8 +50,10 @@ const LoginDetail = () => {
             </div>
           </Card>
         </main>
-
         <Footer />
+        <div className="fixed right-3 top-28 z-50">
+          <DifyChatBot firebase_uid={user?.uid} />
+        </div>
       </div>
     </ProtectedRoute>
   )

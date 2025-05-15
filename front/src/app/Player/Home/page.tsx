@@ -25,6 +25,7 @@ const PlayerHome = () => {
   const [error, setError] = useState<string | null>(null)
   const [page, setPage] = useState(1)
   const ITEMS_PER_PAGE = 3
+  const canGoBack = page > 1
 
   const firebase_uid = user?.uid || ''
 
@@ -122,6 +123,10 @@ const PlayerHome = () => {
     setPage((prevPage) => prevPage + 1)
   }
 
+  const goBack = () => {
+    setPage((prevPage) => prevPage - 1)
+  }
+
   // 表示するノートのリスト（取得したノートを何個表示するのかについての関数）
   const displayedNotes = notes.slice(0, page * ITEMS_PER_PAGE)
   // さらに表示ボタンを表示するか、しないかを決める変数
@@ -174,7 +179,7 @@ const PlayerHome = () => {
                   <col className="w-[12.5%]" /> {/* 詳細 */}
                   <col className="w-[12.5%]" /> {/* 削除 */}
                 </colgroup>
-                <thead className="bg-gray-100 border-b-2 border-gray-200">
+                <thead className="bg-gray-100 bg-opacity-80 border border-b-2 border-gray-300">
                   <tr>
                     <th className="px-1 py-3 text-center text-xl font-semibold text-gray-700">日付</th>
                     <th className="px-1 py-3 text-center text-xl font-semibold text-gray-700">本日のテーマ</th>
@@ -223,14 +228,18 @@ const PlayerHome = () => {
                   )}
                 </tbody>
               </table>
-
-              {hasMore && (
-                <div className="flex justify-center pt-10">
-                  <Buttons width="130px" onClick={loadMore}>
-                    さらに表示
+              <div className="flex justify-center pt-10 gap-10">
+                {canGoBack && (
+                  <Buttons width="130px" onClick={goBack}>
+                    ←前のページ
                   </Buttons>
-                </div>
-              )}
+                )}
+                {hasMore && (
+                  <Buttons width="130px" onClick={loadMore}>
+                    さらに表示→
+                  </Buttons>
+                )}
+              </div>
             </Card>
           </main>
         </div>
