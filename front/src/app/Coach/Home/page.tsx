@@ -15,8 +15,7 @@ import { ProfileResponse } from '../../../types/profile'
 const CoachHome = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<null | string>(null)
-  const [hasPlayersData, setHasPlayersData] = useState<boolean>(false) //複数なのでリスト形式で取得する
-  const [playerDataList, setPlayerDataList] = useState<ProfileResponse[]>([])
+  const [playersDataList, setPlayersDataList] = useState<ProfileResponse[]>([])
 
   useEffect(() => {
     const getPlayerList = async () => {
@@ -27,21 +26,17 @@ const CoachHome = () => {
         const response = await profileApi.getAll()
         // 配列であることを確認
         if (response && Array.isArray(response.items) && response.items.length > 0) {
-          setHasPlayersData(true)
-          setPlayerDataList(response.items)
+          setPlayersDataList(response.items)
         } else {
           // 空のレスポンスの場合は正常だが空の配列
-          setHasPlayersData(true) // テーブルを表示するためにtrueに設定
-          setPlayerDataList([])
+          setPlayersDataList([])
         }
       } catch (error: any) {
         console.error('ノート一覧の取得に失敗しました', error)
         if (error.response && error.response.status === 404) {
-          setHasPlayersData(true)
-          setPlayerDataList([]) // 404の場合は空の配列を設定
+          setPlayersDataList([]) // 404の場合は空の配列を設定
           setError(null) // エラーメッセージをクリア
         } else {
-          setHasPlayersData(false)
           setError(error.message || 'ノート一覧の取得に失敗しました')
         }
       } finally {
@@ -61,7 +56,7 @@ const CoachHome = () => {
             <Card>
               {loading ? (
                 <p className="text-2xl mt-3 text-center">ロード中...</p>
-              ) : hasPlayersData ? (
+              ) : (
                 <div>
                   <div className="text-lefht">
                     <LinkButtons href="/Coach/LoginDetail" className="text-lg">
@@ -93,8 +88,8 @@ const CoachHome = () => {
                             読み込み中...
                           </td>
                         </tr>
-                      ) : playerDataList.length > 0 ? (
-                        playerDataList.map((data, index) => (
+                      ) : playersDataList.length > 0 ? (
+                        playersDataList.map((data, index) => (
                           <tr className="hover:bg-gray-50" key={index}>
                             <td className="px-6 py-4 text-center text-sm text-gray-600">{data.name}</td>
                             <td className="px-6 py-4 text-center text-sm text-gray-600">{data.player_dominant}</td>
@@ -113,13 +108,6 @@ const CoachHome = () => {
                       )}
                     </tbody>
                   </table>
-                </div>
-              ) : (
-                <div className="text-center py-10">
-                  <p className="text-lg text-red-500 mb-4">{error || '選手データを取得できませんでした'}</p>
-                  <LinkButtons href="/" className="text-lg">
-                    ログイン画面に戻る
-                  </LinkButtons>
                 </div>
               )}
             </Card>
