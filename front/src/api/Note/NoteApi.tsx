@@ -84,6 +84,23 @@ export const noteApi = {
     }
   },
 
+  getNotesByUserId: async (userId: string): Promise<NoteListResponse> => {
+    if (!userId || typeof userId !== 'string') {
+      console.error('無効なユーザーIDです', userId)
+      return { items: [] }
+    }
+    try {
+      const response = await axios.get(`${BASE_URL}/note/user/${userId}`)
+      return response.data
+    } catch (error: any) {
+      console.error('ノート一覧取得に失敗しました', error)
+      if (error.response && [404, 402].includes(error.response.status)) {
+        return { items: [] }
+      }
+      throw error
+    }
+  },
+
   // 指定したノートを論理削除で削除する
   deleteNote: async (noteId: string): Promise<boolean> => {
     try {
