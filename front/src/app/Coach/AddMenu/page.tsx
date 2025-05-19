@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation'
 import ProtectedRoute from '../../../components/ProtectedRoute'
 import { AccountRole } from '../../../types/account'
 import { useAuth } from '../../../contexts/AuthContext'
+import DifyChatBot from '../../../components/component/ChatBot/DifyChatBot'
 
 const AddMenu = () => {
   const { user } = useAuth()
@@ -72,7 +73,7 @@ const AddMenu = () => {
 
   return (
     <ProtectedRoute requiredRole={AccountRole.COACH} authRequired={true}>
-      <div className="min-h-screen flex flex-col bg-white">
+      <div className="min-h-screen flex flex-col">
         <Header role="coach">ホーム画面</Header>
 
         <main className="max-w-4xl mx-auto p-6 w-full">
@@ -108,8 +109,10 @@ const AddMenu = () => {
             </form>
           </Card>
         </main>
-
         <Footer />
+        <div className="fixed right-3 top-28 z-50">
+          <DifyChatBot firebase_uid={user?.uid} />
+        </div>
       </div>
     </ProtectedRoute>
   )

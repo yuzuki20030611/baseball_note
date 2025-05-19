@@ -54,7 +54,7 @@ const ProfileDetail = () => {
   }
   return (
     <ProtectedRoute requiredRole={AccountRole.PLAYER} authRequired={true}>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen">
         <Header>ホーム画面</Header>
 
         <main className="flex-grow container mx-auto px-6 py-6 overflow-y-auto h-[calc(100vh-200px)]">
@@ -85,7 +85,7 @@ const ProfileDetail = () => {
                   <div className="text-right pb-1 pr-8 mr-8">
                     <p className="text-2xl">選手</p>
                   </div>
-                  <div className="max-w-3xl bg-gray-100 mx-auto rounded-lg shadow p-8">
+                  <div className="max-w-3xl bg-gray-200 mx-auto rounded-lg shadow p-8">
                     {/* ボタン */}
                     <div className="flex justify-end mb-6">
                       <LinkButtons href="/Player/EditProfile">編集</LinkButtons>

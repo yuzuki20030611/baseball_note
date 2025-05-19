@@ -302,7 +302,7 @@ const EditNote = () => {
                     </div>
                   )}
                   <form onSubmit={handleSubmit}>
-                    <div className="border border-black rounded-lg p-10 m-5">
+                    <div className="rounded-xl p-10 m-5 bg-gray-100">
                       <div className="space-y-2 mb-3">
                         <Label>
                           1日のテーマ：

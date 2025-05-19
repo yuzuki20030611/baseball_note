@@ -27,6 +27,7 @@ class NoParsingFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
         return not record.getMessage().find("/docs") >= 0
 
+
 # /docsのログが大量に表示されるのを防ぐ
 logging.getLogger("uvicorn.access").addFilter(NoParsingFilter())
 
@@ -41,7 +42,13 @@ app_manager = FastAPIAppManager(root_app=app)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:8080"],  # Next.jsのURL
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:8080",
+        "https://fcb8-112-71-191-8.ngrok-free.app",
+        "https://cloud.dify.ai",
+        "*",
+    ],  # Next.jsのURL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -50,7 +57,11 @@ app.add_middleware(
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 
 # 静的ファイル配信の設定（アップロードした画像を配信するため）
-app.mount(f"/{settings.UPLOAD_DIR}", StaticFiles(directory=settings.UPLOAD_DIR), name=settings.UPLOAD_DIR)
+app.mount(
+    f"/{settings.UPLOAD_DIR}",
+    StaticFiles(directory=settings.UPLOAD_DIR),
+    name=settings.UPLOAD_DIR,
+)
 
 
 if settings.SENTRY_SDK_DNS:
@@ -60,9 +71,11 @@ if settings.SENTRY_SDK_DNS:
         environment=settings.ENV,
     )
 
+
 @app.get("/", tags=["info"])
 def get_info() -> dict[str, str]:
     return {"title": settings.TITLE, "version": settings.VERSION}
+
 
 # debugモード時はfastapi-tool-barを有効化する
 def load_routers():
@@ -80,6 +93,7 @@ def load_routers():
         prefix = f"/{filename[:-3]}"
         routers.append((router, tag, prefix))
     return sorted(routers, key=lambda x: x[2])
+
 
 routers = load_routers()
 
@@ -100,8 +114,9 @@ if settings.DEBUG:
     )
 
 # Google Cloud Runで必要な設定
-if __name__ == '__main__':
+if __name__ == "__main__":
     import uvicorn
+
     # 環境変数 'PORT' からポート番号を取得。デフォルトは80
-    port = int(os.environ.get('PORT', 80))
+    port = int(os.environ.get("PORT", 80))
     uvicorn.run("app.main:app", host="0.0.0.0", port=port)

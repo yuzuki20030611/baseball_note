@@ -5,7 +5,6 @@ import React, { useEffect, useState } from 'react'
 import { Header } from '../../../components/component/Header/Header'
 import { Footer } from '../../../components/component/Footer/Footer'
 import { PageTitle } from '../../../components/component/Title/PageTitle'
-import { DeleteButton } from '../../../components/component/Button/Delete'
 import { Card } from '../../../components/component/Card/Card'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 import { MenuItemType } from '../../../types/AddMenu'
@@ -14,6 +13,7 @@ import ProtectedRoute from '../../../components/ProtectedRoute'
 import { AccountRole } from '../../../types/account'
 import { useAuth } from '../../../contexts/AuthContext'
 import { Buttons } from '../../../components/component/Button/Button'
+import DifyChatBot from '../../../components/component/ChatBot/DifyChatBot'
 
 const TrainingList = () => {
   const { user } = useAuth()
@@ -59,7 +59,7 @@ const TrainingList = () => {
       <div>
         <div className="flex flex-col min-h-screen">
           <Header role="coach">ホーム画面</Header>
-          <main className="bg-white">
+          <main>
             <Card>
               <PageTitle>トレーニングメニュー詳細</PageTitle>
               <div className="max-w-4xl mx-auto p-9">
@@ -67,7 +67,7 @@ const TrainingList = () => {
                   <h2 className="text-2xl mt-3">[チーム全体]</h2>
                   <p className="text-2xl mt-3">指導者</p>
                 </div>
-                <div className="bg-gray-100 rounded-lg p-6">
+                <div className="bg-gray-200 rounded-lg shadow-lg p-6">
                   <h3 className="border-b border-black text-2xl text-center font-bold py-3 my-6">基礎トレーニング</h3>
                   <div className="text-right mb-3 text-gray-700">
                     登録済みメニュー数：<span className="font-bold">{menuItems.length}</span>件
@@ -80,9 +80,9 @@ const TrainingList = () => {
                     ) : menuItems.length === 0 ? (
                       <div className="text-center py-4">メニューがありません</div>
                     ) : (
-                      <div className="space-y-6 mt-5">
+                      <div className="space-y-6 mt-5 pb-6 border-b border-black">
                         {menuItems.map((item) => (
-                          <div key={item.id} className="flex justify-between items-center mb-6">
+                          <div key={item.id} className="flex justify-between items-center">
                             <span className="text-lg">・{item.menu}</span>
                             <Buttons height="35px" width="60px" className="p-1" onClick={() => handleDelete(item.id)}>
                               削除
@@ -100,6 +100,9 @@ const TrainingList = () => {
             </Card>
           </main>
           <Footer />
+          <div className="fixed right-3 top-28 z-50">
+            <DifyChatBot firebase_uid={firebase_uid} />
+          </div>
         </div>
       </div>
     </ProtectedRoute>

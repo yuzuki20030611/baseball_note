@@ -235,7 +235,7 @@ const CreateNote = () => {
                   <div className="text-right pr-5 mr-5">
                     <p className="text-2xl mt-3">選手</p>
                   </div>
-                  <div className="border border-black rounded-lg p-10 m-5">
+                  <div className="border rounded-lg p-10 m-5 bg-gray-100">
                     <div className="space-y-2 mb-3">
                       <Label>
                         1日のテーマ：

@@ -1,4 +1,5 @@
 'use client'
+
 import React, { useEffect, useState } from 'react'
 
 import { Header } from '../../../../components/component/Header/Header'
@@ -16,9 +17,13 @@ import { ReferenceVideo } from '../../../../components/component/video/reference
 import { MypracticeVideo } from '../../../../components/component/video/mypracticeVideo'
 import { noteApi } from '../../../../api/Note/NoteApi'
 import { profileApi } from '../../../../api/client/profile/profileApi'
+import DifyChatBot from '../../../../components/component/ChatBot/DifyChatBot'
+import { useAuth } from '../../../../contexts/AuthContext'
 
 const CoachNoteDetail = () => {
   const params = useParams()
+  const { user } = useAuth()
+  const firebase_uid = user?.uid
   const note_id = params.note_id as string
   const [playerName, setPlayerName] = useState<string>('選手')
   const [userId, setUserId] = useState<string | null>(null)
@@ -100,7 +105,7 @@ const CoachNoteDetail = () => {
                   <div className="text-right px-5 py-2">
                     <p className="text-2xl mb-3">指導者</p>
                   </div>
-                  <div className="bg-gray-100 rounded-lg p-6">
+                  <div className="bg-gray-200 rounded-lg p-6">
                     <div className="flex justify-between items-center mb-10">
                       <div className="text-lg font-semibold">作成日： {formatDate(noteDetail.created_at)}</div>
                     </div>
@@ -166,6 +171,9 @@ const CoachNoteDetail = () => {
             )}
           </main>
           <Footer />
+          <div className="fixed right-3 top-28 z-50">
+            <DifyChatBot firebase_uid={firebase_uid} />
+          </div>
         </div>
       </div>
     </ProtectedRoute>
