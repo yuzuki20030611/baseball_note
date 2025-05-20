@@ -14,7 +14,6 @@ import { Footer } from '../../components/component/Footer/Footer'
 import { useAuth } from '../../contexts/AuthContext'
 import Link from 'next/link'
 import { Header } from '../../components/component/Header/Header'
-import AlertMessage from '../../components/component/Alert/AlertMessage'
 import ProtectedRoute from '../../components/ProtectedRoute'
 
 const CreateAccountHome = () => {
@@ -29,11 +28,6 @@ const CreateAccountHome = () => {
   const [validateError, setValidateError] = useState<any>({})
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [alert, setAlert] = useState({
-    status: 'success' as 'success' | 'error',
-    message: '',
-    isVisible: false,
-  })
 
   const onChangeText = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -50,7 +44,7 @@ const CreateAccountHome = () => {
     if (validateError[name]) {
       setValidateError((prev: any) => ({
         ...prev,
-        [name]: undefined,
+        [name]: null,
       }))
     }
   }
@@ -70,11 +64,7 @@ const CreateAccountHome = () => {
     try {
       await createAccount(formData.email, formData.password1, formData.account_role)
       setUserRole(formData.account_role)
-      setAlert({
-        status: 'success',
-        message: 'アカウント作成に成功しました。',
-        isVisible: true,
-      })
+      alert('アカウント作成に成功しました')
       if (formData.account_role === AccountRole.PLAYER) {
         router.push('/Player/Home')
       } else {
@@ -114,7 +104,13 @@ const CreateAccountHome = () => {
         <main className="bg-white flex-1 flex flex-col items-center p-8 w-full">
           <Card>
             <PageTitle>新規アカウント作成</PageTitle>
-            {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{error}</div>}
+            <div className="w-full max-w-md mx-auto">
+              {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                  {error}
+                </div>
+              )}
+            </div>
 
             <form onSubmit={handleSubmit} className="bg-gray-100 p-8 rounded-lg shadow-sm w-full max-w-md mt-6">
               <div className="mb-6">
@@ -182,7 +178,6 @@ const CreateAccountHome = () => {
               </div>
 
               <div className="text-center mt-6">
-                <AlertMessage status={alert.status} message={alert.message} isVisible={alert.isVisible} />
                 <Buttons type="submit" disabled={isLoading} className="text-xl" w="90">
                   {isLoading ? '処理中' : 'アカウント作成'}
                 </Buttons>
