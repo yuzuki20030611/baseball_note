@@ -163,6 +163,15 @@ const PlayerHome = () => {
                 </div>
               </div>
               <PageTitle>野球ノート一覧</PageTitle>
+              <div className="text-center">
+                {loading ? null : !hasProfile ? (
+                  <div className="bg-pink-100 border border-red-400 text-blue-5000 px-4 py-3 rounded relative mb-4">
+                    最初にプロフィール登録を行なってください
+                    <br />
+                    プロフィール登録を完了しなければ、作成したノートを指導者が閲覧することができません
+                  </div>
+                ) : null}
+              </div>
 
               <div className="flex flex-col space-y-10 items-end mb-6 pr-20">
                 <p className="text-2xl">選手</p>

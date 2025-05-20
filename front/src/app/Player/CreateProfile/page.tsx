@@ -12,7 +12,6 @@ import { Card } from '../../../components/component/Card/Card'
 import { CreateProfileRequest, DominantHand, Position } from '../../../types/profile'
 import { profileApi } from '../../../api/client/profile/profileApi'
 import Image from 'next/image'
-import AlertMessage from '../../../components/component/Alert/AlertMessage'
 import { validateImage, validateProfile, ProfilleValidationErrors } from '../../validation/useFormValidation'
 import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 import { useAuth } from '../../../contexts/AuthContext'
@@ -38,11 +37,6 @@ const CreateProfile = () => {
   })
   const [validateError, setValidateError] = useState<ProfilleValidationErrors>({})
   const [error, setError] = useState<string | null>(null)
-  const [alert, setAlert] = useState({
-    status: 'success' as 'success' | 'error',
-    message: '',
-    isVisible: false,
-  })
 
   //この型定義で3種類のHTML要素からの変更イベントを処理できる
   // イベントオブジェクト e から name, value, type を抽出
@@ -52,7 +46,7 @@ const CreateProfile = () => {
     // 入力フィールド変更時に対応するエラーをクリア
     setValidateError((prev) => ({
       ...prev,
-      [name]: undefined,
+      [name]: null,
     }))
     if (name === 'birthday' && type === 'date') {
       setFormData((prev) => ({
@@ -69,7 +63,6 @@ const CreateProfile = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setError(null)
-    setAlert({ status: 'success', message: '', isVisible: false })
     // プロフィールデータのバリデーション
     const validationErrors = validateProfile(formData)
     // 画像バリデーション
@@ -81,13 +74,11 @@ const CreateProfile = () => {
     if (Object.keys(validationErrors).length > 0) {
       setValidateError(validationErrors)
       setError('入力内容に誤りがあります。各項目を確認してください。')
-      setAlert({ status: 'error', message: '入力内容に誤りがあります', isVisible: true })
       return
     }
 
     if (!formData.firebase_uid) {
       setError('ログインが必要です。再度ログインしてください。')
-      setAlert({ status: 'error', message: 'ログインが必要です', isVisible: true })
       return
     }
 
@@ -107,17 +98,12 @@ const CreateProfile = () => {
     // リクエストする型定義に問題がなければリクエストを開始
     try {
       await profileApi.create(dataToSubmit, dataToSubmit.firebase_uid)
-      setAlert({
-        status: 'success',
-        message: 'プロフィール作成に成功しました。',
-        isVisible: true,
-      })
+      alert('プロフィール作成が成功しました')
       setIsCompleted(true)
     } catch (error: any) {
       // エラーメッセージを設定する処理
       console.error('エラー：', error)
       setError('プロフィール作成に失敗しました。入力内容を確認してください。')
-      setAlert({ status: 'error', message: 'プロフィール作成に失敗しました', isVisible: true })
     }
   }
   //このコードで作成された fileInputRef は、オブジェクトであり、
@@ -134,7 +120,7 @@ const CreateProfile = () => {
     // 画像関連のエラーをクリア
     setValidateError((prev) => ({
       ...prev,
-      image: undefined,
+      image: null,
     }))
     if (files && files.length > 0) {
       //files の中に少なくとも1つのファイルがある
@@ -180,12 +166,6 @@ const CreateProfile = () => {
           <main className="flex-grow container mx-auto px-6 py-6 overflow-y-auto h-[calc(100vh-200px)]">
             <Card>
               <PageTitle>プロフィール登録</PageTitle>
-              {/* エラーメッセージの表示部分 */}
-              {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-                  {error}
-                </div>
-              )}
               {isCompleted ? (
                 <div className="max-w-4xl mx-auto p-8 text-center">
                   <h2 className="text-2xl mb-6">プロフィール作成が完了致しました</h2>
@@ -376,8 +356,12 @@ const CreateProfile = () => {
                           <p className="text-red-500 text-sm">{validateError.introduction}</p>
                         )}
                       </div>
+                      {error && (
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                          {error}
+                        </div>
+                      )}
                       <div className="text-center mt-6">
-                        <AlertMessage status={alert.status} message={alert.message} isVisible={alert.isVisible} />
                         <Buttons type="submit" fontSize="xl">
                           登録
                         </Buttons>

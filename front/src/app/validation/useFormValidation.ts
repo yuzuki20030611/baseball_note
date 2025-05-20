@@ -1,15 +1,16 @@
 import { CreateProfileRequest } from "../../types/profile"
 
 export type ProfilleValidationErrors = {
-    name?: string, 
-    birthday?: string, 
-    team_name?: string, 
-    player_dominant?: string, 
-    player_position?: string,
-    admired_player?: string, 
-    introduction?: string, 
-    image?: string
+    name?: string | null, 
+    birthday?: string | null, 
+    team_name?: string | null, 
+    player_dominant?: string | null, 
+    player_position?: string | null,
+    admired_player?: string | null, 
+    introduction?: string | null, 
+    image?: string | null
 }
+
 
 /**
  * プロフィールデータのバリデーション
@@ -81,8 +82,8 @@ export const validateProfile = (data: CreateProfileRequest): ProfilleValidationE
  * @returns エラーメッセージ。問題なければnull
  */
 
-export const validateImage = (file: File | null | undefined): string | undefined => {
-    if(!file) return undefined
+export const validateImage = (file: File | null | undefined): string | null => {
+    if(!file) return null
 
     if(!(file instanceof File)) {
         return "有効なファイルオブジェクトではありません。"
@@ -95,5 +96,5 @@ export const validateImage = (file: File | null | undefined): string | undefined
     if(!file.type.startsWith('image/')) {
         return "画像ファイルを選択してください"
     }
-    return undefined
+    return null
 }
