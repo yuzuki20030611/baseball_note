@@ -126,7 +126,7 @@ const EditNote = () => {
 
   // 入力変更ハンドラ
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
+    const { name, value, type } = e.target
 
     // エラーをクリア
     setValidationErrors((prev) => ({
@@ -134,14 +134,26 @@ const EditNote = () => {
       [name]: null,
     }))
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
+    if (type === 'number') {
+      // number型の入力フィールドの場合（weight, sleep）
+      // 空文字の場合は0、それ以外は数値に変換
+      const numValue = value === '' ? 0 : parseFloat(value)
 
-    // 参考動画URLが変更された際に、プレビューも更新
-    if (name === 'practice_video') {
-      setPracticeVideoPreview(value || null)
+      setFormData((prev) => ({
+        ...prev,
+        [name]: numValue,
+      }))
+    } else {
+      // その他のテキストフィールドはそのまま
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }))
+
+      // 参考動画URLが変更された際に、プレビューも更新
+      if (name === 'practice_video') {
+        setPracticeVideoPreview(value || null)
+      }
     }
   }
 
@@ -150,7 +162,7 @@ const EditNote = () => {
     // トレーニング関連のエラーをクリア
     setValidationErrors((prev) => ({
       ...prev,
-      trainings: undefined,
+      trainings: null,
     }))
 
     setFormData((prev) => {

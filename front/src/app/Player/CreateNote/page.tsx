@@ -77,7 +77,7 @@ const CreateNote = () => {
   }, [firebase_uid])
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
+    const { name, value, type } = e.target
 
     // 入力フィールド変更時に対応するエラーをクリア
     setValidateError((prev) => ({
@@ -85,22 +85,15 @@ const CreateNote = () => {
       [name]: null,
     }))
 
-    // weight と sleep フィールドの処理
-    if (name === 'weight' || name === 'sleep') {
-      // 数値と小数点のみを許可する前処理
-      let numericValue = value.replace(/[^\d.]/g, '')
-
-      // 先頭の0を処理するロジック
-      // 1. 入力が "0" だけの場合はそのまま
-      // 2. 0で始まり小数点が続く場合（例: "0."）はそのまま
-      // 3. 0で始まり別の数字が続く場合（例: "01"）は先頭の0を削除
-      if (numericValue.length > 1 && numericValue[0] === '0' && numericValue[1] !== '.') {
-        numericValue = numericValue.substring(1)
-      }
+    if (type === 'number') {
+      // numberタイプ入力の場合（weight, sleep, トレーニングcount）
+      // 空文字列の場合は0、それ以外は数値に変換
+      // HTML number inputでは既に数値以外は入力できないので、追加のバリデーションは不要
+      const numValue = value === '' ? 0 : parseFloat(value)
 
       setFormData((prev) => ({
         ...prev,
-        [name]: numericValue || '0', // 空の場合は '0' に設定
+        [name]: numValue,
       }))
     } else {
       // その他のフィールドはそのまま
@@ -300,7 +293,7 @@ const CreateNote = () => {
                       <div className="flex flex-grow items-center gap-3">
                         <FullInput
                           className="w-24"
-                          type="text"
+                          type="number"
                           step="0.1"
                           name="weight"
                           onChange={handleChange}
@@ -318,7 +311,7 @@ const CreateNote = () => {
                       <div className="flex flex-grow items-center gap-3">
                         <FullInput
                           className="w-24"
-                          type="text"
+                          type="number"
                           step="0.1"
                           name="sleep"
                           onChange={handleChange}

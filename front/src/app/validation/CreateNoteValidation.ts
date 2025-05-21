@@ -2,15 +2,15 @@ import { MenuItemType } from "../../types/AddMenu";
 import { CreateNoteRequest, UpdateNoteRequest } from "../../types/note";
 
 export type NoteValidationErrors = {
-  theme?: string;
-  assignment?: string;
-  practice_video?: string;
-  my_video?: string;
-  weight?: string;
-  sleep?: string;
-  looked_day?: string;
-  practice?: string;
-  trainings?: string;
+  theme?: string | null;
+  assignment?: string | null;
+  practice_video?: string | null;
+  my_video?: string | null;
+  weight?: string | null;
+  sleep?: string | null;
+  looked_day?: string | null;
+  practice?: string | null;
+  trainings?: string | null;
 };
 
 export const isValidUrl = (url: string): boolean => {
