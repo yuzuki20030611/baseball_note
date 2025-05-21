@@ -40,7 +40,7 @@ const TrainingList = () => {
   // 初回レンダリング時にデータを取得
   useEffect(() => {
     fetchMenuItems()
-  }, [])
+  }, [firebase_uid])
 
   const handleDelete = async (id: string) => {
     if (window.confirm('このメニューを削除してもよろしいですか？')) {
