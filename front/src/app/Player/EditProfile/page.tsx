@@ -262,7 +262,7 @@ const EditProfile = () => {
                     )}
                   </div>
                   <div className="text-right pr-5 mr-5">
-                    <p className="text-2xl mt-3 pb-2">選手</p>
+                    <p className="text-3xl mt-3 mb-3">選手</p>
                   </div>
                   <div className="bg-gray-100 rounded-lg p-20">
                     {/* 写真 */}

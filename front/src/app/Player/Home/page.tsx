@@ -174,10 +174,8 @@ const PlayerHome = () => {
               </div>
 
               <div className="flex flex-col space-y-10 items-end mb-6 pr-20">
-                <p className="text-2xl">選手</p>
-                <LinkButtons href="/Player/CreateNote" className="w-80px">
-                  新規作成
-                </LinkButtons>
+                <p className="text-3xl mt-3">選手</p>
+                <LinkButtons href="/Player/CreateNote">新規作成</LinkButtons>
               </div>
 
               <table className="w-full table-fixed border-collapse">
@@ -219,12 +217,14 @@ const PlayerHome = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4 text-center w-[100px]">
-                          <LinkButtons href={`/Player/NoteDetail/${note.id}`} className="text-md ">
+                          <LinkButtons href={`/Player/NoteDetail/${note.id}`} className="text-md">
                             詳細
                           </LinkButtons>
                         </td>
                         <td className="px-6 py-4 text-center w-[100px]">
-                          <Buttons onClick={() => handleDelete(note.id)}>削除</Buttons>
+                          <Buttons width={85} onClick={() => handleDelete(note.id)}>
+                            削除
+                          </Buttons>
                         </td>
                       </tr>
                     ))

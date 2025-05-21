@@ -233,7 +233,7 @@ const CreateNote = () => {
                 <PageTitle>野球ノート新規作成</PageTitle>
                 <div className="max-w-4xl mx-auto p-8">
                   <div className="text-right pr-5 mr-5">
-                    <p className="text-2xl mt-3">選手</p>
+                    <p className="text-3xl mt-3">選手</p>
                   </div>
                   <div className="border rounded-lg p-10 m-5 bg-gray-100">
                     <div className="space-y-2 mb-3">

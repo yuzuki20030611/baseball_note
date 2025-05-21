@@ -83,7 +83,7 @@ const ProfileDetail = () => {
                 {/* カード内 */}
                 <div className="max-w-4xl mx-auto p-8">
                   <div className="text-right pb-1 mb-2 pr-8 mr-8">
-                    <p className="text-2xl mt-3">選手</p>
+                    <p className="text-3xl mt-3 mb-3">選手</p>
                   </div>
                   <div className="max-w-3xl bg-gray-200 mx-auto rounded-lg shadow p-10">
                     {/* ボタン */}
