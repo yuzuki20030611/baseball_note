@@ -12,11 +12,19 @@ export type LoginInfoValidationErrors = {
     confirmPassword?: string,
     newEmail?: string,
     confirmEmail?: string,
+    noEditForm?: string
 }
 
 
 export const validateLoginEdit = (formData: LoginInfoFormData): LoginInfoValidationErrors => {
     const newErrors: LoginInfoValidationErrors = {}
+
+    // 変更がない場合は処理を中断
+    if (!formData.newPassword && !formData.newEmail) {
+      newErrors.noEditForm = '変更箇所がありません'
+      
+    }
+
 
     // パスワード関連フィールドが入力されている場合のバリデーション
     if (formData.newPassword || formData.confirmPassword) {
