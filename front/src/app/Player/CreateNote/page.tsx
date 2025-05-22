@@ -274,7 +274,7 @@ const CreateNote = () => {
                                   />
                                 </div>
                                 <div className="w-16">
-                                  <Label fontSize="14px">回</Label>
+                                  <Label fontSize="20px">回</Label>
                                 </div>
                                 {validateError.trainings && (
                                   <p className="text-red-500 text-sm">{validateError.trainings}</p>

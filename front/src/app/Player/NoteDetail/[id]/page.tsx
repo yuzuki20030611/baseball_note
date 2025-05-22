@@ -125,7 +125,7 @@ const PlayerNoteDetail = () => {
                         {noteDetail.training_notes.map((training) => (
                           <InfoItem
                             key={training.id}
-                            label={`${training.training?.menu || '未定'}:`}
+                            label={`${training.training?.menu || '未定'}：`}
                             value={`${training.count} 回`}
                             type="number"
                           />
