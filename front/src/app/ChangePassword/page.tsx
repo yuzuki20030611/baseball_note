@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { ChangeEvent, useState } from 'react'
 
 import { Card } from '../../components/component/Card/Card'
 import { Header } from '../../components/component/Header/Header'
@@ -12,18 +12,26 @@ import { resetPassword } from '../services/auth'
 import { Buttons } from '../../components/component/Button/Button'
 import Link from 'next/link'
 import ProtectedRoute from '../../components/ProtectedRoute'
+import { useRouter } from 'next/navigation'
 
 const ChangePassword = () => {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { value } = e.target
+    setError(null)
+    setEmail(value)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setMessage(null)
+    setError(null)
 
     if (!email) {
-      setMessage({ type: 'error', text: 'メールアドレスを入力してください' })
+      setError('メールアドレスを入力してください')
       return
     }
 
@@ -31,17 +39,12 @@ const ChangePassword = () => {
 
     try {
       await resetPassword(email)
-      setMessage({
-        type: 'success',
-        text: 'パスワードリセット用のメールを送信しました。メールのリンクからパスワードを再設定してください。',
-      })
+      alert('パスワードリセット用のメールを送信しました。メールのリンクからパスワードを再設定してください。')
       setEmail('')
+      router.push('/')
     } catch (error) {
       console.error('パスワードの再設定に失敗しました。')
-      setMessage({
-        type: 'error',
-        text: 'パスワードリセットメールの送信に失敗しました。メールアドレスを確認してください。',
-      })
+      setError('パスワードリセットメールの送信に失敗しました。メールアドレスを確認してください。')
     } finally {
       setIsLoading(false)
     }
@@ -54,18 +57,19 @@ const ChangePassword = () => {
         <main className="bg-white flex-1 flex flex-col items-center p-8 w-full">
           <Card>
             <PageTitle>パスワードをリセット</PageTitle>
-            <p className="mt-2 text-center text-sm text-gray-600">登録したメールアドレスを入力してください</p>
-
-            {message && (
-              <div className={`p-4 round ${message.type ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                {message.text}
-              </div>
-            )}
-
             <form onSubmit={handleSubmit} className="bg-gray-100 p-8 rounded-lg shadow-md w-full max-w-lg mt-6">
               <div className="mb-6">
                 <Label>メールアドレス：</Label>
-                <FormInput name="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <FormInput name="email" type="email" value={email} onChange={handleChange} />
+                <p className="mt-2 text-center text-sm text-gray-600">登録したメールアドレスを入力してください</p>
+              </div>
+
+              <div>
+                {error && (
+                  <div className={`px-4 py-3 rounded relative mb-4 bg-red-100 text-red-700 border border-red-400`}>
+                    {error}
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-center gap-4 mt-6">

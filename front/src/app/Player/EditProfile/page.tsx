@@ -14,7 +14,6 @@ import { LinkButtons } from '../../../components/component/Button/LinkButtons'
 import { profileApi } from '../../../api/client/profile/profileApi'
 import { DominantHand, Position, ProfileResponse } from '../../../types/profile'
 import Image from 'next/image'
-import AlertMessage from '../../../components/component/Alert/AlertMessage'
 import { validateImage, validateProfile, ProfilleValidationErrors } from '../../validation/useFormValidation'
 import { useAuth } from '../../../contexts/AuthContext'
 import { useRouter } from 'next/navigation'
@@ -40,11 +39,6 @@ const EditProfile = () => {
   const [image, setImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [isCompleted, setIsCompleted] = useState<null | true>(null)
-  const [alert, setAlert] = useState({
-    status: 'success' as 'success' | 'error',
-    message: '',
-    isVisible: false,
-  })
   const [deleteImage, setDeleteImage] = useState<boolean>(false)
   const firebase_uid = user?.uid || ''
 
@@ -107,7 +101,7 @@ const EditProfile = () => {
     // 画像のエラーをクリア
     setValidateError((prev) => ({
       ...prev,
-      image: undefined,
+      image: null,
     }))
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0]
@@ -154,7 +148,6 @@ const EditProfile = () => {
     if (Object.keys(validationErrors).length > 0) {
       setValidateError(validationErrors)
       setError('入力内容に誤りがあります。各項目を確認してください')
-      setAlert({ status: 'error', message: '入力内容に誤りがあります。再度確認してください', isVisible: true })
       return
     }
     // エラーがなければ送信
@@ -162,7 +155,6 @@ const EditProfile = () => {
       setSubmitting(true) //送信中ということを表せている
       setError(null)
       setValidateError({})
-      setAlert({ status: 'success', message: '', isVisible: false })
       if (!profile) {
         throw new Error('プロフィールデータを取得できていません')
       }
@@ -177,55 +169,50 @@ const EditProfile = () => {
         image: image,
         delete_image: deleteImage,
       })
-      setAlert({
-        status: 'success',
-        message: 'プロフィール編集に成功しました。',
-        isVisible: true,
-      })
+      alert('プロフィールの編集が成功しました')
       setIsCompleted(true)
     } catch (error: any) {
       console.error('プロフィール更新エラー:', error)
       setError('プロフィール更新に失敗しました。')
-      setAlert({ status: 'error', message: 'プロフィールの編集が失敗しました', isVisible: true })
     } finally {
       setSubmitting(false)
     }
   }
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setName(e.target.value)
-    setValidateError((prev) => ({ ...prev, name: undefined }))
+    setValidateError((prev) => ({ ...prev, name: null }))
   }
   const handleBirthdayChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setBirthday(e.target.value)
-    setValidateError((prev) => ({ ...prev, birthday: undefined }))
+    setValidateError((prev) => ({ ...prev, birthday: null }))
   }
   const handleTeamNameChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setTeamName(e.target.value)
-    setValidateError((prev) => ({ ...prev, team_name: undefined }))
+    setValidateError((prev) => ({ ...prev, team_name: null }))
   }
   const handlePlayerDominantChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setPlayerDominant(e.target.value)
-    setValidateError((prev) => ({ ...prev, player_dominant: undefined }))
+    setValidateError((prev) => ({ ...prev, player_dominant: null }))
   }
   const handlePlayerPositionChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setPlayerPosition(e.target.value)
-    setValidateError((prev) => ({ ...prev, player_position: undefined }))
+    setValidateError((prev) => ({ ...prev, player_position: null }))
   }
   const handleAdmiredPlayerChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setAdmiredPlayer(e.target.value)
-    setValidateError((prev) => ({ ...prev, admired_player: undefined }))
+    setValidateError((prev) => ({ ...prev, admired_player: null }))
   }
   const handleIntroductionChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setIntroduction(e.target.value)
-    setValidateError((prev) => ({ ...prev, introduction: undefined }))
+    setValidateError((prev) => ({ ...prev, introduction: null }))
   }
 
   if (loading) {
@@ -275,7 +262,7 @@ const EditProfile = () => {
                     )}
                   </div>
                   <div className="text-right pr-5 mr-5">
-                    <p className="text-2xl mt-3 pb-2">選手</p>
+                    <p className="text-3xl mt-3 mb-3">選手</p>
                   </div>
                   <div className="bg-gray-100 rounded-lg p-20">
                     {/* 写真 */}
@@ -442,7 +429,11 @@ const EditProfile = () => {
                       )}
                     </div>
 
-                    <AlertMessage status={alert.status} message={alert.message} isVisible={alert.isVisible} />
+                    {error && (
+                      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                        {error}
+                      </div>
+                    )}
 
                     <div className="text-center space-x-6 mt-5 pt-5">
                       <LinkButtons href="/Player/ProfileDetail" className="text-lg">
@@ -451,8 +442,10 @@ const EditProfile = () => {
                       <button
                         onClick={handleSubmit}
                         disabled={submitting}
-                        className={`px-3 py-2.5 rounded-md text-lg ${
-                          submitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white'
+                        className={`w-20 px-3 py-2.5 rounded-md text-lg ${
+                          submitting
+                            ? 'bg-gray-400 cursor-not-allowed w-40'
+                            : 'bg-blue-500 hover:bg-blue-600 text-white'
                         }`}
                       >
                         {submitting ? '更新中...' : '決定'}

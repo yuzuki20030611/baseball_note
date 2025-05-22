@@ -99,7 +99,7 @@ const PlayerNoteDetail = () => {
                 <PageTitle>野球ノート詳細</PageTitle>
                 <div className="max-w-4xl mx-auto p-8">
                   <div className="text-right pr-5 mr-5">
-                    <p className="text-2xl mt-3">選手</p>
+                    <p className="text-3xl mt-3 mb-3">選手</p>
                   </div>
                   <div className="bg-gray-200 rounded-lg p-6">
                     <div className="flex justify-between items-center mb-10">
@@ -125,8 +125,8 @@ const PlayerNoteDetail = () => {
                         {noteDetail.training_notes.map((training) => (
                           <InfoItem
                             key={training.id}
-                            label={`${training.training?.menu || '未定'}:`}
-                            value={`${training.count}`}
+                            label={`${training.training?.menu || '未定'}：`}
+                            value={`${training.count} 回`}
                             type="number"
                           />
                         ))}

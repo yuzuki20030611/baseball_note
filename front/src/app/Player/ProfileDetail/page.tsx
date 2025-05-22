@@ -82,10 +82,10 @@ const ProfileDetail = () => {
               <>
                 {/* カード内 */}
                 <div className="max-w-4xl mx-auto p-8">
-                  <div className="text-right pb-1 pr-8 mr-8">
-                    <p className="text-2xl">選手</p>
+                  <div className="text-right pb-1 mb-2 pr-8 mr-8">
+                    <p className="text-3xl mt-3 mb-3">選手</p>
                   </div>
-                  <div className="max-w-3xl bg-gray-200 mx-auto rounded-lg shadow p-8">
+                  <div className="max-w-3xl bg-gray-200 mx-auto rounded-lg shadow p-10">
                     {/* ボタン */}
                     <div className="flex justify-end mb-6">
                       <LinkButtons href="/Player/EditProfile">編集</LinkButtons>

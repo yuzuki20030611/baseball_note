@@ -38,7 +38,7 @@ const LoginPage = () => {
     setError(null)
 
     if (!formData.email || !formData.password) {
-      setError('メールとパスワードを入力してください。')
+      setError('登録したメールアドレスとパスワードを入力してください')
       return
     }
 
@@ -77,8 +77,7 @@ const LoginPage = () => {
         <main className="bg-white flex-1 flex flex-col items-center p-8 w-full">
           <Card>
             <PageTitle>野球ノート</PageTitle>
-            {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{error}</div>}
-            <form onSubmit={handleSubmit} className="bg-gray-100 p-8 rounded-lg shadow-sm w-full max-w-md mt-6">
+            <form onSubmit={handleSubmit} className="bg-gray-100 p-8 rounded-lg shadow-sm w-full max-w-xl mt-6">
               <div className="mb-6">
                 <Label>メールアドレス：</Label>
                 <FormInput
@@ -101,6 +100,11 @@ const LoginPage = () => {
                 />
               </div>
 
+              <div className="w-full max-w-xl mx-auto">
+                {error && (
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{error}</div>
+                )}
+              </div>
               <div className="text-center mt-6">
                 <Buttons type="submit" className="w-full text-2xl mt-3" disabled={isLoading}>
                   {isLoading ? 'ログイン中...' : 'ログイン'}

@@ -137,6 +137,7 @@ export const updateUserPassword = async(currentPassword: string, newPassword: st
 
         // パスワードの更新
         await updatePassword(user, newPassword)
+        alert("パスワードの変更に成功しました。")
     } catch (error: any) {
         console.error("パスワード更新エラー:", error)
         if(error.code === "auth/requires-recent-login") {
@@ -163,7 +164,6 @@ export const updateUserEmail = async (
 
     // 現在のメールアドレスを同じ場合はエラー
     if (user.email.toLowerCase() === newEmail.toLowerCase()) {
-        alert("現在のメールアドレスと同じです。別のメールアドレスを入力してください。")
         throw new Error("現在のメールアドレスと同じです。別のメールアドレスを入力してください。")
     }
 
@@ -179,7 +179,6 @@ export const updateUserEmail = async (
         const data = await response.json()
 
         if (data.exists) {
-            alert("このメールアドレスは既に使用されています。別のメールアドレスを入力してください。")
             throw new Error("このメールアドレスは既に使用されています。別のメールアドレスを入力してください。")
         }
     } catch(error: any) {
@@ -202,7 +201,7 @@ export const updateUserEmail = async (
     alert(`
       新しいメールアドレス（${newEmail}）宛に確認メールを送信しました。
       メール内のリンクをクリックして変更を完了してください。
-      変更完了後、自動的にシステムに反映されます。
+      変更完了後、ログイン画面から再度新しいメールアドレスでログインを行なってください。
     `);
 
     return;

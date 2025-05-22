@@ -40,7 +40,7 @@ const AddMenu = () => {
     // エラーがある場合は処理を中止
     if (Object.keys(validationErrors).length > 0) {
       setValidateError(validationErrors)
-      setError('入力内容に誤りがあります。各項目を確認してください。')
+      setError('入力内容に誤りがあります。')
       return
     }
 
@@ -62,8 +62,9 @@ const AddMenu = () => {
     // 再入力する際に、エラーを取り消す必要がある
     setValidateError((prev) => ({
       ...prev,
-      [name]: undefined,
+      [name]: null,
     }))
+    setError(null)
 
     setFormData((prev) => ({
       ...prev,
@@ -83,12 +84,6 @@ const AddMenu = () => {
               <div className="space-y-6">
                 <div className="mt-14">
                   <Label fontSize="24px">トレーニング名： </Label>
-                  {/* エラーメッセージの表示部分 */}
-                  {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-                      {error}
-                    </div>
-                  )}
                   <FormInput
                     type="text"
                     name="menu"
@@ -96,8 +91,14 @@ const AddMenu = () => {
                     onChange={handleChange}
                     className="w-full border border-gray-300 rounded p-2"
                   />
-                  {validateError.menu && <p className="text-red-500 text-sm mt-1">{validateError.menu}</p>}
-                  <div className="text-center pt-4 mt-3"></div>
+                  <p className="text-sm text-gray-600 font-medium text-indigo-600 text-center mt-3">
+                    回数で数えることができるメニューを追加してください。（（例）バットスイングや懸垂など）
+                  </p>
+
+                  <div className="text-center pt-4 mt-3 h-12 mb-2">
+                    {error && <div className="text-red-500 text-sm mt-1">{error}</div>}
+                    {validateError.menu && <p className="text-red-500 text-sm mt-1">{validateError.menu}</p>}
+                  </div>
                 </div>
                 <div className="flex justify-center space-x-4 pt-6 pb-4">
                   <LinkButtons href="/Coach/TrainingList">トレーニング一覧に戻る</LinkButtons>

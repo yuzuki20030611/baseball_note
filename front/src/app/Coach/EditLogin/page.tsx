@@ -39,7 +39,7 @@ const EditLogin = () => {
 
     setValidateError((prev: any) => ({
       ...prev,
-      [name]: undefined,
+      [name]: null,
     }))
 
     // 関連するエラーメッセージをクリア
@@ -56,12 +56,6 @@ const EditLogin = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-
-    // 変更がない場合は処理を中断
-    if (!formData.newPassword && !formData.newEmail) {
-      alert('変更箇所がありません')
-      return
-    }
 
     // バリデーションチェック
     const validate = validateLoginEdit(formData)
@@ -91,13 +85,6 @@ const EditLogin = () => {
           text: 'パスワードが正常に更新されました',
         })
 
-        // 成功メッセージ表示
-        alert(`
-          パスワードの変更に成功しました。
-          メールアドレス変更のため、新しいメールアドレス宛に確認メールを送信しました。
-          メール内のリンクをクリックして変更を完了してください。
-        `)
-
         // フォームリセットとページ遷移
         setFormData({
           currentPassword: '',
@@ -106,10 +93,7 @@ const EditLogin = () => {
           newEmail: '',
           confirmEmail: '',
         })
-
-        setTimeout(() => {
-          router.push('/Coach/LoginDetail')
-        }, 1000)
+        router.push('/')
       }
       // メールアドレスのみ変更
       else if (formData.newEmail) {
@@ -120,11 +104,6 @@ const EditLogin = () => {
           text: '新しいメールアドレス宛に確認メールを送信しました。メール内のリンクをクリックして変更を完了してください',
         })
 
-        alert(`
-          新しいメールアドレス(${formData.newEmail})宛に確認メールを送信しました。
-          メール内のリンクをクリックして変更を完了してください。
-        `)
-
         // フォームリセットとページ遷移
         setFormData({
           currentPassword: '',
@@ -134,9 +113,7 @@ const EditLogin = () => {
           confirmEmail: '',
         })
 
-        setTimeout(() => {
-          router.push('/Coach/LoginDetail')
-        }, 1000)
+        router.push('/')
       }
       // パスワードのみ変更
       else if (formData.newPassword) {
@@ -147,8 +124,6 @@ const EditLogin = () => {
           text: 'パスワードが正常に更新されました',
         })
 
-        alert('パスワードの変更に成功しました。')
-
         // フォームリセットとページ遷移
         setFormData({
           currentPassword: '',
@@ -158,9 +133,7 @@ const EditLogin = () => {
           confirmEmail: '',
         })
 
-        setTimeout(() => {
-          router.push('/Coach/LoginDetail')
-        }, 1000)
+        router.push('/Coach/LoginDetail')
       }
     } catch (error: any) {
       console.error('更新エラー:', error)
@@ -297,6 +270,12 @@ const EditLogin = () => {
                     ※メールアドレスの変更は、新しいメールアドレス宛に確認メールが送信されます。
                     メール内のリンクをクリックして変更を完了してください。
                   </p>
+
+                  {validateErrors.noEditForm && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                      {validateErrors.noEditForm}
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex justify-center gap-4 mt-10">
