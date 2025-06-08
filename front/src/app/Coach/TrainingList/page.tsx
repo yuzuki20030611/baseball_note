@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import { Header } from '../../../components/component/Header/Header'
 import { Footer } from '../../../components/component/Footer/Footer'
@@ -22,7 +22,8 @@ const TrainingList = () => {
   const [error, setError] = useState<string | null>(null)
   const firebase_uid = user?.uid || ''
 
-  const fetchMenuItems = async () => {
+  // useCallbackでfetchMenuItems関数をメモ化
+  const fetchMenuItems = useCallback(async () => {
     try {
       setIsLoading(true)
       if (firebase_uid) {
@@ -35,12 +36,12 @@ const TrainingList = () => {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [firebase_uid]) // firebase_uidが変更された時のみ関数を再作成
 
-  // 初回レンダリング時にデータを取得
+  // fetchMenuItemsを依存配列に追加
   useEffect(() => {
     fetchMenuItems()
-  }, [firebase_uid])
+  }, [fetchMenuItems])
 
   const handleDelete = async (id: string) => {
     if (window.confirm('このメニューを削除してもよろしいですか？')) {

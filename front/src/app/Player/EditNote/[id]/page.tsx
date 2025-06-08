@@ -1,6 +1,6 @@
 'use client'
 
-import React, { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
+import React, { ChangeEvent, FormEvent, useCallback, useEffect, useRef, useState } from 'react'
 
 import { Header } from '../../../../components/component/Header/Header'
 import { PageTitle } from '../../../../components/component/Title/PageTitle'
@@ -60,59 +60,61 @@ const EditNote = () => {
     trainings: [],
   })
 
+  // fetchNoteDetail関数をuseCallbackでメモ化
+  const fetchNoteDetail = useCallback(async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      if (!note_id) {
+        setError('該当するIDが見つかりません')
+        setLoading(false)
+        return
+      }
+      const data = await noteApi.getNoteDetail(note_id)
+      setNoteDetail(data)
+
+      // フォームデータを初期化
+      setFormData({
+        firebase_uid: firebase_uid || '', // Firebaseのユーザーuid
+        theme: data.theme,
+        assignment: data.assignment,
+        weight: data.weight,
+        sleep: data.sleep,
+        looked_day: data.looked_day,
+        practice: data.practice || '',
+        practice_video: data.practice_video || '',
+        my_video: null,
+        trainings: data.training_notes.map((t) => ({
+          training_id: t.training_id,
+          count: t.count,
+        })),
+      })
+      // 初期プレビューの設定(参考動画)
+      if (data.practice_video) {
+        setPracticeVideoPreview(data.practice_video)
+      }
+
+      // 練習動画の初期設定
+      if (data.my_video) {
+        setMyVideoStatusText(`現在の動画: ${data.my_video.split('/').pop()}`)
+        if (data.my_video_url) {
+          setMyVideoPreview(data.my_video_url)
+        }
+      } else {
+        setMyVideoStatusText('動画が選択されていません')
+      }
+    } catch (error) {
+      console.error('ノート詳細取得エラー', error)
+      setError('ノート詳細の取得に失敗しました')
+    } finally {
+      setLoading(false)
+    }
+  }, [note_id, firebase_uid]) // note_idとfirebase_uidが変更された時のみ関数を再作成
+
   // 画面表示の際にノート情報を取得
   useEffect(() => {
-    const fetchNoteDetail = async () => {
-      try {
-        setLoading(true)
-        setError(null)
-        if (!note_id) {
-          setError('該当するIDが見つかりません')
-          setLoading(false)
-          return
-        }
-        const data = await noteApi.getNoteDetail(note_id)
-        setNoteDetail(data)
-
-        // フォームデータを初期化
-        setFormData({
-          firebase_uid: firebase_uid || '', // Firebaseのユーザーuid
-          theme: data.theme,
-          assignment: data.assignment,
-          weight: data.weight,
-          sleep: data.sleep,
-          looked_day: data.looked_day,
-          practice: data.practice || '',
-          practice_video: data.practice_video || '',
-          my_video: null,
-          trainings: data.training_notes.map((t) => ({
-            training_id: t.training_id,
-            count: t.count,
-          })),
-        })
-        // 初期プレビューの設定(参考動画)
-        if (data.practice_video) {
-          setPracticeVideoPreview(data.practice_video)
-        }
-
-        // 練習動画の初期設定
-        if (data.my_video) {
-          setMyVideoStatusText(`現在の動画: ${data.my_video.split('/').pop()}`)
-          if (data.my_video_url) {
-            setMyVideoPreview(data.my_video_url)
-          }
-        } else {
-          setMyVideoStatusText('動画が選択されていません')
-        }
-      } catch (error) {
-        console.error('ノート詳細取得エラー', error)
-        setError('ノート詳細の取得に失敗しました')
-      } finally {
-        setLoading(false)
-      }
-    }
     fetchNoteDetail()
-  }, [note_id])
+  }, [fetchNoteDetail]) // fetchNoteDetailを依存配列に追加
 
   // ローカルプレビューのクリーンアップ（不必要なメモリを削除）
   useEffect(() => {
@@ -122,7 +124,7 @@ const EditNote = () => {
         URL.revokeObjectURL(myVideoPreview)
       }
     }
-  }, [])
+  }, [myVideoPreview]) // myVideoPreviewを依存配列に追加
 
   // 入力変更ハンドラ
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
