@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // output: "export",
   transpilePackages: ['lucide-react'],
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,

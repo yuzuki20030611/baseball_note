@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
-    "generate-api": "orval --config orval.config.ts"
+    "generate-api": "orval --config orval.config.ts",
+    "deploy-prod": "env-cmd -f .env.prod next build && firebase deploy --only hosting"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.2.4",
@@ -25,6 +26,7 @@
     "add": "^2.0.6",
     "axios": "^1.7.9",
     "class-variance-authority": "^0.7.0",
+    "env-cmd": "^10.1.0",
     "firebase": "^11.5.0",
     "framer-motion": "^12.3.1",
     "lucide-react": "^0.436.0",
