@@ -1,30 +1,30 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { Suspense, useEffect, useState } from 'react'
 
-import { Header } from '../../../../components/component/Header/Header'
-import { PageTitle } from '../../../../components/component/Title/PageTitle'
-import { Footer } from '../../../../components/component/Footer/Footer'
-import { Label } from '../../../../components/component/Label/Label'
-import { InfoItem } from '../../../../components/component/InfoItem/InfoItem'
-import { Card } from '../../../../components/component/Card/Card'
-import { LinkButtons } from '../../../../components/component/Button/LinkButtons'
-import ProtectedRoute from '../../../../components/ProtectedRoute'
-import { AccountRole } from '../../../../types/account'
-import { useParams } from 'next/navigation'
-import { NoteDetailResponse } from '../../../../types/note'
-import { ReferenceVideo } from '../../../../components/component/video/referenceVideo'
-import { MypracticeVideo } from '../../../../components/component/video/mypracticeVideo'
-import { noteApi } from '../../../../api/Note/NoteApi'
-import { profileApi } from '../../../../api/client/profile/profileApi'
-import DifyChatBot from '../../../../components/component/ChatBot/DifyChatBot'
-import { useAuth } from '../../../../contexts/AuthContext'
+import { Header } from '../../../components/component/Header/Header'
+import { PageTitle } from '../../../components/component/Title/PageTitle'
+import { Footer } from '../../../components/component/Footer/Footer'
+import { Label } from '../../../components/component/Label/Label'
+import { InfoItem } from '../../../components/component/InfoItem/InfoItem'
+import { Card } from '../../../components/component/Card/Card'
+import { LinkButtons } from '../../../components/component/Button/LinkButtons'
+import ProtectedRoute from '../../../components/ProtectedRoute'
+import { AccountRole } from '../../../types/account'
+import { useSearchParams } from 'next/navigation'
+import { NoteDetailResponse } from '../../../types/note'
+import { ReferenceVideo } from '../../../components/component/video/referenceVideo'
+import { MypracticeVideo } from '../../../components/component/video/mypracticeVideo'
+import { noteApi } from '../../../api/Note/NoteApi'
+import { profileApi } from '../../../api/client/profile/profileApi'
+import DifyChatBot from '../../../components/component/ChatBot/DifyChatBot'
+import { useAuth } from '../../../contexts/AuthContext'
 
-const CoachNoteDetail = () => {
-  const params = useParams()
+function CoachNoteDetailContent() {
+  const searchParams = useSearchParams()
   const { user } = useAuth()
   const firebase_uid = user?.uid
-  const note_id = params.note_id as string
+  const note_id = searchParams.get('note_id')
   const [playerName, setPlayerName] = useState<string>('選手')
   const [userId, setUserId] = useState<string | null>(null)
 
@@ -37,7 +37,7 @@ const CoachNoteDetail = () => {
       try {
         setLoading(true)
         if (!note_id) {
-          setError('該当するIDが見つかりません')
+          setError('ノートIDが指定されていません')
           setLoading(false)
           return
         }
@@ -88,14 +88,15 @@ const CoachNoteDetail = () => {
             ) : error ? (
               <Card>
                 <div className="text-cetner py-10">
-                  <LinkButtons href={`/Coach/NoteList/${userId}`}>ノート一覧に戻る</LinkButtons>
+                  <p className="text-red-500 mb-4">{error}</p>
+                  {userId && <LinkButtons href={`/Coach/NoteList?user_id=${userId}`}>ノート一覧に戻る</LinkButtons>}
                 </div>
               </Card>
             ) : !noteDetail ? (
               <Card>
                 <div className="text-center py-10">
                   <p className="text-red-500 mb-4">ノートが見つかりません</p>
-                  <LinkButtons href={`/Coach/NoteList/${userId}`}>ノート一覧に戻る</LinkButtons>
+                  {userId && <LinkButtons href={`/Coach/NoteList?user_id=${userId}`}>ノート一覧に戻る</LinkButtons>}
                 </div>
               </Card>
             ) : (
@@ -163,7 +164,7 @@ const CoachNoteDetail = () => {
                     </div>
 
                     <div className="space-y-2 my-3 py-3 text-center">
-                      <LinkButtons href={`/Coach/NoteList/${userId}`}>ノート一覧に戻る</LinkButtons>
+                      <LinkButtons href={`/Coach/NoteList?user_id=${userId}`}>ノート一覧に戻る</LinkButtons>
                     </div>
                   </div>
                 </div>
@@ -176,6 +177,16 @@ const CoachNoteDetail = () => {
           </div>
         </div>
       </div>
+    </ProtectedRoute>
+  )
+}
+
+const CoachNoteDetail = () => {
+  return (
+    <ProtectedRoute requiredRole={AccountRole.COACH} authRequired={true}>
+      <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+        <CoachNoteDetailContent />
+      </Suspense>
     </ProtectedRoute>
   )
 }

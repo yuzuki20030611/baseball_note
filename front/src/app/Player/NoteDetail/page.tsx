@@ -1,27 +1,27 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { Suspense, useEffect, useState } from 'react'
 
-import { Header } from '../../../../components/component/Header/Header'
-import { PageTitle } from '../../../../components/component/Title/PageTitle'
-import { Buttons } from '../../../../components/component/Button/Button'
-import { Footer } from '../../../../components/component/Footer/Footer'
-import { Label } from '../../../../components/component/Label/Label'
-import { InfoItem } from '../../../../components/component/InfoItem/InfoItem'
-import { Card } from '../../../../components/component/Card/Card'
-import { LinkButtons } from '../../../../components/component/Button/LinkButtons'
-import ProtectedRoute from '../../../../components/ProtectedRoute'
-import { AccountRole } from '../../../../types/account'
-import { useParams, useRouter } from 'next/navigation'
-import { NoteDetailResponse } from '../../../../types/note'
-import { noteApi } from '../../../../api/Note/NoteApi'
-import { MypracticeVideo } from '../../../../components/component/video/mypracticeVideo'
-import { ReferenceVideo } from '../../../../components/component/video/referenceVideo'
+import { Header } from '../../../components/component/Header/Header'
+import { PageTitle } from '../../../components/component/Title/PageTitle'
+import { Buttons } from '../../../components/component/Button/Button'
+import { Footer } from '../../../components/component/Footer/Footer'
+import { Label } from '../../../components/component/Label/Label'
+import { InfoItem } from '../../../components/component/InfoItem/InfoItem'
+import { Card } from '../../../components/component/Card/Card'
+import { LinkButtons } from '../../../components/component/Button/LinkButtons'
+import ProtectedRoute from '../../../components/ProtectedRoute'
+import { AccountRole } from '../../../types/account'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { NoteDetailResponse } from '../../../types/note'
+import { noteApi } from '../../../api/Note/NoteApi'
+import { MypracticeVideo } from '../../../components/component/video/mypracticeVideo'
+import { ReferenceVideo } from '../../../components/component/video/referenceVideo'
 
-const PlayerNoteDetail = () => {
-  const params = useParams()
+function PlayerNoteDetailContent() {
+  const searchParams = useSearchParams()
   const router = useRouter()
-  const note_id = params.id as string //idを文字列で取得
+  const note_id = searchParams.get('id')
 
   const [noteDetail, setNoteDetail] = useState<NoteDetailResponse | null>(null)
   const [loading, setLoading] = useState(true)
@@ -34,7 +34,7 @@ const PlayerNoteDetail = () => {
         setLoading(true)
         setError(null)
         if (!note_id) {
-          setError('該当するIDが見つかりません')
+          setError('ノートIDが指定されていません')
           setLoading(false)
           return
         }
@@ -52,7 +52,10 @@ const PlayerNoteDetail = () => {
 
   // ノート削除の関数
   const handleDelete = async () => {
-    if (!note_id) return
+    if (!note_id) {
+      setError('ノートIDが取得できません')
+      return
+    }
 
     if (window.confirm('このノートを削除してもよろしいでしょうか？')) {
       try {
@@ -105,7 +108,7 @@ const PlayerNoteDetail = () => {
                     <div className="flex justify-between items-center mb-10">
                       <div className="text-xl font-semibold">作成日時：{formatDate(noteDetail.created_at)}</div>
                       <div className="space-x-3">
-                        <LinkButtons href={`/Player/EditNote/${note_id}`} className="text-lg">
+                        <LinkButtons href={`/Player/EditNote?id=${note_id}`} className="text-lg">
                           編集
                         </LinkButtons>
                         <Buttons fontSize="18px" onClick={handleDelete}>
@@ -174,6 +177,16 @@ const PlayerNoteDetail = () => {
           <Footer />
         </div>
       </div>
+    </ProtectedRoute>
+  )
+}
+
+const PlayerNoteDetail = () => {
+  return (
+    <ProtectedRoute requiredRole={AccountRole.PLAYER} authRequired={true}>
+      <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+        <PlayerNoteDetailContent />
+      </Suspense>
     </ProtectedRoute>
   )
 }

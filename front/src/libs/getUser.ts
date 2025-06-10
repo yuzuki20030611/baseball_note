@@ -1,11 +1,24 @@
-import type { Profile, User } from 'next-auth'
+interface FirebaseProfile {
+  uid: string
+  email?: string | null
+  displayName?: string | null
+}
 
-export const getUser = async (profile: Profile, accessToken: string) => {
-  if (!profile.sub) {
-    throw new Error('profile.sub is required')
+interface User {
+  id: string
+  email: string
+  name?: string
+}
+
+// 🟡 変更: Profile → FirebaseProfile
+export const getUser = async (profile: FirebaseProfile, accessToken: string) => {
+  // 🟡 変更: profile.sub → profile.uid
+  if (!profile.uid) {
+    throw new Error('profile.uid is required')
   }
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/uid/${profile.sub}`, {
+    // 🟡 変更: profile.sub → profile.uid
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/uid/${profile.uid}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -19,7 +32,6 @@ export const getUser = async (profile: Profile, accessToken: string) => {
       const user = await res.json()
       return user as User
     }
-
   } catch (error) {
     console.error('ユーザー処理エラー:', error)
     throw error
