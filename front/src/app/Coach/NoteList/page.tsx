@@ -1,27 +1,27 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { Suspense, useEffect, useState } from 'react'
 
-import { Header } from '../../../../components/component/Header/Header'
-import { Footer } from '../../../../components/component/Footer/Footer'
-import { PageTitle } from '../../../../components/component/Title/PageTitle'
-import { Buttons } from '../../../../components/component/Button/Button'
-import { Card } from '../../../../components/component/Card/Card'
-import { LinkButtons } from '../../../../components/component/Button/LinkButtons'
-import ProtectedRoute from '../../../../components/ProtectedRoute'
-import { AccountRole } from '../../../../types/account'
-import { useParams } from 'next/navigation'
-import { NoteListItem } from '../../../../types/note'
-import { noteApi } from '../../../../api/Note/NoteApi'
-import { profileApi } from '../../../../api/client/profile/profileApi'
-import DifyChatBot from '../../../../components/component/ChatBot/DifyChatBot'
-import { useAuth } from '../../../../contexts/AuthContext'
+import { Header } from '../../../components/component/Header/Header'
+import { Footer } from '../../../components/component/Footer/Footer'
+import { PageTitle } from '../../../components/component/Title/PageTitle'
+import { Buttons } from '../../../components/component/Button/Button'
+import { Card } from '../../../components/component/Card/Card'
+import { LinkButtons } from '../../../components/component/Button/LinkButtons'
+import ProtectedRoute from '../../../components/ProtectedRoute'
+import { AccountRole } from '../../../types/account'
+import { useSearchParams } from 'next/navigation'
+import { NoteListItem } from '../../../types/note'
+import { noteApi } from '../../../api/Note/NoteApi'
+import { profileApi } from '../../../api/client/profile/profileApi'
+import DifyChatBot from '../../../components/component/ChatBot/DifyChatBot'
+import { useAuth } from '../../../contexts/AuthContext'
 
-const NoteList = () => {
+function NoteListContent() {
   const { user } = useAuth()
   const firebase_uid = user?.uid
-  const params = useParams()
-  const userId = params.user_id ? String(params.user_id) : null
+  const searchParams = useSearchParams()
+  const userId = searchParams.get('user_id')
   const [playerName, setPlayerName] = useState<string>('選手')
 
   const [loading, setLoading] = useState(true)
@@ -34,7 +34,7 @@ const NoteList = () => {
   useEffect(() => {
     const fetchNoteList = async () => {
       if (!userId) {
-        setError('ユーザーIDが存在しないです')
+        setError('ユーザーIDが指定されていません')
         setLoading(false)
         return
       }
@@ -143,7 +143,7 @@ const NoteList = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4 text-center w-[100px]">
-                          <LinkButtons href={`/Coach/NoteDetail/${note.id}`} width="100px" className="text-md">
+                          <LinkButtons href={`/Coach/NoteDetail?note_id=${note.id}`} width="100px" className="text-md">
                             詳細
                           </LinkButtons>
                         </td>
@@ -178,6 +178,17 @@ const NoteList = () => {
           </div>
         </div>
       </div>
+    </ProtectedRoute>
+  )
+}
+
+// 🔄 変更点7: Suspenseラッパーコンポーネント
+const NoteList = () => {
+  return (
+    <ProtectedRoute requiredRole={AccountRole.COACH} authRequired={true}>
+      <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+        <NoteListContent />
+      </Suspense>
     </ProtectedRoute>
   )
 }

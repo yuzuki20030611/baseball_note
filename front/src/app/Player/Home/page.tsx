@@ -217,7 +217,7 @@ const PlayerHome = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4 text-center w-[100px]">
-                          <LinkButtons href={`/Player/NoteDetail/${note.id}`} className="text-md">
+                          <LinkButtons href={`/Player/NoteDetail?id=${note.id}`} className="text-md">
                             詳細
                           </LinkButtons>
                         </td>

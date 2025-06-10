@@ -1,36 +1,32 @@
 'use client'
 
-import React, { ChangeEvent, FormEvent, useCallback, useEffect, useRef, useState } from 'react'
+import React, { ChangeEvent, FormEvent, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 
-import { Header } from '../../../../components/component/Header/Header'
-import { PageTitle } from '../../../../components/component/Title/PageTitle'
-import { Footer } from '../../../../components/component/Footer/Footer'
-import { Label } from '../../../../components/component/Label/Label'
-import { FullInput } from '../../../../components/component/Input/FullInput'
-import { RequiredBadge } from '../../../../components/component/Label/RequiredBadge'
-import { Card } from '../../../../components/component/Card/Card'
-import { LinkButtons } from '../../../../components/component/Button/LinkButtons'
-import ProtectedRoute from '../../../../components/ProtectedRoute'
-import { AccountRole } from '../../../../types/account'
-import { useParams, useRouter } from 'next/navigation'
-import { NoteDetailResponse, UpdateNoteRequest } from '../../../../types/note'
-import { noteApi } from '../../../../api/Note/NoteApi'
-import { Buttons } from '../../../../components/component/Button/Button'
-import { ReferenceVideo } from '../../../../components/component/video/referenceVideo'
-import { MypracticeVideo } from '../../../../components/component/video/mypracticeVideo'
-import { useAuth } from '../../../../contexts/AuthContext'
-import {
-  NoteValidationErrors,
-  validateEditNote,
-  validateMyVideo,
-} from '../../../../app/validation/CreateNoteValidation'
+import { Header } from '../../../components/component/Header/Header'
+import { PageTitle } from '../../../components/component/Title/PageTitle'
+import { Footer } from '../../../components/component/Footer/Footer'
+import { Label } from '../../../components/component/Label/Label'
+import { FullInput } from '../../../components/component/Input/FullInput'
+import { RequiredBadge } from '../../../components/component/Label/RequiredBadge'
+import { Card } from '../../../components/component/Card/Card'
+import { LinkButtons } from '../../../components/component/Button/LinkButtons'
+import ProtectedRoute from '../../../components/ProtectedRoute'
+import { AccountRole } from '../../../types/account'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { NoteDetailResponse, UpdateNoteRequest } from '../../../types/note'
+import { noteApi } from '../../../api/Note/NoteApi'
+import { Buttons } from '../../../components/component/Button/Button'
+import { ReferenceVideo } from '../../../components/component/video/referenceVideo'
+import { MypracticeVideo } from '../../../components/component/video/mypracticeVideo'
+import { useAuth } from '../../../contexts/AuthContext'
+import { NoteValidationErrors, validateEditNote, validateMyVideo } from '../../validation/CreateNoteValidation'
 
-const EditNote = () => {
+function EditNoteContent() {
   const { user } = useAuth()
   const firebase_uid = user?.uid
-  const params = useParams()
+  const searchParams = useSearchParams()
   const router = useRouter()
-  const note_id = params.id as string
+  const note_id = searchParams.get('id')
   const myVideoInputRef = useRef<HTMLInputElement>(null)
 
   const [noteDetail, setNoteDetail] = useState<NoteDetailResponse | null>(null)
@@ -66,7 +62,7 @@ const EditNote = () => {
       setLoading(true)
       setError(null)
       if (!note_id) {
-        setError('該当するIDが見つかりません')
+        setError('ノートIDが指定されていません')
         setLoading(false)
         return
       }
@@ -271,12 +267,19 @@ const EditNote = () => {
 
     try {
       setError(null)
+      // note_idの型安全性チェック
+      if (!note_id) {
+        setError('ノートIDが取得できません')
+        setIsSubmitting(false)
+        return
+      }
+
       await noteApi.updateNote(note_id, {
         ...formData,
       })
 
       alert('ノートの更新に成功しました！')
-      router.push(`/Player/NoteDetail/${note_id}`)
+      router.push(`/Player/NoteDetail?id=${note_id}`)
     } catch (error) {
       console.error('ノート更新エラー', error)
       setError('ノートの更新に失敗しました')
@@ -494,7 +497,7 @@ const EditNote = () => {
                         )}
                       </div>
                       <div className="flex justify-center space-x-5 mt-5">
-                        <LinkButtons href={`/Player/NoteDetail/${note_id}`} className="text-lg">
+                        <LinkButtons href={`/Player/NoteDetail?id=${note_id}`} className="text-lg">
                           詳細画面に戻る
                         </LinkButtons>
                         <Buttons type="submit" className="text-lg" disabled={isSubmitting}>
@@ -510,6 +513,17 @@ const EditNote = () => {
           <Footer />
         </div>
       </div>
+    </ProtectedRoute>
+  )
+}
+
+// 🔄 変更点8: Suspenseラッパーコンポーネント
+const EditNote = () => {
+  return (
+    <ProtectedRoute requiredRole={AccountRole.PLAYER} authRequired={true}>
+      <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+        <EditNoteContent />
+      </Suspense>
     </ProtectedRoute>
   )
 }

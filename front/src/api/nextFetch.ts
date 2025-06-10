@@ -1,6 +1,5 @@
-import { getSession } from 'next-auth/react'
 import type { NextApiRequest } from 'next'
-import { auth } from '@/auth'
+import { auth } from '../app/firebase/config'
 
 type RequestConfig = Pick<NextApiRequest, 'method' | 'url'> & {
   params?: Record<string, any>
@@ -21,19 +20,19 @@ export const nextFetch = <T>(config: RequestConfig, options?: RequestInit): Prom
 
   const fetchWithAuth = async () => {
     try {
-      const isServer = typeof window === 'undefined'
-      const session = isServer ? await auth() : await getSession()
-
-      if (!session?.accessToken) {
+      const user = auth.currentUser
+      if (!user) {
         throw new Error('認証情報が見つかりません')
       }
+
+      const accessToken = await user.getIdToken()
 
       const fetchOptions: RequestInit = {
         ...options,
         method: config.method,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${session?.accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
           ...config.headers,
           ...options?.headers,
         },
