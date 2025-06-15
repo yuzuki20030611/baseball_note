@@ -40,28 +40,30 @@ app = FastAPI(
 )
 app_manager = FastAPIAppManager(root_app=app)
 
+# allow_origins=[
+#         "http://localhost:3000",
+#         "http://localhost:8080",
+#         "https://fcb8-112-71-191-8.ngrok-free.app",
+#         "https://cloud.dify.ai",
+#         "*",
+#     ],  # Next.jsのURL
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:8080",
-        "https://fcb8-112-71-191-8.ngrok-free.app",
-        "https://cloud.dify.ai",
-        "*",
-    ],  # Next.jsのURL
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# アップロードディレクトリの作成
-os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+# # アップロードディレクトリの作成
+# os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 
-# 静的ファイル配信の設定（アップロードした画像を配信するため）
-app.mount(
-    f"/{settings.UPLOAD_DIR}",
-    StaticFiles(directory=settings.UPLOAD_DIR),
-    name=settings.UPLOAD_DIR,
-)
+# # 静的ファイル配信の設定（アップロードした画像を配信するため）
+# app.mount(
+#     f"/{settings.UPLOAD_DIR}",
+#     StaticFiles(directory=settings.UPLOAD_DIR),
+#     name=settings.UPLOAD_DIR,
+# )
 
 
 if settings.SENTRY_SDK_DNS:
@@ -75,6 +77,16 @@ if settings.SENTRY_SDK_DNS:
 @app.get("/", tags=["info"])
 def get_info() -> dict[str, str]:
     return {"title": settings.TITLE, "version": settings.VERSION}
+
+
+@app.get("/")
+async def root():
+    return {"status": "healthy", "message": "Baseball Note Backend API"}
+
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
 
 
 # debugモード時はfastapi-tool-barを有効化する
@@ -118,5 +130,5 @@ if __name__ == "__main__":
     import uvicorn
 
     # 環境変数 'PORT' からポート番号を取得。デフォルトは80
-    port = int(os.environ.get("PORT", 80))
+    port = int(os.environ.get("PORT", 8080))
     uvicorn.run("app.main:app", host="0.0.0.0", port=port)
