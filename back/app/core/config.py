@@ -22,11 +22,11 @@ class Settings(BaseSettings):
     ]
     BASE_DIR_PATH: str = str(Path(__file__).parent.parent.absolute())
     ROOT_DIR_PATH: str = str(Path(__file__).parent.parent.parent.absolute())
-    DB_HOST: str
-    DB_PORT: str
-    DB_NAME: str
-    DB_USER_NAME: str
-    DB_PASSWORD: str
+    DB_HOST: str = "dummy"
+    DB_PORT: str = "5432"
+    DB_NAME: str = "dummy"
+    DB_USER_NAME: str = "dummy"
+    DB_PASSWORD: str = "dummy"
     API_GATEWAY_STAGE_PATH: str = ""
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     SECRET_KEY: str = "secret"
