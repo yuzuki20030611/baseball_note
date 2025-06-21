@@ -19,14 +19,15 @@ class Settings(BaseSettings):
         "http://127.0.0.1:8000",
         "http://localhost:3000",
         "http://localhost:3333",
+        "https://baseball-note-backend-218218207988.asia-northeast1.run.app",  # ← これを追加（必須）
     ]
     BASE_DIR_PATH: str = str(Path(__file__).parent.parent.absolute())
     ROOT_DIR_PATH: str = str(Path(__file__).parent.parent.parent.absolute())
-    DB_HOST: str = "dummy"
+    DB_HOST: str = ""
     DB_PORT: str = "5432"
-    DB_NAME: str = "dummy"
-    DB_USER_NAME: str = "dummy"
-    DB_PASSWORD: str = "dummy"
+    DB_NAME: str = ""
+    DB_USER_NAME: str = ""
+    DB_PASSWORD: str = ""
     API_GATEWAY_STAGE_PATH: str = ""
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     SECRET_KEY: str = "secret"
@@ -47,13 +48,13 @@ class Settings(BaseSettings):
             return (
                 "postgresql+asyncpg://"
                 f"{self.DB_USER_NAME}:{self.DB_PASSWORD}@"
-                f"{self.DB_HOST}/{self.DB_NAME}"
+                f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
             )
         else:
             return (
                 "postgresql://"
                 f"{self.DB_USER_NAME}:{self.DB_PASSWORD}@"
-                f"{self.DB_HOST}/{self.DB_NAME}"
+                f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
             )
 
     model_config = SettingsConfigDict(env_file=".env")
