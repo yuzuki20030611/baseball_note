@@ -14,13 +14,17 @@ echo "PYTHONPATH: ${PYTHONPATH}"
 # Port setting
 export PORT=${PORT:-8080}
 
-# Database migration (production only)
-if [ "${ENV}" = "production" ]; then
-    echo "Running database migrations..."
-    alembic upgrade head
-else
-    echo "Skipping migrations (not production environment)"
-fi
+# マイグレーションを完全にスキップ（テーブルは既に存在するため）
+echo "Skipping database migrations (tables already exist)"
+
+# テーブルがない場合はこちらを使用する
+# # Database migration (production only)
+# if [ "${ENV}" = "production" ]; then
+#     echo "Running database migrations..."
+#     alembic upgrade head
+# else
+#     echo "Skipping migrations (not production environment)"
+# fi
 
 # Application startup
 echo "Starting FastAPI application on port $PORT..."
