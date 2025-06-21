@@ -70,6 +70,15 @@ const LoginPage = () => {
     }
   }
 
+  // デモアカウント自動入力機能
+  const fillDemoAccount = (email: string, password: string) => {
+    setFormData({
+      email: email,
+      password: password,
+    })
+    setError(null) // エラーをクリア
+  }
+
   return (
     <ProtectedRoute authRequired={false}>
       <div className="min-h-screen flex flex-col">
@@ -123,6 +132,68 @@ const LoginPage = () => {
                     パスワードをお忘れの方
                   </Link>
                 </p>
+                {/* デモアカウント情報 */}
+                <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <h3 className="text-lg font-semibold text-blue-800 mb-4">⚾ デモアカウント</h3>
+
+                  <div className="space-y-3">
+                    {/* 選手用アカウント */}
+                    <div
+                      className="bg-white p-3 rounded-md shadow-sm border border-blue-100 cursor-pointer hover:shadow-md transition-shadow"
+                      onClick={() => fillDemoAccount('tatarayuzuki@icloud.com', 'aaaa1111')}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center">
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 mr-2">
+                            選手
+                          </span>
+                          <span className="font-medium text-gray-700">選手用アカウント</span>
+                        </div>
+                        <span className="text-xs text-blue-500 font-medium">クリックで入力</span>
+                      </div>
+                      <div className="text-sm space-y-1">
+                        <p className="text-gray-600">
+                          <span className="font-medium">メール:</span>
+                          <span className="ml-1 text-blue-600 font-mono">tatarayuzuki@icloud.com</span>
+                        </p>
+                        <p className="text-gray-600">
+                          <span className="font-medium">パスワード:</span>
+                          <span className="ml-1 text-blue-600 font-mono">aaaa1111</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 監督用アカウント */}
+                    <div
+                      className="bg-white p-3 rounded-md shadow-sm border border-blue-100 cursor-pointer hover:shadow-md transition-shadow"
+                      onClick={() => fillDemoAccount('tatarayuzuki1113@gmail.com', 'aaaa1111')}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center">
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 mr-2">
+                            監督
+                          </span>
+                          <span className="font-medium text-gray-700">監督用アカウント</span>
+                        </div>
+                        <span className="text-xs text-blue-500 font-medium">クリックで入力</span>
+                      </div>
+                      <div className="text-sm space-y-1">
+                        <p className="text-gray-600">
+                          <span className="font-medium">メール:</span>
+                          <span className="ml-1 text-blue-600 font-mono">tatarayuzuki1113@gmail.com</span>
+                        </p>
+                        <p className="text-gray-600">
+                          <span className="font-medium">パスワード:</span>
+                          <span className="ml-1 text-blue-600 font-mono">aaaa1111</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-blue-600 mt-3 italic text-center">
+                    💡 アカウントをクリックすると自動入力されます
+                  </p>
+                </div>
               </div>
             </form>
           </Card>
