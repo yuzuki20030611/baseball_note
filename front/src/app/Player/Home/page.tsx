@@ -24,7 +24,7 @@ const PlayerHome = () => {
   const [notesLoading, setNotesLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [page, setPage] = useState(1)
-  const ITEMS_PER_PAGE = 20
+  const ITEMS_PER_PAGE = 3
   const canGoBack = page > 1
 
   const firebase_uid = user?.uid || ''
