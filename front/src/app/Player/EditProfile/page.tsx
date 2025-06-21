@@ -367,7 +367,7 @@ const EditProfile = () => {
                         <RequiredBadge />
                       </Label>
                       <select
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                        className="w-full px-4 py-2 border border-2 border-solid border-black rounded-md"
                         value={playerDominant}
                         onChange={handlePlayerDominantChange}
                       >
@@ -388,7 +388,7 @@ const EditProfile = () => {
                         <RequiredBadge />
                       </Label>
                       <select
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                        className="w-full px-4 py-2 border border-2 border-solid border-black rounded-md"
                         value={playerPosition}
                         onChange={handlePlayerPositionChange}
                       >

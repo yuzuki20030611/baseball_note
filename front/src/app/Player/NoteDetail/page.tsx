@@ -4,7 +4,6 @@ import React, { Suspense, useEffect, useState } from 'react'
 
 import { Header } from '../../../components/component/Header/Header'
 import { PageTitle } from '../../../components/component/Title/PageTitle'
-import { Buttons } from '../../../components/component/Button/Button'
 import { Footer } from '../../../components/component/Footer/Footer'
 import { Label } from '../../../components/component/Label/Label'
 import { InfoItem } from '../../../components/component/InfoItem/InfoItem'
@@ -17,6 +16,7 @@ import { NoteDetailResponse } from '../../../types/note'
 import { noteApi } from '../../../api/Note/NoteApi'
 import { MypracticeVideo } from '../../../components/component/video/mypracticeVideo'
 import { ReferenceVideo } from '../../../components/component/video/referenceVideo'
+import { ClickButtons } from '../../../components/component/Button/ClickButtons'
 
 function PlayerNoteDetailContent() {
   const searchParams = useSearchParams()
@@ -111,9 +111,9 @@ function PlayerNoteDetailContent() {
                         <LinkButtons href={`/Player/EditNote?id=${note_id}`} className="text-lg">
                           編集
                         </LinkButtons>
-                        <Buttons fontSize="18px" onClick={handleDelete}>
+                        <ClickButtons onClick={handleDelete} className="text-lg">
                           削除
-                        </Buttons>
+                        </ClickButtons>
                       </div>
                     </div>
                     <div className="space-y-2 mb-3">
