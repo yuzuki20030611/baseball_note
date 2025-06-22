@@ -106,13 +106,7 @@ function NoteListContent() {
               <div className="text-right px-5 py-2">
                 <p className="text-2xl mt-3">指導者</p>
               </div>
-              <table className="w-full table-fixed border-collapse">
-                <colgroup>
-                  <col className="w-[20%]" /> {/* 日付 - 幅を増やす */}
-                  <col className="w-[35%]" /> {/* 本日のテーマ - 幅を増やす */}
-                  <col className="w-[35%]" /> {/* 課題 - 幅を増やす */}
-                  <col className="w-[10%]" /> {/* 詳細 */}
-                </colgroup>
+              <table className="w-full">
                 <thead className="bg-gray-100 bg-opacity-80 border border-b-2 border-gray-300">
                   <tr>
                     <th className="px-1 py-3 text-center text-xl font-semibold text-gray-700">日付</th>
@@ -133,16 +127,14 @@ function NoteListContent() {
                       <tr key={note.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 text-center text-sm text-gray-600">{formatDate(note.created_at)}</td>
                         <td className="px-6 py-4 text-center text-sm text-gray-600">
-                          <div className="truncate mx-auto" title={note.theme}>
-                            {note.theme}
-                          </div>
+                          <div className="truncate mx-auto">{note.theme}</div>
                         </td>
                         <td className="px-6 py-4 text-center text-sm text-gray-600">
                           <div className="truncate mx-auto" title={note.assignment || ''}>
                             {note.assignment || ''}
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-center w-[100px]">
+                        <td className="px-6 py-4 text-center">
                           <LinkButtons href={`/Coach/NoteDetail?note_id=${note.id}`} width="100px" className="text-md">
                             詳細
                           </LinkButtons>

@@ -11,16 +11,19 @@ logger = get_logger(__name__)
 router = APIRouter()
 
 
-# ヘルパー関数: 全テーブル情報の取得
-def get_all_table_data(db: Session, limit: int = 5) -> Dict[str, List[Dict[str, Any]]]:
+def get_all_table_data(db: Session) -> Dict[str, List[Dict[str, Any]]]:
     """
-    システム内の全テーブルデータを取得する軽量版ヘルパー関数
-    料金対策：各テーブルのデータ件数を制限
+    システム内の全テーブルデータを取得する関数
     """
 
-    # 全ユーザー情報（最新のみ制限）
+    # 全ユーザー情報（削除されたものも含む）
     users = []
-    user_records = db.query(Users).order_by(Users.created_at.desc()).limit(limit).all()
+    user_records = (
+        db.query(Users)
+        .execution_options(include_deleted=True)  # 削除済みデータも含める
+        .order_by(Users.created_at.desc())
+        .all()
+    )
     for user in user_records:
         users.append(
             {
@@ -28,17 +31,26 @@ def get_all_table_data(db: Session, limit: int = 5) -> Dict[str, List[Dict[str, 
                 "firebase_uid": user.firebase_uid,
                 "email": user.email,
                 "role": user.role,
+                "deleted_at": user.deleted_at.isoformat()
+                if user.deleted_at
+                else None,  # 削除日時を追加
+                "created_at": user.created_at.isoformat() if user.created_at else None,
+                "updated_at": user.updated_at.isoformat() if user.updated_at else None,
             }
         )
 
-    # 全プロフィール情報（最新のみ制限）
+    # 全プロフィール情報（削除されたものも含む）
     profiles = []
     profile_records = (
-        db.query(Profiles).order_by(Profiles.created_at.desc()).limit(limit).all()
+        db.query(Profiles)
+        .execution_options(include_deleted=True)  # 削除済みデータも含める
+        .order_by(Profiles.created_at.desc())
+        .all()
     )
     for profile in profile_records:
         profiles.append(
             {
+                "id": str(profile.id),
                 "user_id": str(profile.user_id),
                 "name": profile.name,
                 "team_name": profile.team_name,
@@ -46,68 +58,84 @@ def get_all_table_data(db: Session, limit: int = 5) -> Dict[str, List[Dict[str, 
                 "dominant_hand": profile.player_dominant,
                 "birthday": profile.birthday.isoformat() if profile.birthday else None,
                 "admired_player": profile.admired_player,
-                # 長いテキストは文字数制限
-                "introduction": profile.introduction[:200] + "..."
-                if profile.introduction and len(profile.introduction) > 200
-                else profile.introduction,
+                "introduction": profile.introduction,
+                "created_at": profile.created_at.isoformat()
+                if profile.created_at
+                else None,
+                "updated_at": profile.updated_at.isoformat()
+                if profile.updated_at
+                else None,
             }
         )
 
-    # 全ノート情報（最新のみ制限 + 文字数制限）
+    # 全ノート情報（削除されたものも含む）
     notes = []
-    note_records = db.query(Notes).order_by(Notes.created_at.desc()).limit(limit).all()
+    note_records = (
+        db.query(Notes)
+        .execution_options(include_deleted=True)  # 削除済みデータも含める
+        .order_by(Notes.created_at.desc())
+        .all()
+    )
     for note in note_records:
         notes.append(
             {
                 "id": str(note.id),
                 "user_id": str(note.user_id),
                 "theme": note.theme,
-                # 長いテキストは文字数制限
-                "assignment": note.assignment[:300] + "..."
-                if note.assignment and len(note.assignment) > 300
-                else note.assignment,
+                "assignment": note.assignment,
                 "weight": float(note.weight) if note.weight else None,
                 "sleep": float(note.sleep) if note.sleep else None,
-                "looked_day": note.looked_day[:200] + "..."
-                if note.looked_day and len(note.looked_day) > 200
-                else note.looked_day,
-                "practice": note.practice[:200] + "..."
-                if note.practice and len(note.practice) > 200
-                else note.practice,
+                "looked_day": note.looked_day,
+                "practice": note.practice,
+                "practice_video": note.practice_video,
+                "my_video": note.my_video,
+                "deleted_at": note.deleted_at.isoformat() if note.deleted_at else None,
+                "created_at": note.created_at.isoformat() if note.created_at else None,
+                "updated_at": note.updated_at.isoformat() if note.updated_at else None,
             }
         )
 
-    # 全トレーニング情報（最新のみ制限 + 文字数制限）
+    # 全トレーニング情報（削除されたものも含む）
     trainings = []
     training_records = (
-        db.query(Trainings).order_by(Trainings.created_at.desc()).limit(limit).all()
+        db.query(Trainings)
+        .execution_options(include_deleted=True)  # 削除済みデータも含める
+        .order_by(Trainings.created_at.desc())
+        .all()
     )
     for training in training_records:
         trainings.append(
             {
                 "id": str(training.id),
                 "user_id": str(training.user_id),
-                # メニューの文字数制限
-                "menu": training.menu[:200] + "..."
-                if training.menu and len(training.menu) > 200
-                else training.menu,
+                "menu": training.menu,
+                "deleted_at": training.deleted_at.isoformat()
+                if training.deleted_at
+                else None,
+                "created_at": training.created_at.isoformat()
+                if training.created_at
+                else None,
             }
         )
 
-    # 全トレーニングノート関連情報（最新のみ制限）
+    # 全トレーニングノート関連情報（削除されたものも含む）
     training_notes = []
     tn_records = (
         db.query(TrainingNotes)
+        .execution_options(include_deleted=True)  # 削除済みデータも含める
         .order_by(TrainingNotes.created_at.desc())
-        .limit(limit)
         .all()
     )
     for tn in tn_records:
         training_notes.append(
             {
+                "id": str(tn.id),
                 "training_id": str(tn.training_id),
                 "note_id": str(tn.note_id),
                 "count": tn.count,
+                "deleted_at": tn.deleted_at.isoformat() if tn.deleted_at else None,
+                "created_at": tn.created_at.isoformat() if tn.created_at else None,
+                "updated_at": tn.updated_at.isoformat() if tn.updated_at else None,
             }
         )
 
@@ -117,22 +145,25 @@ def get_all_table_data(db: Session, limit: int = 5) -> Dict[str, List[Dict[str, 
         "notes": notes,
         "trainings": trainings,
         "training_notes": training_notes,
-        "_metadata": {
-            "limit_applied": limit,
-            "note": "料金最適化のため各テーブル最新{}件のみ表示".format(limit),
-        },
     }
 
 
-# 特定ユーザーの関連データ取得
-def get_user_related_data(db: Session, user_id: str, limit: int = 5) -> Dict[str, Any]:
+def get_user_related_data(
+    db: Session,
+    user_id: str,
+) -> Dict[str, Any]:
     """
-    特定ユーザーの関連データを取得する軽量版ヘルパー関数
+    特定ユーザーの関連データを取得する関数
     """
 
-    # プロフィール情報取得
+    # プロフィール情報取得（削除されたものも含む）
     my_profile = None
-    profile = db.query(Profiles).filter(Profiles.user_id == user_id).first()
+    profile = (
+        db.query(Profiles)
+        .filter(Profiles.user_id == user_id)
+        .execution_options(include_deleted=True)
+        .first()
+    )
     if profile:
         my_profile = {
             "id": str(profile.id),
@@ -142,19 +173,22 @@ def get_user_related_data(db: Session, user_id: str, limit: int = 5) -> Dict[str
             "dominant_hand": profile.player_dominant,
             "birthday": profile.birthday.isoformat() if profile.birthday else None,
             "admired_player": profile.admired_player,
-            # 長いテキストは文字数制限
-            "introduction": profile.introduction[:200] + "..."
-            if profile.introduction and len(profile.introduction) > 200
-            else profile.introduction,
+            "introduction": profile.introduction,
+            "created_at": profile.created_at.isoformat()
+            if profile.created_at
+            else None,
+            "updated_at": profile.updated_at.isoformat()
+            if profile.updated_at
+            else None,
         }
 
-    # ノート情報取得（最新のみ制限 + 文字数制限）
+    # ノート情報取得（削除されたものも含む）
     my_notes = []
     note_records = (
         db.query(Notes)
         .filter(Notes.user_id == user_id)
-        .order_by(Notes.created_at.desc())  # 最新順
-        .limit(limit)  # 件数制限
+        .execution_options(include_deleted=True)
+        .order_by(Notes.created_at.desc())
         .all()
     )
     for note in note_records:
@@ -162,57 +196,62 @@ def get_user_related_data(db: Session, user_id: str, limit: int = 5) -> Dict[str
             {
                 "id": str(note.id),
                 "theme": note.theme,
-                # 長いテキストは文字数制限（料金対策）
-                "assignment": note.assignment[:300] + "..."
-                if note.assignment and len(note.assignment) > 300
-                else note.assignment,
+                "assignment": note.assignment,
                 "weight": float(note.weight) if note.weight else None,
                 "sleep": float(note.sleep) if note.sleep else None,
-                "looked_day": note.looked_day[:200] + "..."
-                if note.looked_day and len(note.looked_day) > 200
-                else note.looked_day,
-                "practice": note.practice[:200] + "..."
-                if note.practice and len(note.practice) > 200
-                else note.practice,
+                "looked_day": note.looked_day,
+                "practice": note.practice,
+                "practice_video": note.practice_video,
+                "my_video": note.my_video,
+                "deleted_at": note.deleted_at.isoformat() if note.deleted_at else None,
+                "created_at": note.created_at.isoformat() if note.created_at else None,
+                "updated_at": note.updated_at.isoformat() if note.updated_at else None,
             }
         )
 
-    # トレーニング情報取得（最新のみ制限 + 文字数制限）
+    # トレーニング情報取得（削除されたものも含む）
     my_trainings = []
     training_records = (
         db.query(Trainings)
         .filter(Trainings.user_id == user_id)
-        .order_by(Trainings.created_at.desc())  # 最新順
-        .limit(limit)  # 件数制限
+        .execution_options(include_deleted=True)
+        .order_by(Trainings.created_at.desc())
         .all()
     )
     for training in training_records:
         my_trainings.append(
             {
                 "id": str(training.id),
-                # メニューの文字数制限
-                "menu": training.menu[:200] + "..."
-                if training.menu and len(training.menu) > 200
-                else training.menu,
+                "menu": training.menu,
+                "deleted_at": training.deleted_at.isoformat()
+                if training.deleted_at
+                else None,
+                "created_at": training.created_at.isoformat()
+                if training.created_at
+                else None,
             }
         )
 
-    # トレーニングノート関連情報（最新のみ制限）
+    # トレーニングノート関連情報（削除されたものも含む）
     my_training_notes = []
     training_note_records = (
         db.query(TrainingNotes)
         .join(Notes, TrainingNotes.note_id == Notes.id)
         .filter(Notes.user_id == user_id)
-        .order_by(TrainingNotes.created_at.desc())  # 最新順
-        .limit(limit)  # 件数制限
+        .execution_options(include_deleted=True)
+        .order_by(TrainingNotes.created_at.desc())
         .all()
     )
     for tn in training_note_records:
         my_training_notes.append(
             {
+                "id": str(tn.id),
                 "training_id": str(tn.training_id),
                 "note_id": str(tn.note_id),
                 "count": tn.count,
+                "deleted_at": tn.deleted_at.isoformat() if tn.deleted_at else None,
+                "created_at": tn.created_at.isoformat() if tn.created_at else None,
+                "updated_at": tn.updated_at.isoformat() if tn.updated_at else None,
             }
         )
 
@@ -221,34 +260,26 @@ def get_user_related_data(db: Session, user_id: str, limit: int = 5) -> Dict[str
         "notes": my_notes,
         "trainings": my_trainings,
         "training_notes": my_training_notes,
-        "_metadata": {
-            "limit_applied": limit,
-            "note": "料金最適化のため各データ最新{}件のみ表示".format(limit),
-        },
     }
 
 
 @router.get("/data", response_model=Dict[str, Any])
 async def get_user_data(
     firebase_uid: str = Query(..., description="Firebase UID of the user"),
-    limit: int = Query(
-        default=5, ge=1, le=50, description="取得件数制限（デフォルト5件、最大50件）"
-    ),
     db: Session = Depends(get_db),
 ):
     """
     特定ユーザーの情報を取得するエンドポイント
     Difyチャットボットで使用します
-
-    料金最適化：
-    - デフォルト5件、最大50件まで制限
-    - 長いテキストは文字数制限
-    - 最新データ優先で取得
     """
-    logger.info(f"Dify APIリクエスト: firebase_uid={firebase_uid}, limit={limit}")
 
-    # ユーザーが存在するか確認
-    user = db.query(Users).filter(Users.firebase_uid == firebase_uid).first()
+    # ユーザーが存在するか確認（削除されたユーザーも含む）
+    user = (
+        db.query(Users)
+        .filter(Users.firebase_uid == firebase_uid)
+        .execution_options(include_deleted=True)
+        .first()
+    )
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -258,34 +289,25 @@ async def get_user_data(
         "firebase_uid": user.firebase_uid,
         "email": user.email,
         "role": user.role,
+        "deleted_at": user.deleted_at.isoformat() if user.deleted_at else None,
+        "created_at": user.created_at.isoformat() if user.created_at else None,
+        "updated_at": user.updated_at.isoformat() if user.updated_at else None,
     }
 
     # ヘルパー関数を使用してユーザー関連データを取得
-    my_data = get_user_related_data(db, user.id, limit)
+    my_data = get_user_related_data(db, user.id)
 
     return {"current_user": current_user, "my_data": my_data}
 
 
 @router.get("/all-data", response_model=Dict[str, Any])
 async def get_all_data(
-    limit: int = Query(
-        default=5,
-        ge=1,
-        le=50,
-        description="各テーブルの取得件数制限（デフォルト5件、最大50件）",
-    ),
     db: Session = Depends(get_db),
 ):
     """
-    全データを取得するエンドポイント（軽量版）
+    全データを取得するエンドポイント
     Difyチャットボットで使用します
-
-    料金最適化：
-    - 各テーブルデフォルト5件、最大50件まで制限
-    - 長いテキストは文字数制限
-    - 最新データ優先で取得
     """
-    logger.info(f"Dify API 全データリクエスト: limit={limit}")
 
     # ヘルパー関数を使用して全テーブル情報を取得
-    return get_all_table_data(db, limit)
+    return get_all_table_data(db)
